@@ -110,7 +110,7 @@
   <header>
     <div>
       <h1>CappinCheck Demo Gallery</h1>
-      <p>Pre-generated static reports showing different claim-audit outcomes on public AI model documents.</p>
+      <p>Pre-generated static reports: real AI model launch docs plus one careful supported control.</p>
     </div>
     <p><code>Document -> Claims -> Audit Report</code></p>
   </header>
@@ -122,28 +122,32 @@
   <script>
     const examples = [
       {
-        label: 'Real Public Report',
-        badge: 'context',
+        label: 'Google Gemini 3.5',
+        badge: 'mixed',
         href: 'gemini_35_flash_report.html',
-        summary: 'Live Gemini run on Google’s Gemini 3.5 announcement, contrasted against the official DeepMind model card. Best headline artifact for showing real public input.'
+        summary: 'Live Gemini run on Google’s Gemini 3.5 announcement, contrasted against the official DeepMind model card. Best headline artifact for showing real public input.',
+        command: 'cappincheck audit https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-5/ --contrast --reference https://deepmind.google/models/model-cards/gemini-3-5-flash --contrast-top 2 --limit 4 --out examples/gemini_35_flash_report.md --json examples/gemini_35_flash_report.json --html examples/gemini_35_flash_report.html'
       },
       {
         label: 'Anthropic Sonnet 4.5',
         badge: 'overstated',
         href: 'anthropic_sonnet_45_report.html',
-        summary: 'Live Gemini run on Anthropic’s Claude Sonnet 4.5 launch page. Shows a broad “best coding model” claim being narrowed against provided Anthropic references and Gemini-discovered evidence.'
+        summary: 'Live Gemini run on Anthropic’s Claude Sonnet 4.5 launch page. Shows a broad “best coding model” claim being narrowed against provided Anthropic references and Gemini-discovered evidence.',
+        command: 'cappincheck audit https://www.anthropic.com/news/claude-sonnet-4-5 --contrast --reference https://www.anthropic.com/claude-sonnet-4-5-system-card --reference https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy --contrast-top 1 --limit 1 --out examples/anthropic_sonnet_45_report.md --json examples/anthropic_sonnet_45_report.json --html examples/anthropic_sonnet_45_report.html'
       },
       {
         label: 'xAI Grok 3 Proxy',
-        badge: 'context',
+        badge: 'missing_context',
         href: 'xai_grok3_report.html',
-        summary: 'Live Gemini run on a local source proxy for the xAI Grok 3 launch page, because the official xAI page is Cloudflare-blocked to the CLI fetcher. Official xAI, leaderboard, LiveCodeBench, and Stanford transparency URLs are preserved as references.'
+        summary: 'Live Gemini run on a local source proxy for the xAI Grok 3 launch page, because the official xAI page is Cloudflare-blocked to the CLI fetcher. Official xAI, leaderboard, LiveCodeBench, and Stanford transparency URLs are preserved as references.',
+        command: 'cappincheck audit examples/xai_grok3_launch_input.md --contrast --reference https://x.ai/news/grok-3 --reference https://lmarena.ai/?leaderboard= --reference https://livecodebench.github.io/ --reference https://crfm.stanford.edu/fmti/December-2025/company-reports/xAI_FinalReport_FMTI2025.html --contrast-top 1 --limit 1 --out examples/xai_grok3_report.md --json examples/xai_grok3_report.json --html examples/xai_grok3_report.html'
       },
       {
         label: 'Careful Scientific Claim',
         badge: 'supported',
         href: 'careful_report.html',
-        summary: 'Shows the non-cynical state: a scoped document with correct percentage-point wording and explicit limitations remains supported.'
+        summary: 'Shows the non-cynical state: a scoped document with correct percentage-point wording and explicit limitations remains supported.',
+        command: 'cappincheck audit examples/careful_document.md --mock --profile --out examples/careful_report.md --json examples/careful_report.json --html examples/careful_report.html'
       }
     ];
     let selected = 0;
@@ -153,7 +157,7 @@
     function cls(value) {
       if (value === 'supported') return 'supported';
       if (value === 'overstated') return 'overstated';
-      if (value === 'context') return 'context';
+      if (value === 'context' || value === 'mixed' || value === 'missing_context') return 'context';
       return '';
     }
     function render() {
