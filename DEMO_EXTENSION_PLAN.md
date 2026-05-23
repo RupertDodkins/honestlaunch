@@ -16,6 +16,13 @@ Already present or in progress:
 - Numeric calibration for the planted `84.1% -> 87.3%` / `30% improvement` demo.
 - Static HTML dashboard with filters/source rendering.
 
+Current evidence behavior:
+
+- The verifier searches for and returns `supporting_evidence`.
+- The contradiction finder searches for and returns `counter_evidence` plus `missing_context`.
+- The report renders these as evidence lists in the right-side evidence stack.
+- This is useful, but it is not yet an explicit side-by-side source comparison.
+
 ## Product Decision
 
 Build **Evidence Contrast Mode** before any broader Claim Drift mode.
@@ -67,6 +74,8 @@ Acceptance criteria:
 
 ## Evidence Contrast Mode
 
+Evidence Contrast Mode is the explicit "claim vs existing docs" feature. It should not merely add more evidence snippets. It should show, for each selected claim, the contrast between the document wording and the best available source wording.
+
 ### User Experience
 
 Add optional flags to the existing audit command:
@@ -110,6 +119,25 @@ The contrast card answers:
 - What did the best source actually say?
 - Is the source narrower, broader, contradictory, or not checkable?
 - What is the safest defensible rewrite?
+
+Example card shape:
+
+```text
+Claim says:
+"Our method generalizes across real-world domains."
+
+Best source says:
+"Evaluated on three curated benchmark datasets."
+
+Delta:
+The claim generalizes benchmark evidence into real-world deployment language.
+
+Verdict:
+overstated / missing_context
+
+Defensible rewrite:
+"The method improved performance on three curated benchmarks; real-world deployment was not tested."
+```
 
 ### Schema
 
@@ -320,4 +348,3 @@ Core demo sentence:
 > Search grounding finds candidate evidence, URL Context reads the sources, Code Execution or local calibration checks numbers, and structured outputs turn it into a reusable claim ledger.
 
 Keep the serious artifact first. The playful language is garnish.
-

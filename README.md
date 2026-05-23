@@ -2,9 +2,9 @@
 
 Grounded adversarial claim audit for dense expert documents.
 
-CappinCheck reads a paper, model report, technical blog post, or other dense expert document, extracts the riskiest factual claims, then dispatches specialist verifier agents to decide whether each claim is no cap, sus, cap, or needs receipts.
+CappinCheck reads a paper, model report, technical blog post, or other dense expert document, extracts the riskiest factual claims, then dispatches specialist verifier agents to produce a structured evidence ledger.
 
-It is not a paper summarizer. The output is a claim ledger: original wording, formal verdict, evidence, counter-evidence, cap score, and the strongest defensible rewrite.
+It is not a paper summarizer. The output is a claim ledger: original wording, formal verdict, supporting evidence found, contradictions or narrowing evidence, missing context, numeric findings, and the strongest defensible rewrite.
 
 ## Why Low-Latency Gemini
 
@@ -56,7 +56,7 @@ For a real/public source placeholder that avoids copying copyrighted text into t
 
 1. Run the deterministic mock command above.
 2. Open `examples/demo_report.html`.
-3. Point out the claim ledger: verdict, cap score, evidence, missing context, and rewrite.
+3. Point out the claim ledger: formal verdict, supporting evidence found, contradictions/narrowing evidence, missing context, and rewrite.
 4. Highlight the numeric calibration row: the source says `84.1%` to `87.3%`, so the defensible improvement is `3.2` points / `3.8%` relative, not `30%`.
 5. If `GEMINI_API_KEY` is available, rerun without `--mock` and compare the live grounded report to the deterministic fallback.
 
@@ -69,9 +69,23 @@ Each audited claim includes:
 - Formal verdict: `supported`, `overstated`, `missing_context`, `contradicted`, or `not_checkable`
 - Vibe verdict: `no cap`, `mostly no cap`, `sus`, `cap`, or `needs receipts`
 - Cap score from `0` to `100`
-- Supporting evidence
-- Counter-evidence and missing context
+- Supporting evidence found
+- Contradictions / narrowing evidence
+- Missing context
 - Strongest defensible rewrite
+
+## Planned: Evidence Contrast Mode
+
+The current report shows evidence lists: verifier support, contradiction/narrowing evidence, and missing context. The next planned mode is sharper: for selected claims, CappinCheck will discover authoritative public sources with Google Search grounding, read those sources with URL Context, and render a side-by-side contrast card:
+
+```text
+Claim says: ...
+Best source says: ...
+Delta: narrower_than_claim / missing_context / contradicted / not_checkable
+Defensible rewrite: ...
+```
+
+This is documented in `DEMO_EXTENSION_PLAN.md`. Evidence Contrast Mode is the intended answer to "show me exactly where the claim differs from existing docs."
 
 ## Limitations
 
