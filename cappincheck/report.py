@@ -17,12 +17,12 @@ def write_markdown(report: AuditReport, path: Path) -> None:
         "",
         f"Source: `{report.document.source}`",
         "",
-        "| Claim | Formal Verdict | Confidence | Vibe | Cap Score |",
-        "| --- | --- | --- | --- | ---: |",
+        "| Claim | Formal Verdict | Confidence | Stretch Score |",
+        "| --- | --- | --- | ---: |",
     ]
     for audit in report.audits:
         lines.append(
-            f"| {audit.claim.claim} | {audit.verdict.value} | {audit.confidence} | {audit.vibe} | {audit.cap_score} |"
+            f"| {audit.claim.claim} | {audit.verdict.value} | {audit.confidence} | {audit.cap_score} |"
         )
 
     for audit in report.audits:
@@ -273,11 +273,7 @@ def write_html(report: AuditReport, path: Path) -> None:
         <h2>Claim Ledger</h2>
         <span class="hint" tabindex="0" data-tip="Each row is a risky factual claim extracted from the document. Click one to inspect the audit.">?</span>
       </div>
-      <div class="filters">
-        <label>Vibe
-          <span class="hint" tabindex="0" data-tip="Memorable verdict: no cap means supported; sus means missing context; cap means overstated or contradicted; needs receipts means not checkable.">?</span>
-          <select id="vibe-filter" onchange="filters.vibe=this.value; syncSelection(); render();"></select>
-        </label>
+      <div class="filters single">
         <label>Verdict
           <span class="hint" tabindex="0" data-tip="Formal verdict used in JSON/Markdown: supported, overstated, missing context, contradicted, or not checkable.">?</span>
           <select id="verdict-filter" onchange="filters.verdict=this.value; syncSelection(); render();"></select>
@@ -295,19 +291,17 @@ def write_html(report: AuditReport, path: Path) -> None:
     </section>
     <section>
       <div class="title-row">
-        <h2>Evidence Stack</h2>
-        <span class="hint" tabindex="0" data-tip="Evidence is split into support, counter-evidence, and missing context so the verdict can be inspected.">?</span>
+        <h2>Sources Checked</h2>
+        <span class="hint" tabindex="0" data-tip="Sources checked includes contrast references, supporting evidence, narrowing evidence, and missing context.">?</span>
       </div>
       <div id="evidence"></div>
-      <h3>Raw JSON</h3>
-      <pre id="raw"></pre>
     </section>
   </main>
   <script>
     const report = {data};
     let selected = 0;
-    const filters = {{ vibe: 'all', verdict: 'all' }};
-    const cls = (vibe) => String(vibe).replaceAll(' ', '-');
+    const filters = {{ verdict: 'all' }};
+    const cls = (value) => String(value).replaceAll('_', '-').replaceAll(' ', '-');
     const confidenceScore = {{ low: 34, medium: 67, high: 100 }};
     const esc = (value) => String(value ?? '').replace(/[&<>"']/g, char => ({{
       '&': '&amp;',
@@ -327,10 +321,8 @@ def write_html(report: AuditReport, path: Path) -> None:
     const hint = (text) => `<span class="hint" tabindex="0" data-tip="${{esc(text)}}">?</span>`;
     const filteredAudits = () => report.audits
       .map((audit, index) => ({{ ...audit, __index: index }}))
-      .filter(audit => filters.vibe === 'all' || audit.vibe === filters.vibe)
       .filter(audit => filters.verdict === 'all' || audit.verdict === filters.verdict);
     function setupFilters() {{
-      fillSelect('vibe-filter', 'All vibes', [...new Set(report.audits.map(audit => audit.vibe))]);
       fillSelect('verdict-filter', 'All verdicts', [...new Set(report.audits.map(audit => audit.verdict))]);
     }}
     function fillSelect(id, allLabel, values) {{
@@ -349,17 +341,15 @@ def write_html(report: AuditReport, path: Path) -> None:
       document.getElementById('claim-list').innerHTML = audits.map((audit, i) => `
         <button class="claim-row ${{audit.__index === selected ? 'active' : ''}}" onclick="selected=${{audit.__index}}; render();">
           <div class="claim-meta">
-            <span class="badge ${{cls(audit.vibe)}}">${{esc(audit.vibe)}}</span>
             <span class="muted">${{esc(audit.verdict)}} · ${{esc(audit.claim.claim_type)}}</span>
           </div>
           <div class="wrap">${{esc(audit.claim.claim)}}</div>
-          <div class="meter ${{cls(audit.vibe)}}" title="Cap score ${{audit.cap_score}} / 100"><div style="width: ${{audit.cap_score}}%"></div></div>
+          <div class="meter ${{cls(audit.verdict)}}" title="Stretch score ${{audit.cap_score}} / 100"><div style="width: ${{audit.cap_score}}%"></div></div>
         </button>
       `).join('');
       if (!audits.length) {{
         document.getElementById('claim-detail').innerHTML = '<div class="panel"><p class="muted">No claims match the selected filters.</p></div>';
         document.getElementById('evidence').innerHTML = '';
-        document.getElementById('raw').textContent = '';
         return;
       }}
       const audit = audits.find(item => item.__index === selected) ?? audits[0];
@@ -368,49 +358,104 @@ def write_html(report: AuditReport, path: Path) -> None:
       const confidence = confidenceScore[audit.confidence] ?? 0;
       document.getElementById('claim-detail').innerHTML = `
         <div class="panel">
-          <span class="badge ${{cls(audit.vibe)}}">${{esc(audit.vibe)}}</span>
           <strong>Formal verdict: ${{esc(audit.verdict)}}</strong>
-          ${{hint(vibeTip(audit.vibe))}}
           <div class="score"><div style="width: ${{audit.cap_score}}%"></div></div>
           <p class="muted">
             Confidence: ${{esc(audit.confidence)}} ${{hint('Confidence reflects how strongly the available evidence supports this verdict, not whether the original claim is true.')}}
-            · Cap Score: ${{audit.cap_score}} / 100 ${{hint('Higher means the original wording stretches further beyond what the evidence supports.')}}
+            · Stretch Score: ${{audit.cap_score}} / 100 ${{hint('Higher means the original wording stretches further beyond what the evidence supports.')}}
             · Evidence items: ${{evidenceCount}} ${{hint('Evidence items are supporting or counter-evidence records attached to this claim.')}}
           </p>
           <div class="strength-grid">
-            ${{strengthCard('Cap pressure', audit.cap_score, audit.vibe, `${{audit.cap_score}}/100`, 'How much the wording outruns the evidence.')}}
-            ${{strengthCard('Confidence', confidence, audit.vibe, esc(audit.confidence), 'How confident CappinCheck is in this verdict from available evidence.')}}
-            ${{strengthCard('Evidence depth', evidenceScore, audit.vibe, `${{evidenceCount}} item${{evidenceCount === 1 ? '' : 's'}}`, 'How much direct evidence is attached to this claim audit.')}}
+            ${{strengthCard('Stretch pressure', audit.cap_score, audit.verdict, `${{audit.cap_score}}/100`, 'How much the wording outruns the evidence.')}}
+            ${{strengthCard('Confidence', confidence, audit.verdict, esc(audit.confidence), 'How confident CappinCheck is in this verdict from available evidence.')}}
+            ${{strengthCard('Evidence depth', evidenceScore, audit.verdict, `${{evidenceCount}} item${{evidenceCount === 1 ? '' : 's'}}`, 'How much direct evidence is attached to this claim audit.')}}
           </div>
         </div>
         <div class="panel"><h3>Original</h3><p class="wrap">${{esc(audit.claim.claim)}}</p></div>
+        ${{contrastCard(audit.contrast)}}
         <div class="panel"><h3>Defensible Rewrite</h3><p class="wrap">${{esc(audit.weaker_supported_rewrite)}}</p></div>
         <div class="panel"><h3>Why</h3><p class="wrap">${{esc(audit.why)}}</p></div>
         <div class="panel"><h3>Numeric Findings</h3>${{list(audit.numeric_findings)}}</div>
       `;
       document.getElementById('evidence').innerHTML = `
+        ${{sourcesChecked(audit.contrast)}}
         <div class="panel"><h3>Supporting Evidence Found</h3>${{items(audit.supporting_evidence)}}</div>
         <div class="panel"><h3>Contradictions / Narrowing Evidence</h3>${{items(audit.counter_evidence)}}</div>
         <div class="panel"><h3>Missing Context</h3>${{list(audit.missing_context)}}</div>
       `;
-      document.getElementById('raw').textContent = JSON.stringify(audit, null, 2);
     }}
-    function strengthCard(label, value, vibe, display, tip) {{
+    function strengthCard(label, value, verdict, display, tip) {{
       return `
         <div class="strength-card">
           <div class="strength-label"><span>${{label}} ${{hint(tip)}}</span><span>${{display}}</span></div>
-          <div class="meter ${{cls(vibe)}}"><div style="width: ${{value}}%"></div></div>
+          <div class="meter ${{cls(verdict)}}"><div style="width: ${{value}}%"></div></div>
         </div>
       `;
     }}
-    function vibeTip(vibe) {{
-      return {{
-        'no cap': 'The claim appears supported as written.',
-        'mostly no cap': 'The claim is basically supported, with small caveats.',
-        'sus': 'The claim may be plausible, but important context or scope limits are missing.',
-        'cap': 'The claim is materially overstated, contradicted, or numerically stretched.',
-        'needs receipts': 'The claim cannot be checked from available evidence.'
-      }}[vibe] || 'Audit verdict label.';
+    function contrastCard(contrast) {{
+      if (!contrast) return '';
+      const best = contrast.best_sources?.[0];
+      const sourceSummary = best ? best.evidence_summary : 'No usable reference source was available.';
+      const qualification = best?.key_qualification ? `<p><strong>Key qualification:</strong> ${{esc(best.key_qualification)}}</p>` : '';
+      return `
+        <div class="panel">
+          <h3>Evidence Contrast</h3>
+          <p><strong>Claim says:</strong> <span class="wrap">${{esc(contrast.claim_text)}}</span></p>
+          <p><strong>Best reference says:</strong> <span class="wrap">${{esc(sourceSummary)}}</span></p>
+          ${{qualification}}
+          <p><strong>Delta:</strong> ${{esc(contrast.delta_type)}} — ${{esc(contrast.delta_explanation)}}</p>
+          <p><strong>Final verdict:</strong> ${{esc(contrast.recommended_verdict)}} · Confidence: ${{esc(contrast.confidence)}}</p>
+          <p><strong>Defensible rewrite:</strong> <span class="wrap">${{esc(contrast.suggested_rewrite)}}</span></p>
+        </div>
+      `;
+    }}
+    function sourcesChecked(contrast) {{
+      if (!contrast) return '<div class="panel"><h3>Evidence Contrast References</h3><p class="muted">No contrast references checked for this claim.</p></div>';
+      const references = contrast.reference_sources || [];
+      const best = contrast.best_sources || [];
+      return `
+        <div class="panel">
+          <h3>Evidence Contrast References</h3>
+          ${{referenceItems(references)}}
+        </div>
+        <div class="panel">
+          <h3>Reference Snippets / Mismatches</h3>
+          ${{contrastSourceItems(best)}}
+        </div>
+      `;
+    }}
+    function referenceItems(values) {{
+      if (!values.length) return '<p class="muted">None recorded.</p>';
+      return values.map(item => {{
+        const href = safeHref(item.url);
+        const source = href
+          ? `<a href="${{esc(href)}}" target="_blank" rel="noopener noreferrer">${{esc(item.url)}}</a>`
+          : `<span class="muted">${{esc(item.url || 'No URL recorded')}}</span>`;
+        return `
+          <div class="source-item">
+            <p><strong>${{esc(item.title)}}</strong> <span class="muted">(${{esc(item.source_type)}} · authority ${{item.authority_score}}/100)</span></p>
+            <p class="wrap">${{source}}</p>
+            <p class="muted wrap">${{esc(item.why_relevant || '')}}</p>
+          </div>
+        `;
+      }}).join('');
+    }}
+    function contrastSourceItems(values) {{
+      if (!values.length) return '<p class="muted">None recorded.</p>';
+      return values.map(item => {{
+        const href = safeHref(item.url);
+        const source = href
+          ? `<a href="${{esc(href)}}" target="_blank" rel="noopener noreferrer">${{esc(item.url)}}</a>`
+          : `<span class="muted">${{esc(item.url || 'No URL recorded')}}</span>`;
+        return `
+          <div class="source-item">
+            <p><strong>${{esc(item.title)}}</strong> <span class="muted">(${{esc(item.stance)}})</span></p>
+            <p class="wrap">${{esc(item.evidence_summary)}}</p>
+            <p class="wrap">${{source}}</p>
+            <p class="muted wrap">${{esc(item.key_qualification || '')}}</p>
+          </div>
+        `;
+      }}).join('');
     }}
     function list(values) {{
       if (!values.length) return '<p class="muted">None recorded.</p>';
@@ -449,17 +494,17 @@ def _audit_markdown(audit: ClaimAudit) -> list[str]:
         "",
         f"**Confidence:** {audit.confidence}",
         "",
-        f"**Vibe:** {audit.vibe}",
-        "",
         f"**Original:** {audit.claim.claim}",
         "",
-        f"**Cap Score:** {audit.cap_score}/100",
+        f"**Stretch Score:** {audit.cap_score}/100",
         "",
         f"**Why:** {audit.why}",
         "",
         f"**Defensible rewrite:** {audit.weaker_supported_rewrite}",
         "",
     ]
+    if audit.contrast:
+        lines.extend(_contrast_markdown(audit))
     if audit.numeric_findings:
         lines.append("**Numeric findings:**")
         lines.extend(f"- {finding}" for finding in audit.numeric_findings)
@@ -475,6 +520,60 @@ def _audit_markdown(audit: ClaimAudit) -> list[str]:
     if audit.missing_context:
         lines.append("**Missing context:**")
         lines.extend(f"- {item}" for item in audit.missing_context)
+        lines.append("")
+    return lines
+
+
+def _contrast_markdown(audit: ClaimAudit) -> list[str]:
+    contrast = audit.contrast
+    if not contrast:
+        return []
+    lines = [
+        "### Evidence Contrast",
+        "",
+        f"**Claim says:** {contrast.claim_text}",
+        "",
+    ]
+    if contrast.best_sources:
+        best = contrast.best_sources[0]
+        lines.extend(
+            [
+                f"**Best reference says:** {best.evidence_summary}",
+                "",
+            ]
+        )
+        if best.key_qualification:
+            lines.extend([f"**Key qualification:** {best.key_qualification}", ""])
+    else:
+        lines.extend(["**Best reference says:** No usable reference source was available.", ""])
+    lines.extend(
+        [
+            f"**Delta:** {contrast.delta_type} — {contrast.delta_explanation}",
+            "",
+            f"**Final verdict:** {contrast.recommended_verdict.value}",
+            "",
+            f"**Defensible rewrite:** {contrast.suggested_rewrite}",
+            "",
+            "### Sources Checked",
+            "",
+        ]
+    )
+    if contrast.reference_sources:
+        for source in contrast.reference_sources:
+            lines.append(
+                f"- {source.title} ({source.source_type}, authority {source.authority_score}/100): {source.url}. "
+                f"{source.why_relevant}"
+            )
+        lines.append("")
+    else:
+        lines.extend(["- None recorded.", ""])
+    if contrast.best_sources:
+        lines.append("**Reference snippets / mismatches:**")
+        for source in contrast.best_sources:
+            lines.append(
+                f"- {source.evidence_summary} ({source.title}, {source.stance}, {source.url}). "
+                f"{source.key_qualification}"
+            )
         lines.append("")
     return lines
 

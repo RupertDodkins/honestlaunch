@@ -29,8 +29,20 @@ def audit(
     limit: int = typer.Option(5, "--limit", min=1, max=12, help="Number of claims to audit."),
     runtime: str = typer.Option("local", "--runtime", help="Runtime adapter: local or managed."),
     mock: bool = typer.Option(False, "--mock", help="Run deterministic no-key demo mode."),
+    contrast: bool = typer.Option(False, "--contrast", help="Compare top claims against reference URLs."),
+    reference: list[str] | None = typer.Option(
+        None,
+        "--reference",
+        help="Reference URL for Evidence Contrast Mode. Repeat for multiple sources.",
+    ),
+    contrast_top: int = typer.Option(2, "--contrast-top", min=1, max=8, help="Number of claims to contrast."),
 ) -> None:
     """Audit risky factual claims in a dense document."""
+    if runtime not in {"local", "managed"}:
+        raise typer.BadParameter("--runtime must be local or managed")
+    reference_urls = reference or []
+    if contrast and not mock and not reference_urls:
+        raise typer.BadParameter("--contrast requires at least one --reference URL unless --mock is used.")
     document = load_document(source)
     typer.echo(f"Loaded: {document.title}")
     typer.echo("Extracting risky claims...")
@@ -40,10 +52,19 @@ def audit(
         _fail_with_context("claim extraction", exc)
     typer.echo(f"Extracted {len(claims)} risky claims.")
     typer.echo(f"Auditing top {min(limit, len(claims))} claims...")
-    if runtime not in {"local", "managed"}:
-        raise typer.BadParameter("--runtime must be local or managed")
     try:
-        audits = asyncio.run(audit_claims(document, claims, mock=mock, limit=limit, runtime=runtime))
+        audits = asyncio.run(
+            audit_claims(
+                document,
+                claims,
+                mock=mock,
+                limit=limit,
+                runtime=runtime,
+                contrast=contrast,
+                reference_urls=reference_urls,
+                contrast_top=contrast_top,
+            )
+        )
     except Exception as exc:
         _fail_with_context("claim audit", exc)
     report = AuditReport(document=document, claims=claims, audits=audits)

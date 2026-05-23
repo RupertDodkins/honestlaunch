@@ -2,21 +2,19 @@
 
 Source: `examples/demo_document.md`
 
-| Claim | Formal Verdict | Confidence | Vibe | Cap Score |
-| --- | --- | --- | --- | ---: |
-| Our method improves performance by 30% over prior work on real-world tasks. | overstated | high | cap | 88 |
-| The system robustly generalizes across domains. | missing_context | medium | sus | 64 |
-| This is the first agentic workflow for scientific claim auditing. | missing_context | medium | sus | 64 |
+| Claim | Formal Verdict | Confidence | Stretch Score |
+| --- | --- | --- | ---: |
+| Our method improves performance by 30% over prior work on real-world tasks. | overstated | high | 88 |
+| The system robustly generalizes across domains. | missing_context | medium | 64 |
+| This is the first agentic workflow for scientific claim auditing. | missing_context | medium | 64 |
 
 ## c1: overstated
 
 **Confidence:** high
 
-**Vibe:** cap
-
 **Original:** Our method improves performance by 30% over prior work on real-world tasks.
 
-**Cap Score:** 88/100
+**Stretch Score:** 88/100
 
 **Why:** The reported benchmark numbers show improvement, but the stated 30% improvement does not match the arithmetic and the evidence is a curated benchmark, not real-world tasks.
 
@@ -37,11 +35,9 @@ Source: `examples/demo_document.md`
 
 **Confidence:** medium
 
-**Vibe:** sus
-
 **Original:** The system robustly generalizes across domains.
 
-**Cap Score:** 64/100
+**Stretch Score:** 64/100
 
 **Why:** The claim may be plausible, but the demo document does not provide enough scope or external evidence.
 
@@ -55,11 +51,9 @@ Source: `examples/demo_document.md`
 
 **Confidence:** medium
 
-**Vibe:** sus
-
 **Original:** This is the first agentic workflow for scientific claim auditing.
 
-**Cap Score:** 64/100
+**Stretch Score:** 64/100
 
 **Why:** The claim may be plausible, but the demo document does not provide enough scope or external evidence.
 

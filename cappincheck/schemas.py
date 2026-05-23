@@ -28,6 +28,27 @@ class Verdict(str, Enum):
 
 Vibe = Literal["no cap", "mostly no cap", "sus", "cap", "needs receipts"]
 Confidence = Literal["low", "medium", "high"]
+SourceType = Literal[
+    "official_doc",
+    "paper",
+    "standard",
+    "dataset",
+    "benchmark",
+    "government",
+    "academic",
+    "vendor_doc",
+    "blog",
+    "unknown",
+]
+SourceStance = Literal["supports", "narrows", "contradicts", "irrelevant", "unclear"]
+DeltaType = Literal[
+    "same",
+    "narrower_than_claim",
+    "broader_than_claim",
+    "missing_context",
+    "contradicted",
+    "not_checkable",
+]
 
 
 class Document(BaseModel):
@@ -63,6 +84,34 @@ class AgentAudit(BaseModel):
     numeric_findings: list[str] = Field(default_factory=list)
 
 
+class ReferenceSource(BaseModel):
+    url: str
+    title: str = "Reference source"
+    source_type: SourceType = "unknown"
+    why_relevant: str = ""
+    authority_score: int = Field(default=50, ge=0, le=100)
+
+
+class ContrastSource(BaseModel):
+    url: str
+    title: str = "Reference source"
+    stance: SourceStance = "unclear"
+    evidence_summary: str
+    key_qualification: str = ""
+
+
+class EvidenceContrast(BaseModel):
+    claim_id: str
+    claim_text: str
+    reference_sources: list[ReferenceSource] = Field(default_factory=list)
+    best_sources: list[ContrastSource] = Field(default_factory=list)
+    delta_type: DeltaType = "not_checkable"
+    delta_explanation: str
+    suggested_rewrite: str
+    recommended_verdict: Verdict = Verdict.NOT_CHECKABLE
+    confidence: Confidence = "medium"
+
+
 class ClaimAudit(BaseModel):
     claim: RiskyClaim
     verdict: Verdict
@@ -75,10 +124,10 @@ class ClaimAudit(BaseModel):
     counter_evidence: list[EvidenceItem] = Field(default_factory=list)
     missing_context: list[str] = Field(default_factory=list)
     numeric_findings: list[str] = Field(default_factory=list)
+    contrast: EvidenceContrast | None = None
 
 
 class AuditReport(BaseModel):
     document: Document
     claims: list[RiskyClaim]
     audits: list[ClaimAudit]
-

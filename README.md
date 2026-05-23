@@ -4,7 +4,7 @@ Grounded adversarial claim audit for dense expert documents.
 
 CappinCheck reads an AI model report, paper, technical blog post, or other dense expert document, extracts the riskiest factual claims, then dispatches specialist verifier agents to produce a structured evidence ledger.
 
-It is not a paper summarizer. The output is a claim ledger: original wording, formal verdict, supporting evidence found, contradictions or narrowing evidence, missing context, numeric findings, and the strongest defensible rewrite.
+It is not a paper summarizer. The output is a claim ledger: original wording, formal verdict, evidence contrast against references, supporting evidence found, contradictions or narrowing evidence, missing context, numeric findings, and the strongest defensible rewrite.
 
 ## Why Low-Latency Gemini
 
@@ -37,12 +37,33 @@ open examples/demo_report.html
 
 The deterministic fixture is `examples/demo_document.md`; use `--mock` for public demos when API access is unavailable or live grounding is flaky.
 
+Run the no-key Evidence Contrast demo:
+
+```bash
+cappincheck audit examples/demo_document.md --mock --contrast --contrast-top 2 --out examples/contrast_demo.md --json examples/contrast_demo.json --html examples/contrast_demo.html
+open examples/contrast_demo.html
+```
+
 Run with Gemini:
 
 ```bash
 export GEMINI_API_KEY=...
 cappincheck audit examples/demo_document.md --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
 ```
+
+Run Evidence Contrast against explicit reference URLs:
+
+```bash
+cappincheck audit examples/demo_document.md \
+  --contrast \
+  --reference https://example.org/benchmark-x-report \
+  --contrast-top 2 \
+  --out examples/contrast_live.md \
+  --json examples/contrast_live.json \
+  --html examples/contrast_live.html
+```
+
+V1 uses explicit `--reference` URLs for reliability. Automatic reference discovery is intentionally deferred.
 
 Run the experimental managed runtime:
 
@@ -56,9 +77,9 @@ For a real/public source placeholder that avoids copying copyrighted text into t
 
 1. Run the deterministic mock command above.
 2. Open `examples/demo_report.html`.
-3. Point out the claim ledger: formal verdict, supporting evidence found, contradictions/narrowing evidence, missing context, and rewrite.
-4. Highlight the numeric calibration row: the source says `84.1%` to `87.3%`, so the defensible improvement is `3.2` points / `3.8%` relative, not `30%`.
-5. If `GEMINI_API_KEY` is available, rerun without `--mock` and compare the live grounded report to the deterministic fallback.
+3. Point out the claim ledger: formal verdict, Evidence Contrast, Sources Checked, missing context, and rewrite.
+4. Highlight the numeric contrast row: the source says `84.1%` to `87.3%`, so the defensible improvement is `3.2` points / `3.8%` relative, not `30%`.
+5. If `GEMINI_API_KEY` is available, rerun with `--contrast --reference ...` and compare the live grounded report to the deterministic fallback.
 
 ## Output
 
@@ -67,15 +88,17 @@ Each audited claim includes:
 - Original claim
 - Claim type
 - Formal verdict: `supported`, `overstated`, `missing_context`, `contradicted`, or `not_checkable`
-- Cap score from `0` to `100`
+- Stretch score from `0` to `100`
+- Evidence Contrast against explicit reference URLs when `--contrast` is enabled
+- Sources Checked with reference URLs, snippets, and mismatch notes
 - Supporting evidence found
 - Contradictions / narrowing evidence
 - Missing context
 - Strongest defensible rewrite
 
-## Planned: Evidence Contrast Mode
+## Evidence Contrast Mode
 
-The current report shows evidence lists: verifier support, contradiction/narrowing evidence, and missing context. The next planned mode is sharper: for selected claims, CappinCheck will compare the claim against user-provided reference URLs with URL Context and render a side-by-side contrast card:
+Evidence Contrast Mode compares selected claims against user-provided reference URLs with URL Context and renders a side-by-side contrast card:
 
 ```text
 Claim says: ...
@@ -86,12 +109,12 @@ Defensible rewrite: ...
 
 This is documented in `DEMO_EXTENSION_PLAN.md`. Evidence Contrast Mode is the intended answer to "show me exactly where the claim differs from existing docs."
 
-Planned report layout:
+Report layout:
 
 - `Evidence Contrast`: the demo-facing side-by-side card: claim wording, reference wording, delta, final verdict, and defensible rewrite.
 - `Sources Checked`: expandable reference URLs, snippets, and mismatch notes underneath for inspection.
 
-Reference discovery with Google Search grounding is a v2 extension. The first version should prioritize explicit `--reference` URLs for demo reliability.
+Reference discovery with Google Search grounding is a v2 extension. The first version prioritizes explicit `--reference` URLs for demo reliability.
 
 ## Limitations
 
