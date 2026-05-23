@@ -1,0 +1,104 @@
+{
+  "document": {
+    "title": "Needs Receipts Demo",
+    "source": "examples/needs_receipts_document.md",
+    "text": "# Needs Receipts Demo\n\n## Abstract\n\nUsers strongly prefer CappinCheck over existing review tools. CappinCheck is the first tool to audit scientific claims with agents.\n\n## Deployment\n\nCappinCheck is safe for production use in regulated environments.\n\n## Evidence\n\nThis short document intentionally does not include a user study, benchmark, safety evaluation, production deployment study, prior-work comparison, or external validation.\n\n"
+  },
+  "claims": [
+    {
+      "id": "receipts_1",
+      "claim": "Users strongly prefer CappinCheck over existing review tools.",
+      "claim_type": "other",
+      "source_location": "Abstract",
+      "why_risky": "Preference claims need user study data or survey evidence.",
+      "audit_question": "Does the document report a user study, sample size, or preference measurement?"
+    },
+    {
+      "id": "receipts_2",
+      "claim": "CappinCheck is safe for production use in regulated environments.",
+      "claim_type": "safety",
+      "source_location": "Deployment",
+      "why_risky": "Safety and regulated-production claims require concrete validation and scope.",
+      "audit_question": "Does the document provide safety evaluation, threat model, or deployment evidence?"
+    },
+    {
+      "id": "receipts_3",
+      "claim": "CappinCheck is the first tool to audit scientific claims with agents.",
+      "claim_type": "novelty",
+      "source_location": "Introduction",
+      "why_risky": "First/novelty claims require prior-work search.",
+      "audit_question": "Does the document provide a literature or product comparison supporting the firstness claim?"
+    }
+  ],
+  "audits": [
+    {
+      "claim": {
+        "id": "receipts_1",
+        "claim": "Users strongly prefer CappinCheck over existing review tools.",
+        "claim_type": "other",
+        "source_location": "Abstract",
+        "why_risky": "Preference claims need user study data or survey evidence.",
+        "audit_question": "Does the document report a user study, sample size, or preference measurement?"
+      },
+      "verdict": "not_checkable",
+      "vibe": "needs receipts",
+      "confidence": "medium",
+      "cap_score": 58,
+      "why": "The claim may be true, but the document does not provide the evidence needed to audit it.",
+      "weaker_supported_rewrite": "The document presents this as an aspiration or positioning claim, not an evidenced result.",
+      "supporting_evidence": [],
+      "counter_evidence": [],
+      "missing_context": [
+        "No measurement method is reported.",
+        "No sample size, benchmark, user study, or external validation is attached to the claim."
+      ],
+      "numeric_findings": []
+    },
+    {
+      "claim": {
+        "id": "receipts_2",
+        "claim": "CappinCheck is safe for production use in regulated environments.",
+        "claim_type": "safety",
+        "source_location": "Deployment",
+        "why_risky": "Safety and regulated-production claims require concrete validation and scope.",
+        "audit_question": "Does the document provide safety evaluation, threat model, or deployment evidence?"
+      },
+      "verdict": "not_checkable",
+      "vibe": "needs receipts",
+      "confidence": "medium",
+      "cap_score": 72,
+      "why": "The claim may be true, but the document does not provide the evidence needed to audit it.",
+      "weaker_supported_rewrite": "The document presents this as an aspiration or positioning claim, not an evidenced result.",
+      "supporting_evidence": [],
+      "counter_evidence": [],
+      "missing_context": [
+        "No measurement method is reported.",
+        "No sample size, benchmark, user study, or external validation is attached to the claim."
+      ],
+      "numeric_findings": []
+    },
+    {
+      "claim": {
+        "id": "receipts_3",
+        "claim": "CappinCheck is the first tool to audit scientific claims with agents.",
+        "claim_type": "novelty",
+        "source_location": "Introduction",
+        "why_risky": "First/novelty claims require prior-work search.",
+        "audit_question": "Does the document provide a literature or product comparison supporting the firstness claim?"
+      },
+      "verdict": "not_checkable",
+      "vibe": "needs receipts",
+      "confidence": "medium",
+      "cap_score": 58,
+      "why": "The claim may be true, but the document does not provide the evidence needed to audit it.",
+      "weaker_supported_rewrite": "The document presents this as an aspiration or positioning claim, not an evidenced result.",
+      "supporting_evidence": [],
+      "counter_evidence": [],
+      "missing_context": [
+        "No measurement method is reported.",
+        "No sample size, benchmark, user study, or external validation is attached to the claim."
+      ],
+      "numeric_findings": []
+    }
+  ]
+}

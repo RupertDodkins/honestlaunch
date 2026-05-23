@@ -12,7 +12,7 @@ class ClaimSet(BaseModel):
 
 def extract_claims(document: Document, *, mock: bool, limit: int = 8) -> list[RiskyClaim]:
     if mock:
-        return _mock_claims()
+        return _mock_claims(document)[:limit]
 
     client = GeminiClient()
     prompt = f"""
@@ -34,7 +34,12 @@ DOCUMENT:
     return client.structured(prompt, ClaimSet, tools=False).claims[:limit]
 
 
-def _mock_claims() -> list[RiskyClaim]:
+def _mock_claims(document: Document | None = None) -> list[RiskyClaim]:
+    text = (document.text if document else "").lower()
+    if "careful scientific claim" in text:
+        return _careful_claims()
+    if "needs receipts" in text:
+        return _needs_receipts_claims()
     return [
         RiskyClaim(
             id="c1",
@@ -59,5 +64,66 @@ def _mock_claims() -> list[RiskyClaim]:
             source_location="Introduction",
             why_risky="First/novelty claims require broad literature comparison.",
             audit_question="Does prior work include similar scientific fact-checking or claim-audit systems?",
+        ),
+    ]
+
+
+def _careful_claims() -> list[RiskyClaim]:
+    return [
+        RiskyClaim(
+            id="careful_1",
+            claim=(
+                "CappinCheck improved from 84.1% to 87.3% on Benchmark X, "
+                "a 3.2 percentage-point gain under the benchmark conditions."
+            ),
+            claim_type=ClaimType.NUMERIC,
+            source_location="Results",
+            why_risky="Numeric claims are worth checking even when they appear carefully scoped.",
+            audit_question="Do the reported table values support the stated absolute improvement?",
+        ),
+        RiskyClaim(
+            id="careful_2",
+            claim="The evaluation does not establish real-world deployment performance.",
+            claim_type=ClaimType.DEPLOYMENT,
+            source_location="Limitations",
+            why_risky="This is a caveat claim; the audit should preserve it if the document states the limitation.",
+            audit_question="Does the document explicitly limit the conclusion to benchmark evaluation?",
+        ),
+        RiskyClaim(
+            id="careful_3",
+            claim="The result is limited to the curated Benchmark X dataset.",
+            claim_type=ClaimType.GENERALIZATION,
+            source_location="Discussion",
+            why_risky="Scope-limiting claims should be supported by the document's evaluation description.",
+            audit_question="Does the document avoid broad generalization beyond Benchmark X?",
+        ),
+    ]
+
+
+def _needs_receipts_claims() -> list[RiskyClaim]:
+    return [
+        RiskyClaim(
+            id="receipts_1",
+            claim="Users strongly prefer CappinCheck over existing review tools.",
+            claim_type=ClaimType.OTHER,
+            source_location="Abstract",
+            why_risky="Preference claims need user study data or survey evidence.",
+            audit_question="Does the document report a user study, sample size, or preference measurement?",
+        ),
+        RiskyClaim(
+            id="receipts_2",
+            claim="CappinCheck is safe for production use in regulated environments.",
+            claim_type=ClaimType.SAFETY,
+            source_location="Deployment",
+            why_risky="Safety and regulated-production claims require concrete validation and scope.",
+            audit_question="Does the document provide safety evaluation, threat model, or deployment evidence?",
+        ),
+        RiskyClaim(
+            id="receipts_3",
+            claim="CappinCheck is the first tool to audit scientific claims with agents.",
+            claim_type=ClaimType.NOVELTY,
+            source_location="Introduction",
+            why_risky="First/novelty claims require prior-work search.",
+            audit_question="Does the document provide a literature or product comparison supporting the firstness claim?",
         ),
     ]

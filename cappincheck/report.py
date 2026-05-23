@@ -8,7 +8,7 @@ from .schemas import AuditReport, ClaimAudit
 
 
 def write_json(report: AuditReport, path: Path) -> None:
-    path.write_text(report.model_dump_json(indent=2), encoding="utf-8")
+    path.write_text(report.model_dump_json(indent=2, exclude_none=True), encoding="utf-8")
 
 
 def write_markdown(report: AuditReport, path: Path) -> None:
@@ -32,7 +32,7 @@ def write_markdown(report: AuditReport, path: Path) -> None:
 
 
 def write_html(report: AuditReport, path: Path) -> None:
-    data = json.dumps(report.model_dump(), indent=2).replace("</", "<\\/")
+    data = json.dumps(report.model_dump(exclude_none=True), indent=2).replace("</", "<\\/")
     markup = f"""<!doctype html>
 <html lang="en">
 <head>

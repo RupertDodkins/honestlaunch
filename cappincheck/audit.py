@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 from pydantic import BaseModel, Field
 
+from .contrast import apply_contrast
 from .gemini import GeminiClient
 from .numeric import calibrate_numeric_claim
 from .schemas import AgentAudit, ClaimAudit, Document, EvidenceItem, RiskyClaim, Verdict
@@ -24,15 +25,36 @@ async def audit_claims(
     mock: bool,
     limit: int = 5,
     runtime: str = "local",
+    contrast: bool = False,
+    reference_urls: list[str] | None = None,
+    contrast_top: int = 2,
 ) -> list[ClaimAudit]:
     if runtime not in {"local", "managed"}:
         raise ValueError("runtime must be local or managed")
     selected = claims[:limit]
     if mock:
-        return [_mock_audit(claim) for claim in selected]
+        audits = [_mock_audit(document, claim) for claim in selected]
+        if contrast:
+            return await apply_contrast(
+                document,
+                audits,
+                mock=True,
+                reference_urls=reference_urls or [],
+                contrast_top=contrast_top,
+            )
+        return audits
 
     per_claim = await asyncio.gather(*[_audit_one(document, claim, runtime=runtime) for claim in selected])
-    return list(per_claim)
+    audits = list(per_claim)
+    if contrast:
+        return await apply_contrast(
+            document,
+            audits,
+            mock=False,
+            reference_urls=reference_urls or [],
+            contrast_top=contrast_top,
+        )
+    return audits
 
 
 async def _audit_one(document: Document, claim: RiskyClaim, *, runtime: str) -> ClaimAudit:
@@ -113,7 +135,11 @@ Specialist agent results:
     return await asyncio.to_thread(client.structured, prompt, ClaimAudit)
 
 
-def _mock_audit(claim: RiskyClaim) -> ClaimAudit:
+def _mock_audit(document: Document, claim: RiskyClaim) -> ClaimAudit:
+    if claim.id.startswith("careful_"):
+        return _mock_careful_audit(claim)
+    if claim.id.startswith("receipts_"):
+        return _mock_needs_receipts_audit(claim)
     if claim.id == "c1":
         supporting = [
             EvidenceItem(
@@ -162,6 +188,57 @@ def _mock_audit(claim: RiskyClaim) -> ClaimAudit:
         supporting_evidence=[],
         counter_evidence=[],
         missing_context=["Additional external grounding would be needed for a production verdict."],
+        numeric_findings=[],
+    )
+
+
+def _mock_careful_audit(claim: RiskyClaim) -> ClaimAudit:
+    supporting = [
+        EvidenceItem(
+            source_title="Careful document benchmark table",
+            url=None,
+            snippet="Baseline: 84.1%. CappinCheck: 87.3%. The document calls this a 3.2 percentage-point gain.",
+            relevance="The source wording matches the table and keeps the scope limited to Benchmark X.",
+        )
+    ]
+    if claim.id == "careful_1":
+        numeric_findings = [
+            "Absolute gain: 87.3 - 84.1 = 3.2 percentage points.",
+            "Relative gain: (3.2 / 84.1) * 100 = 3.8%.",
+            "The document uses percentage-point wording, so the numeric claim is properly scoped.",
+        ]
+    else:
+        numeric_findings = []
+    return ClaimAudit(
+        claim=claim,
+        verdict=Verdict.SUPPORTED,
+        vibe="no cap",
+        confidence="high",
+        cap_score=8 if claim.id == "careful_1" else 14,
+        why="The claim is narrow, scoped, and supported by the document's own evidence and caveats.",
+        weaker_supported_rewrite=claim.claim,
+        supporting_evidence=supporting,
+        counter_evidence=[],
+        missing_context=[],
+        numeric_findings=numeric_findings,
+    )
+
+
+def _mock_needs_receipts_audit(claim: RiskyClaim) -> ClaimAudit:
+    return ClaimAudit(
+        claim=claim,
+        verdict=Verdict.NOT_CHECKABLE,
+        vibe="needs receipts",
+        confidence="medium",
+        cap_score=58 if claim.claim_type.value != "safety" else 72,
+        why="The claim may be true, but the document does not provide the evidence needed to audit it.",
+        weaker_supported_rewrite="The document presents this as an aspiration or positioning claim, not an evidenced result.",
+        supporting_evidence=[],
+        counter_evidence=[],
+        missing_context=[
+            "No measurement method is reported.",
+            "No sample size, benchmark, user study, or external validation is attached to the claim.",
+        ],
         numeric_findings=[],
     )
 

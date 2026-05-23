@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CappinCheck Demo Gallery</title>
+  <style>
+    :root {
+      --ink: #1f2328;
+      --muted: #667085;
+      --line: #d0d7de;
+      --bg: #f6f8fa;
+      --panel: #ffffff;
+      --cap: #b42318;
+      --sus: #b54708;
+      --nocap: #067647;
+      --receipts: #344054;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    header {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: 0;
+    }
+    p {
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      padding: 12px 22px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+      overflow-x: auto;
+    }
+    button {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--ink);
+      padding: 9px 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    button.active {
+      border-color: var(--ink);
+      box-shadow: 0 0 0 2px rgba(31,35,40,.08);
+    }
+    .badge {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      color: white;
+      font-size: 12px;
+      background: var(--receipts);
+    }
+    .cap { background: var(--cap); }
+    .sus { background: var(--sus); }
+    .nocap { background: var(--nocap); }
+    .layout {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      min-height: calc(100vh - 122px);
+    }
+    .summary {
+      padding: 14px 22px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--line);
+    }
+    iframe {
+      width: 100%;
+      min-height: 900px;
+      border: 0;
+      background: var(--panel);
+    }
+    code {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 2px 5px;
+    }
+    @media (max-width: 760px) {
+      header {
+        display: block;
+      }
+      iframe {
+        min-height: 1100px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>CappinCheck Demo Gallery</h1>
+      <p>Pre-generated claim-ledger states, plus a live managed-runtime command for the stage demo.</p>
+    </div>
+    <p><code>Document -> Claims -> Audit Report</code></p>
+  </header>
+  <nav class="tabs" id="tabs"></nav>
+  <main class="layout">
+    <section class="summary" id="summary"></section>
+    <iframe id="frame" title="Selected CappinCheck report"></iframe>
+  </main>
+  <script>
+    const examples = [
+      {
+        label: 'Overstated Benchmark',
+        badge: 'cap',
+        href: 'overstated_report.html',
+        summary: 'Shows a numeric/generalization stretch: the document says 30% and real-world tasks, but the table supports 3.8% relative improvement on one benchmark.'
+      },
+      {
+        label: 'Careful Scientific Claim',
+        badge: 'no cap',
+        href: 'careful_report.html',
+        summary: 'Shows the non-cynical state: a scoped document with correct percentage-point wording and explicit limitations stays mostly green.'
+      },
+      {
+        label: 'Needs Receipts',
+        badge: 'needs receipts',
+        href: 'needs_receipts_report.html',
+        summary: 'Shows the unauditable state: claims may be true, but the document provides no user study, safety validation, or prior-work comparison.'
+      },
+      {
+        label: 'Managed Runtime Sample',
+        badge: 'sus',
+        href: 'managed_report.html',
+        summary: 'A one-claim report generated through the experimental Google GenAI Interactions runtime.'
+      }
+    ];
+    let selected = 0;
+    const tabs = document.getElementById('tabs');
+    const frame = document.getElementById('frame');
+    const summary = document.getElementById('summary');
+    function cls(value) {
+      if (value === 'no cap') return 'nocap';
+      if (value === 'cap') return 'cap';
+      if (value === 'sus') return 'sus';
+      return '';
+    }
+    function render() {
+      tabs.innerHTML = examples.map((item, index) => `
+        <button class="${index === selected ? 'active' : ''}" onclick="selected=${index}; render();">
+          ${item.label}<span class="badge ${cls(item.badge)}">${item.badge}</span>
+        </button>
+      `).join('');
+      const item = examples[selected];
+      summary.innerHTML = `
+        <strong>${item.label}</strong>
+        <p>${item.summary}</p>
+        <p>Live command: <code>cappincheck audit examples/demo_document.md --runtime managed --limit 1 --out examples/managed_report.md --json examples/managed_report.json --html examples/managed_report.html</code></p>
+      `;
+      frame.src = item.href;
+    }
+    render();
+  </script>
+</body>
+</html>
+
