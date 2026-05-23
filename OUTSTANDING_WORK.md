@@ -194,7 +194,7 @@ Verification criteria:
 - The report has at least one memorable claim row with:
   - original claim
   - verdict
-  - cap score
+  - stretch score
   - weaker supported rewrite
   - source evidence or missing context
 - README points to both:

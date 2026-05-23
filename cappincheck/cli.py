@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 from pathlib import Path
 
 import typer
@@ -67,7 +68,16 @@ def audit(
         )
     except Exception as exc:
         _fail_with_context("claim audit", exc)
-    report = AuditReport(document=document, claims=claims, audits=audits)
+    report = AuditReport(
+        document=document,
+        claims=claims,
+        audits=audits,
+        runtime=runtime,
+        mode="deterministic_fallback" if mock else "live_gemini",
+        model=None if mock else os.getenv("CLAIMLENS_MODEL", "gemini-3.5-flash"),
+        contrast_enabled=contrast,
+        reference_urls=reference_urls,
+    )
 
     write_markdown(report, out)
     typer.echo(f"Wrote markdown report: {out}")

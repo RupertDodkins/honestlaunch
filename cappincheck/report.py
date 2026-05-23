@@ -17,12 +17,20 @@ def write_markdown(report: AuditReport, path: Path) -> None:
         "",
         f"Source: `{report.document.source}`",
         "",
+        "## Provenance",
+        "",
+        f"- Mode: `{report.mode}`",
+        f"- Runtime: `{report.runtime}`",
+        f"- Model: `{report.model or 'none'}`",
+        f"- Evidence Contrast: `{'enabled' if report.contrast_enabled else 'disabled'}`",
+        f"- Reference URLs: {', '.join(f'`{url}`' for url in report.reference_urls) if report.reference_urls else '`none`'}",
+        "",
         "| Claim | Formal Verdict | Confidence | Stretch Score |",
         "| --- | --- | --- | ---: |",
     ]
     for audit in report.audits:
         lines.append(
-            f"| {audit.claim.claim} | {audit.verdict.value} | {audit.confidence} | {audit.cap_score} |"
+            f"| {audit.claim.claim} | {audit.verdict.value} | {audit.confidence} | {audit.stretch_score} |"
         )
 
     for audit in report.audits:
@@ -46,9 +54,9 @@ def write_html(report: AuditReport, path: Path) -> None:
       --line: #d0d7de;
       --bg: #f6f8fa;
       --panel: #ffffff;
-      --cap: #b42318;
-      --sus: #b54708;
-      --nocap: #067647;
+      --overstated: #b42318;
+      --missing: #b54708;
+      --supported: #067647;
       --receipts: #344054;
     }}
     body {{
@@ -124,10 +132,6 @@ def write_html(report: AuditReport, path: Path) -> None:
       color: white;
       background: var(--receipts);
     }}
-    .badge.cap {{ background: var(--cap); }}
-    .badge.sus {{ background: var(--sus); }}
-    .badge.no-cap, .badge.mostly-no-cap {{ background: var(--nocap); }}
-    .badge.needs-receipts {{ background: var(--receipts); }}
     .hint {{
       display: inline-grid;
       place-items: center;
@@ -190,7 +194,7 @@ def write_html(report: AuditReport, path: Path) -> None:
       overflow: hidden;
       margin-top: 8px;
     }}
-    .score > div {{ height: 100%; background: var(--cap); }}
+    .score > div {{ height: 100%; background: var(--overstated); }}
     .strength-grid {{
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -219,9 +223,9 @@ def write_html(report: AuditReport, path: Path) -> None:
       margin-top: 8px;
     }}
     .meter > div {{ height: 100%; background: var(--receipts); }}
-    .meter.cap > div {{ background: var(--cap); }}
-    .meter.sus > div {{ background: var(--sus); }}
-    .meter.no-cap > div, .meter.mostly-no-cap > div {{ background: var(--nocap); }}
+    .meter.overstated > div, .meter.contradicted > div {{ background: var(--overstated); }}
+    .meter.missing-context > div {{ background: var(--missing); }}
+    .meter.supported > div {{ background: var(--supported); }}
     a {{
       color: var(--receipts);
       font-weight: 700;
@@ -279,7 +283,7 @@ def write_html(report: AuditReport, path: Path) -> None:
       <h1>CappinCheck</h1>
       <div class="muted">{html.escape(report.document.title)}</div>
     </div>
-    <div class="muted">{len(report.audits)} audited claims</div>
+    <div class="muted">{len(report.audits)} audited claims · {html.escape(report.mode)} · {html.escape(report.runtime)}</div>
   </header>
   <main>
     <aside>
@@ -358,7 +362,7 @@ def write_html(report: AuditReport, path: Path) -> None:
             <span class="muted">${{esc(audit.verdict)}} · ${{esc(audit.claim.claim_type)}}</span>
           </div>
           <div class="wrap">${{esc(audit.claim.claim)}}</div>
-          <div class="meter ${{cls(audit.verdict)}}" title="Stretch score ${{audit.cap_score}} / 100"><div style="width: ${{audit.cap_score}}%"></div></div>
+          <div class="meter ${{cls(audit.verdict)}}" title="Stretch score ${{audit.stretch_score}} / 100"><div style="width: ${{audit.stretch_score}}%"></div></div>
         </button>
       `).join('');
       if (!audits.length) {{
@@ -372,15 +376,21 @@ def write_html(report: AuditReport, path: Path) -> None:
       const confidence = confidenceScore[audit.confidence] ?? 0;
       document.getElementById('claim-detail').innerHTML = `
         <div class="panel">
+          <h3>Report Provenance</h3>
+          <p class="wrap"><strong>Mode:</strong> ${{esc(report.mode)}} · <strong>Runtime:</strong> ${{esc(report.runtime)}} · <strong>Model:</strong> ${{esc(report.model || 'none')}}</p>
+          <p class="wrap"><strong>Evidence Contrast:</strong> ${{report.contrast_enabled ? 'enabled' : 'disabled'}}</p>
+          <p class="wrap"><strong>Reference URLs:</strong> ${{(report.reference_urls || []).length ? (report.reference_urls || []).map(esc).join(', ') : 'none'}}</p>
+        </div>
+        <div class="panel">
           <strong>Formal verdict: ${{esc(audit.verdict)}}</strong>
-          <div class="score"><div style="width: ${{audit.cap_score}}%"></div></div>
+          <div class="score"><div style="width: ${{audit.stretch_score}}%"></div></div>
           <p class="muted">
             Confidence: ${{esc(audit.confidence)}} ${{hint('Confidence reflects how strongly the available evidence supports this verdict, not whether the original claim is true.')}}
-            · Stretch Score: ${{audit.cap_score}} / 100 ${{hint('Higher means the original wording stretches further beyond what the evidence supports.')}}
+            · Stretch Score: ${{audit.stretch_score}} / 100 ${{hint('Higher means the original wording stretches further beyond what the evidence supports.')}}
             · Evidence items: ${{evidenceCount}} ${{hint('Evidence items are supporting or counter-evidence records attached to this claim.')}}
           </p>
           <div class="strength-grid">
-            ${{strengthCard('Stretch pressure', audit.cap_score, audit.verdict, `${{audit.cap_score}}/100`, 'How much the wording outruns the evidence.')}}
+            ${{strengthCard('Stretch pressure', audit.stretch_score, audit.verdict, `${{audit.stretch_score}}/100`, 'How much the wording outruns the evidence.')}}
             ${{strengthCard('Confidence', confidence, audit.verdict, esc(audit.confidence), 'How confident CappinCheck is in this verdict from available evidence.')}}
             ${{strengthCard('Evidence depth', evidenceScore, audit.verdict, `${{evidenceCount}} item${{evidenceCount === 1 ? '' : 's'}}`, 'How much direct evidence is attached to this claim audit.')}}
           </div>
@@ -528,7 +538,7 @@ def _audit_markdown(audit: ClaimAudit) -> list[str]:
         "",
         f"**Original:** {audit.claim.claim}",
         "",
-        f"**Stretch Score:** {audit.cap_score}/100",
+        f"**Stretch Score:** {audit.stretch_score}/100",
         "",
         f"**Why:** {audit.why}",
         "",
@@ -623,8 +633,9 @@ def _contrast_markdown(audit: ClaimAudit) -> list[str]:
     )
     if contrast.reference_sources:
         for source in contrast.reference_sources:
+            source_url = source.url or "internal fixture source"
             lines.append(
-                f"- {source.title} ({source.source_type}, authority {source.authority_score}/100): {source.url}. "
+                f"- {source.title} ({source.source_type}, authority {source.authority_score}/100): {source_url}. "
                 f"{source.why_relevant}"
             )
         lines.append("")
@@ -633,8 +644,9 @@ def _contrast_markdown(audit: ClaimAudit) -> list[str]:
     if contrast.best_sources:
         lines.append("**Reference snippets / mismatches:**")
         for source in contrast.best_sources:
+            source_url = source.url or "internal fixture source"
             lines.append(
-                f"- {source.evidence_summary} ({source.title}, {source.stance}, {source.url}). "
+                f"- {source.evidence_summary} ({source.title}, {source.stance}, {source_url}). "
                 f"{source.key_qualification}"
             )
         lines.append("")

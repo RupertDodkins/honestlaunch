@@ -11,9 +11,9 @@
       --line: #d0d7de;
       --bg: #f6f8fa;
       --panel: #ffffff;
-      --cap: #b42318;
-      --sus: #b54708;
-      --nocap: #067647;
+      --overstated: #b42318;
+      --context: #b54708;
+      --supported: #067647;
       --receipts: #344054;
     }
     body {
@@ -71,9 +71,9 @@
       font-size: 12px;
       background: var(--receipts);
     }
-    .cap { background: var(--cap); }
-    .sus { background: var(--sus); }
-    .nocap { background: var(--nocap); }
+    .overstated { background: var(--overstated); }
+    .context { background: var(--context); }
+    .supported { background: var(--supported); }
     .layout {
       display: grid;
       grid-template-rows: auto minmax(0, 1fr);
@@ -110,7 +110,7 @@
   <header>
     <div>
       <h1>CappinCheck Demo Gallery</h1>
-      <p>Pre-generated claim-ledger states, plus a live managed-runtime command for the stage demo.</p>
+      <p>Pre-generated static reports. Use the live-grounded report if vetted; use the deterministic fallback if network or API access is uncertain.</p>
     </div>
     <p><code>Document -> Claims -> Audit Report</code></p>
   </header>
@@ -122,28 +122,28 @@
   <script>
     const examples = [
       {
-        label: 'Overstated Benchmark',
-        badge: 'cap',
-        href: 'overstated_report.html',
-        summary: 'Shows a numeric/generalization stretch: the document says 30% and real-world tasks, but the table supports 3.8% relative improvement on one benchmark.'
+        label: 'Evidence Contrast Fallback',
+        badge: 'overstated',
+        href: 'contrast_demo.html',
+        summary: 'Deterministic offline report. Shows the core mechanism: a risky claim, evidence contrast, sources checked, agent steps, and a defensible rewrite.'
       },
       {
         label: 'Careful Scientific Claim',
-        badge: 'no cap',
+        badge: 'supported',
         href: 'careful_report.html',
-        summary: 'Shows the non-cynical state: a scoped document with correct percentage-point wording and explicit limitations stays mostly green.'
+        summary: 'Shows the non-cynical state: a scoped document with correct percentage-point wording and explicit limitations remains supported.'
       },
       {
-        label: 'Needs Receipts',
-        badge: 'needs receipts',
+        label: 'Not Checkable',
+        badge: 'not checkable',
         href: 'needs_receipts_report.html',
         summary: 'Shows the unauditable state: claims may be true, but the document provides no user study, safety validation, or prior-work comparison.'
       },
       {
-        label: 'Managed Runtime Sample',
-        badge: 'sus',
-        href: 'managed_report.html',
-        summary: 'A one-claim report generated through the experimental Google GenAI Interactions runtime.'
+        label: 'Standard Audit Fallback',
+        badge: 'context',
+        href: 'overstated_report.html',
+        summary: 'Same deterministic source document without Evidence Contrast enabled. Useful for explaining what the contrast extension adds.'
       }
     ];
     let selected = 0;
@@ -151,9 +151,9 @@
     const frame = document.getElementById('frame');
     const summary = document.getElementById('summary');
     function cls(value) {
-      if (value === 'no cap') return 'nocap';
-      if (value === 'cap') return 'cap';
-      if (value === 'sus') return 'sus';
+      if (value === 'supported') return 'supported';
+      if (value === 'overstated') return 'overstated';
+      if (value === 'context') return 'context';
       return '';
     }
     function render() {
@@ -166,7 +166,7 @@
       summary.innerHTML = `
         <strong>${item.label}</strong>
         <p>${item.summary}</p>
-        <p>Live command: <code>cappincheck audit examples/demo_document.md --runtime managed --limit 1 --out examples/managed_report.md --json examples/managed_report.json --html examples/managed_report.html</code></p>
+        <p>Fallback command: <code>cappincheck audit examples/demo_document.md --mock --contrast --contrast-top 2 --out examples/contrast_demo.md --json examples/contrast_demo.json --html examples/contrast_demo.html</code></p>
       `;
       frame.src = item.href;
     }
@@ -174,4 +174,3 @@
   </script>
 </body>
 </html>
-

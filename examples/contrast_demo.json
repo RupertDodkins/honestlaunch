@@ -41,9 +41,8 @@
         "audit_question": "Do the reported benchmark numbers justify a 30% improvement and real-world generalization?"
       },
       "verdict": "overstated",
-      "vibe": "cap",
       "confidence": "high",
-      "cap_score": 88,
+      "stretch_score": 88,
       "why": "The reference supports a narrower benchmark improvement, but not a 30% improvement on real-world tasks.",
       "weaker_supported_rewrite": "CappinCheck improves from 84.1% to 87.3% on Benchmark X, a 3.2 percentage-point gain and 3.8% relative improvement under the benchmark conditions.",
       "supporting_evidence": [
@@ -126,17 +125,15 @@
         "claim_text": "Our method improves performance by 30% over prior work on real-world tasks.",
         "reference_sources": [
           {
-            "url": "https://example.org/benchmark-x-report",
-            "title": "Benchmark X Report",
+            "title": "Internal Benchmark X fixture",
             "source_type": "benchmark",
-            "why_relevant": "Contains the baseline and CappinCheck benchmark scores used by the claim.",
+            "why_relevant": "Deterministic offline fixture containing the baseline and CappinCheck benchmark scores.",
             "authority_score": 85
           }
         ],
         "best_sources": [
           {
-            "url": "https://example.org/benchmark-x-report",
-            "title": "Benchmark X Report",
+            "title": "Internal Benchmark X fixture",
             "stance": "narrows",
             "evidence_summary": "The reference reports 84.1% for the baseline and 87.3% for CappinCheck on Benchmark X.",
             "key_qualification": "The evidence is one curated benchmark, not real-world tasks; the computed gain is 3.2 percentage points and 3.8% relative."
@@ -159,9 +156,8 @@
         "audit_question": "Were multiple domains and out-of-distribution settings actually tested?"
       },
       "verdict": "missing_context",
-      "vibe": "sus",
       "confidence": "high",
-      "cap_score": 64,
+      "stretch_score": 64,
       "why": "The claim generalizes beyond the reference, which only supports performance on curated Benchmark X.",
       "weaker_supported_rewrite": "CappinCheck generalizes across the curated domains represented in Benchmark X; real-world deployment performance was not evaluated.",
       "supporting_evidence": [],
@@ -217,17 +213,15 @@
         "claim_text": "The system robustly generalizes across domains.",
         "reference_sources": [
           {
-            "url": "https://example.org/benchmark-x-report",
-            "title": "Benchmark X Report",
+            "title": "Internal Benchmark X fixture",
             "source_type": "benchmark",
-            "why_relevant": "Defines the evaluation setting and its limitations.",
+            "why_relevant": "Deterministic offline fixture defining the evaluation setting and limitations.",
             "authority_score": 85
           }
         ],
         "best_sources": [
           {
-            "url": "https://example.org/benchmark-x-report",
-            "title": "Benchmark X Report",
+            "title": "Internal Benchmark X fixture",
             "stance": "narrows",
             "evidence_summary": "The reference describes curated technical claims from public documents.",
             "key_qualification": "It does not evaluate clinical, legal, private-enterprise, or real-world deployment settings."
@@ -250,9 +244,8 @@
         "audit_question": "Does prior work include similar scientific fact-checking or claim-audit systems?"
       },
       "verdict": "missing_context",
-      "vibe": "sus",
       "confidence": "medium",
-      "cap_score": 64,
+      "stretch_score": 64,
       "why": "The claim may be plausible, but the demo document does not provide enough scope or external evidence.",
       "weaker_supported_rewrite": "The document provides preliminary evidence for a narrower version of this claim.",
       "supporting_evidence": [],
@@ -304,5 +297,9 @@
         }
       ]
     }
-  ]
+  ],
+  "runtime": "local",
+  "mode": "deterministic_fallback",
+  "contrast_enabled": true,
+  "reference_urls": []
 }

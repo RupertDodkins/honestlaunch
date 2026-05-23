@@ -38,7 +38,7 @@ def _mock_claims(document: Document | None = None) -> list[RiskyClaim]:
     text = (document.text if document else "").lower()
     if "careful scientific claim" in text:
         return _careful_claims()
-    if "needs receipts" in text:
+    if "unauditable fixture" in text:
         return _needs_receipts_claims()
     return [
         RiskyClaim(

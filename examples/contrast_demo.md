@@ -2,6 +2,14 @@
 
 Source: `examples/demo_document.md`
 
+## Provenance
+
+- Mode: `deterministic_fallback`
+- Runtime: `local`
+- Model: `none`
+- Evidence Contrast: `enabled`
+- Reference URLs: `none`
+
 | Claim | Formal Verdict | Confidence | Stretch Score |
 | --- | --- | --- | ---: |
 | Our method improves performance by 30% over prior work on real-world tasks. | overstated | high | 88 |
@@ -74,10 +82,10 @@ Source: `examples/demo_document.md`
 
 ### Sources Checked
 
-- Benchmark X Report (benchmark, authority 85/100): https://example.org/benchmark-x-report. Contains the baseline and CappinCheck benchmark scores used by the claim.
+- Internal Benchmark X fixture (benchmark, authority 85/100): internal fixture source. Deterministic offline fixture containing the baseline and CappinCheck benchmark scores.
 
 **Reference snippets / mismatches:**
-- The reference reports 84.1% for the baseline and 87.3% for CappinCheck on Benchmark X. (Benchmark X Report, narrows, https://example.org/benchmark-x-report). The evidence is one curated benchmark, not real-world tasks; the computed gain is 3.2 percentage points and 3.8% relative.
+- The reference reports 84.1% for the baseline and 87.3% for CappinCheck on Benchmark X. (Internal Benchmark X fixture, narrows, internal fixture source). The evidence is one curated benchmark, not real-world tasks; the computed gain is 3.2 percentage points and 3.8% relative.
 
 **Numeric findings:**
 - Absolute gain: 87.3 - 84.1 = 3.2 points.
@@ -142,10 +150,10 @@ Source: `examples/demo_document.md`
 
 ### Sources Checked
 
-- Benchmark X Report (benchmark, authority 85/100): https://example.org/benchmark-x-report. Defines the evaluation setting and its limitations.
+- Internal Benchmark X fixture (benchmark, authority 85/100): internal fixture source. Deterministic offline fixture defining the evaluation setting and limitations.
 
 **Reference snippets / mismatches:**
-- The reference describes curated technical claims from public documents. (Benchmark X Report, narrows, https://example.org/benchmark-x-report). It does not evaluate clinical, legal, private-enterprise, or real-world deployment settings.
+- The reference describes curated technical claims from public documents. (Internal Benchmark X fixture, narrows, internal fixture source). It does not evaluate clinical, legal, private-enterprise, or real-world deployment settings.
 
 **Missing context:**
 - Additional external grounding would be needed for a production verdict.

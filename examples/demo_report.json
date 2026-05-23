@@ -41,9 +41,8 @@
         "audit_question": "Do the reported benchmark numbers justify a 30% improvement and real-world generalization?"
       },
       "verdict": "overstated",
-      "vibe": "cap",
       "confidence": "high",
-      "cap_score": 88,
+      "stretch_score": 88,
       "why": "The reported benchmark numbers show improvement, but the stated 30% improvement does not match the arithmetic and the evidence is a curated benchmark, not real-world tasks.",
       "weaker_supported_rewrite": "Our method improves performance from 84.1% to 87.3% on Benchmark X, a 3.2-point absolute gain and 3.8% relative improvement.",
       "supporting_evidence": [
@@ -132,9 +131,8 @@
         "audit_question": "Were multiple domains and out-of-distribution settings actually tested?"
       },
       "verdict": "missing_context",
-      "vibe": "sus",
       "confidence": "medium",
-      "cap_score": 64,
+      "stretch_score": 64,
       "why": "The claim may be plausible, but the demo document does not provide enough scope or external evidence.",
       "weaker_supported_rewrite": "The document provides preliminary evidence for a narrower version of this claim.",
       "supporting_evidence": [],
@@ -196,9 +194,8 @@
         "audit_question": "Does prior work include similar scientific fact-checking or claim-audit systems?"
       },
       "verdict": "missing_context",
-      "vibe": "sus",
       "confidence": "medium",
-      "cap_score": 64,
+      "stretch_score": 64,
       "why": "The claim may be plausible, but the demo document does not provide enough scope or external evidence.",
       "weaker_supported_rewrite": "The document provides preliminary evidence for a narrower version of this claim.",
       "supporting_evidence": [],
@@ -250,5 +247,9 @@
         }
       ]
     }
-  ]
+  ],
+  "runtime": "local",
+  "mode": "deterministic_fallback",
+  "contrast_enabled": false,
+  "reference_urls": []
 }

@@ -11,7 +11,7 @@ Target demo domain: AI model reports and launch claims.
 Reader-facing source of truth:
 
 - One final formal verdict per claim.
-- No `cap`, `sus`, or `no cap` in the main report view.
+- No playful verdict labels in the report or JSON schema.
 - Evidence Contrast is the main demo card.
 - Sources Checked is the expandable/detail layer.
 
@@ -235,7 +235,7 @@ Files likely touched:
 
 Tasks:
 
-- Remove vibe labels from main HTML/Markdown demo view.
+- Remove playful labels from main HTML/Markdown/JSON output.
 - Make formal verdict, confidence, reason, and rewrite primary.
 - Add `Evidence Contrast` above raw evidence.
 - Add `Sources Checked` below contrast card.
@@ -283,8 +283,8 @@ Markdown layout target:
 Success criteria:
 
 - HTML visibly shows Evidence Contrast before Sources Checked.
-- Main report view has no `cap`, `sus`, or `no cap` text.
-- Markdown has no vibe heading for claim sections.
+- Main report view has no playful verdict labels.
+- Markdown has no informal-label heading for claim sections.
 - Existing support/counter/missing-context details remain inspectable.
 - Narrow viewport does not visibly overlap text.
 
@@ -397,7 +397,7 @@ Tasks:
   - contrast exists for selected claims
   - final verdict includes expected `overstated`
   - numeric rewrite includes `3.2` and `3.8%`
-  - no visible vibe label is required for the main result
+  - no informal verdict label is required for the main result
 
 Suggested command:
 
@@ -536,4 +536,3 @@ Pass criteria:
 - Existing non-contrast demo still works.
 - Contrast demo works without API/network.
 - Public docs match implemented behavior.
-

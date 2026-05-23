@@ -26,7 +26,6 @@ class Verdict(str, Enum):
     NOT_CHECKABLE = "not_checkable"
 
 
-Vibe = Literal["no cap", "mostly no cap", "sus", "cap", "needs receipts"]
 Confidence = Literal["low", "medium", "high"]
 SourceType = Literal[
     "official_doc",
@@ -85,7 +84,7 @@ class AgentAudit(BaseModel):
 
 
 class ReferenceSource(BaseModel):
-    url: str
+    url: str | None = None
     title: str = "Reference source"
     source_type: SourceType = "unknown"
     why_relevant: str = ""
@@ -93,7 +92,7 @@ class ReferenceSource(BaseModel):
 
 
 class ContrastSource(BaseModel):
-    url: str
+    url: str | None = None
     title: str = "Reference source"
     stance: SourceStance = "unclear"
     evidence_summary: str
@@ -115,9 +114,8 @@ class EvidenceContrast(BaseModel):
 class ClaimAudit(BaseModel):
     claim: RiskyClaim
     verdict: Verdict
-    vibe: Vibe
     confidence: Confidence
-    cap_score: int = Field(ge=0, le=100)
+    stretch_score: int = Field(ge=0, le=100)
     why: str
     weaker_supported_rewrite: str
     supporting_evidence: list[EvidenceItem] = Field(default_factory=list)
@@ -132,3 +130,8 @@ class AuditReport(BaseModel):
     document: Document
     claims: list[RiskyClaim]
     audits: list[ClaimAudit]
+    runtime: str = "mock"
+    mode: str = "deterministic_fallback"
+    model: str | None = None
+    contrast_enabled: bool = False
+    reference_urls: list[str] = Field(default_factory=list)

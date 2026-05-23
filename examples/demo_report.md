@@ -2,6 +2,14 @@
 
 Source: `examples/demo_document.md`
 
+## Provenance
+
+- Mode: `deterministic_fallback`
+- Runtime: `local`
+- Model: `none`
+- Evidence Contrast: `disabled`
+- Reference URLs: `none`
+
 | Claim | Formal Verdict | Confidence | Stretch Score |
 | --- | --- | --- | ---: |
 | Our method improves performance by 30% over prior work on real-world tasks. | overstated | high | 88 |

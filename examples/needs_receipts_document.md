@@ -1,4 +1,4 @@
-# Needs Receipts Demo
+# Unauditable Fixture Demo
 
 ## Abstract
 
@@ -11,4 +11,3 @@ CappinCheck is safe for production use in regulated environments.
 ## Evidence
 
 This short document intentionally does not include a user study, benchmark, safety evaluation, production deployment study, prior-work comparison, or external validation.
-

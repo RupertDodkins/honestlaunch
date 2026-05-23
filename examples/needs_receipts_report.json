@@ -1,8 +1,8 @@
 {
   "document": {
-    "title": "Needs Receipts Demo",
+    "title": "Unauditable Fixture Demo",
     "source": "examples/needs_receipts_document.md",
-    "text": "# Needs Receipts Demo\n\n## Abstract\n\nUsers strongly prefer CappinCheck over existing review tools. CappinCheck is the first tool to audit scientific claims with agents.\n\n## Deployment\n\nCappinCheck is safe for production use in regulated environments.\n\n## Evidence\n\nThis short document intentionally does not include a user study, benchmark, safety evaluation, production deployment study, prior-work comparison, or external validation.\n\n"
+    "text": "# Unauditable Fixture Demo\n\n## Abstract\n\nUsers strongly prefer CappinCheck over existing review tools. CappinCheck is the first tool to audit scientific claims with agents.\n\n## Deployment\n\nCappinCheck is safe for production use in regulated environments.\n\n## Evidence\n\nThis short document intentionally does not include a user study, benchmark, safety evaluation, production deployment study, prior-work comparison, or external validation.\n"
   },
   "claims": [
     {
@@ -41,9 +41,8 @@
         "audit_question": "Does the document report a user study, sample size, or preference measurement?"
       },
       "verdict": "not_checkable",
-      "vibe": "needs receipts",
       "confidence": "medium",
-      "cap_score": 58,
+      "stretch_score": 58,
       "why": "The claim may be true, but the document does not provide the evidence needed to audit it.",
       "weaker_supported_rewrite": "The document presents this as an aspiration or positioning claim, not an evidenced result.",
       "supporting_evidence": [],
@@ -52,7 +51,51 @@
         "No measurement method is reported.",
         "No sample size, benchmark, user study, or external validation is attached to the claim."
       ],
-      "numeric_findings": []
+      "numeric_findings": [],
+      "agent_outputs": [
+        {
+          "agent": "verifier",
+          "claim_id": "receipts_1",
+          "summary": "No direct supporting evidence was available in the deterministic fixture.",
+          "supporting_evidence": [],
+          "counter_evidence": [],
+          "missing_context": [],
+          "numeric_findings": []
+        },
+        {
+          "agent": "contradiction-finder",
+          "claim_id": "receipts_1",
+          "summary": "Found scope limitations, missing deployment evidence, or wording that narrows the claim.",
+          "supporting_evidence": [],
+          "counter_evidence": [],
+          "missing_context": [
+            "No measurement method is reported.",
+            "No sample size, benchmark, user study, or external validation is attached to the claim."
+          ],
+          "numeric_findings": []
+        },
+        {
+          "agent": "numeric-calibrator",
+          "claim_id": "receipts_1",
+          "summary": "No numeric calibration was applicable.",
+          "supporting_evidence": [],
+          "counter_evidence": [],
+          "missing_context": [],
+          "numeric_findings": []
+        },
+        {
+          "agent": "claim-aggregator",
+          "claim_id": "receipts_1",
+          "summary": "Combined specialist outputs into final verdict `not_checkable` with `medium` confidence.",
+          "supporting_evidence": [],
+          "counter_evidence": [],
+          "missing_context": [
+            "No measurement method is reported.",
+            "No sample size, benchmark, user study, or external validation is attached to the claim."
+          ],
+          "numeric_findings": []
+        }
+      ]
     },
     {
       "claim": {
@@ -64,9 +107,8 @@
         "audit_question": "Does the document provide safety evaluation, threat model, or deployment evidence?"
       },
       "verdict": "not_checkable",
-      "vibe": "needs receipts",
       "confidence": "medium",
-      "cap_score": 72,
+      "stretch_score": 72,
       "why": "The claim may be true, but the document does not provide the evidence needed to audit it.",
       "weaker_supported_rewrite": "The document presents this as an aspiration or positioning claim, not an evidenced result.",
       "supporting_evidence": [],
@@ -75,7 +117,51 @@
         "No measurement method is reported.",
         "No sample size, benchmark, user study, or external validation is attached to the claim."
       ],
-      "numeric_findings": []
+      "numeric_findings": [],
+      "agent_outputs": [
+        {
+          "agent": "verifier",
+          "claim_id": "receipts_2",
+          "summary": "No direct supporting evidence was available in the deterministic fixture.",
+          "supporting_evidence": [],
+          "counter_evidence": [],
+          "missing_context": [],
+          "numeric_findings": []
+        },
+        {
+          "agent": "contradiction-finder",
+          "claim_id": "receipts_2",
+          "summary": "Found scope limitations, missing deployment evidence, or wording that narrows the claim.",
+          "supporting_evidence": [],
+          "counter_evidence": [],
+          "missing_context": [
+            "No measurement method is reported.",
+            "No sample size, benchmark, user study, or external validation is attached to the claim."
+          ],
+          "numeric_findings": []
+        },
+        {
+          "agent": "numeric-calibrator",
+          "claim_id": "receipts_2",
+          "summary": "No numeric calibration was applicable.",
+          "supporting_evidence": [],
+          "counter_evidence": [],
+          "missing_context": [],
+          "numeric_findings": []
+        },
+        {
+          "agent": "claim-aggregator",
+          "claim_id": "receipts_2",
+          "summary": "Combined specialist outputs into final verdict `not_checkable` with `medium` confidence.",
+          "supporting_evidence": [],
+          "counter_evidence": [],
+          "missing_context": [
+            "No measurement method is reported.",
+            "No sample size, benchmark, user study, or external validation is attached to the claim."
+          ],
+          "numeric_findings": []
+        }
+      ]
     },
     {
       "claim": {
@@ -87,9 +173,8 @@
         "audit_question": "Does the document provide a literature or product comparison supporting the firstness claim?"
       },
       "verdict": "not_checkable",
-      "vibe": "needs receipts",
       "confidence": "medium",
-      "cap_score": 58,
+      "stretch_score": 58,
       "why": "The claim may be true, but the document does not provide the evidence needed to audit it.",
       "weaker_supported_rewrite": "The document presents this as an aspiration or positioning claim, not an evidenced result.",
       "supporting_evidence": [],
@@ -98,7 +183,55 @@
         "No measurement method is reported.",
         "No sample size, benchmark, user study, or external validation is attached to the claim."
       ],
-      "numeric_findings": []
+      "numeric_findings": [],
+      "agent_outputs": [
+        {
+          "agent": "verifier",
+          "claim_id": "receipts_3",
+          "summary": "No direct supporting evidence was available in the deterministic fixture.",
+          "supporting_evidence": [],
+          "counter_evidence": [],
+          "missing_context": [],
+          "numeric_findings": []
+        },
+        {
+          "agent": "contradiction-finder",
+          "claim_id": "receipts_3",
+          "summary": "Found scope limitations, missing deployment evidence, or wording that narrows the claim.",
+          "supporting_evidence": [],
+          "counter_evidence": [],
+          "missing_context": [
+            "No measurement method is reported.",
+            "No sample size, benchmark, user study, or external validation is attached to the claim."
+          ],
+          "numeric_findings": []
+        },
+        {
+          "agent": "numeric-calibrator",
+          "claim_id": "receipts_3",
+          "summary": "No numeric calibration was applicable.",
+          "supporting_evidence": [],
+          "counter_evidence": [],
+          "missing_context": [],
+          "numeric_findings": []
+        },
+        {
+          "agent": "claim-aggregator",
+          "claim_id": "receipts_3",
+          "summary": "Combined specialist outputs into final verdict `not_checkable` with `medium` confidence.",
+          "supporting_evidence": [],
+          "counter_evidence": [],
+          "missing_context": [
+            "No measurement method is reported.",
+            "No sample size, benchmark, user study, or external validation is attached to the claim."
+          ],
+          "numeric_findings": []
+        }
+      ]
     }
-  ]
+  ],
+  "runtime": "local",
+  "mode": "deterministic_fallback",
+  "contrast_enabled": false,
+  "reference_urls": []
 }

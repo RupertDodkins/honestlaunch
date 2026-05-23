@@ -56,7 +56,7 @@ Run Evidence Contrast against explicit reference URLs:
 ```bash
 cappincheck audit examples/demo_document.md \
   --contrast \
-  --reference https://example.org/benchmark-x-report \
+  --reference https://ai.google.dev/gemini-api/docs/models \
   --contrast-top 2 \
   --out examples/contrast_live.md \
   --json examples/contrast_live.json \
@@ -64,12 +64,6 @@ cappincheck audit examples/demo_document.md \
 ```
 
 V1 uses explicit `--reference` URLs for reliability. Automatic reference discovery is intentionally deferred.
-
-Run the experimental managed runtime:
-
-```bash
-cappincheck audit examples/demo_document.md --runtime managed --limit 1 --out examples/managed_report.md --json examples/managed_report.json --html examples/managed_report.html
-```
 
 For a real/public source placeholder that avoids copying copyrighted text into the repo, see `examples/real_public_example.md`.
 
@@ -121,4 +115,4 @@ Reference discovery with Google Search grounding is a v2 extension. The first ve
 
 CappinCheck does not prove that a paper is true or false. It identifies claims whose wording may outrun the available evidence. It should be used as a triage and review aid, not as an authority.
 
-The default runtime is local async Gemini execution over repo-local skill files. The experimental managed runtime depends on beta Interactions API availability and JSON normalization from managed interaction output. Live output depends on model availability, tool support, and grounding quality. The `--mock` path is intentionally deterministic so public demos can run without secrets or network access.
+The default runtime is local async Gemini execution over repo-local skill files. The experimental managed runtime is implemented but not demo-safe in this environment; see `RUNTIME.md`. Live output depends on model availability, tool support, and grounding quality. The `--mock` path is intentionally deterministic so public demos can run without secrets or network access.

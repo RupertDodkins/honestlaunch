@@ -40,14 +40,14 @@ Do not build File Search integration, hosted UI, auth, database, chat interface,
 
 ### 1. Branding Posture
 
-Risk: `CappinCheck`, `cap`, `sus`, and `cap score` can make the tool feel unserious in front of research-heavy judges.
+Risk: playful labels can make the tool feel unserious in front of research-heavy judges.
 
 Decision:
 
 - Keep the project name `CappinCheck`.
 - Lead reports with formal labels: `Formal Verdict`, `Confidence`, `Evidence`, `Delta`, and `Defensible Rewrite`.
-- Remove `cap`, `sus`, and `no cap` labels from the main demo view.
-- Keep playful terminology out of the primary Markdown/HTML report unless it is hidden in raw JSON or future non-demo UI.
+- Remove playful labels from the demo report and JSON schema.
+- Use `stretch_score` for the numeric severity measure.
 
 Acceptance criteria:
 
@@ -253,8 +253,8 @@ Done when all commands exit `0`.
 Tasks:
 
 - Update report ordering so formal verdict/confidence/reason are the primary reader-facing source of truth.
-- Remove vibe labels from the main demo view.
-- Update README copy if it currently leads with slang.
+- Remove playful labels from the main demo view and generated JSON.
+- Update README copy if it currently leads with informal terminology.
 
 Verification:
 

@@ -158,9 +158,8 @@ def _mock_audit(document: Document, claim: RiskyClaim) -> ClaimAudit:
         return ClaimAudit(
             claim=claim,
             verdict=Verdict.OVERSTATED,
-            vibe="cap",
             confidence="high",
-            cap_score=88,
+            stretch_score=88,
             why=(
                 "The reported benchmark numbers show improvement, but the stated 30% improvement "
                 "does not match the arithmetic and the evidence is a curated benchmark, not real-world tasks."
@@ -178,14 +177,13 @@ def _mock_audit(document: Document, claim: RiskyClaim) -> ClaimAudit:
             ],
         )
 
-    vibe = "sus" if claim.claim_type.value in {"generalization", "novelty"} else "needs receipts"
-    verdict = Verdict.MISSING_CONTEXT if vibe == "sus" else Verdict.NOT_CHECKABLE
+    needs_context = claim.claim_type.value in {"generalization", "novelty"}
+    verdict = Verdict.MISSING_CONTEXT if needs_context else Verdict.NOT_CHECKABLE
     return ClaimAudit(
         claim=claim,
         verdict=verdict,
-        vibe=vibe,
         confidence="medium",
-        cap_score=64 if vibe == "sus" else 55,
+        stretch_score=64 if needs_context else 55,
         why="The claim may be plausible, but the demo document does not provide enough scope or external evidence.",
         weaker_supported_rewrite="The document provides preliminary evidence for a narrower version of this claim.",
         supporting_evidence=[],
@@ -215,9 +213,8 @@ def _mock_careful_audit(claim: RiskyClaim) -> ClaimAudit:
     return ClaimAudit(
         claim=claim,
         verdict=Verdict.SUPPORTED,
-        vibe="no cap",
         confidence="high",
-        cap_score=8 if claim.id == "careful_1" else 14,
+        stretch_score=8 if claim.id == "careful_1" else 14,
         why="The claim is narrow, scoped, and supported by the document's own evidence and caveats.",
         weaker_supported_rewrite=claim.claim,
         supporting_evidence=supporting,
@@ -231,9 +228,8 @@ def _mock_needs_receipts_audit(claim: RiskyClaim) -> ClaimAudit:
     return ClaimAudit(
         claim=claim,
         verdict=Verdict.NOT_CHECKABLE,
-        vibe="needs receipts",
         confidence="medium",
-        cap_score=58 if claim.claim_type.value != "safety" else 72,
+        stretch_score=58 if claim.claim_type.value != "safety" else 72,
         why="The claim may be true, but the document does not provide the evidence needed to audit it.",
         weaker_supported_rewrite="The document presents this as an aspiration or positioning claim, not an evidenced result.",
         supporting_evidence=[],

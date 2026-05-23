@@ -13,7 +13,7 @@ class ContrastSet(BaseModel):
 
 
 def top_contrast_candidates(audits: list[ClaimAudit], limit: int) -> list[ClaimAudit]:
-    return sorted(audits, key=lambda audit: audit.cap_score, reverse=True)[:limit]
+    return sorted(audits, key=lambda audit: audit.stretch_score, reverse=True)[:limit]
 
 
 async def apply_contrast(
@@ -102,14 +102,11 @@ def _merge_contrast_verdict(audit: ClaimAudit, contrast: EvidenceContrast) -> No
     audit.why = contrast.delta_explanation
     audit.weaker_supported_rewrite = contrast.suggested_rewrite
     if contrast.recommended_verdict == Verdict.SUPPORTED:
-        audit.vibe = "no cap"
-        audit.cap_score = min(audit.cap_score, 20)
+        audit.stretch_score = min(audit.stretch_score, 20)
     elif contrast.recommended_verdict == Verdict.MISSING_CONTEXT:
-        audit.vibe = "sus"
-        audit.cap_score = max(audit.cap_score, 60)
+        audit.stretch_score = max(audit.stretch_score, 60)
     elif contrast.recommended_verdict in {Verdict.OVERSTATED, Verdict.CONTRADICTED}:
-        audit.vibe = "cap"
-        audit.cap_score = max(audit.cap_score, 80)
+        audit.stretch_score = max(audit.stretch_score, 80)
 
 
 def _mock_contrast(audit: ClaimAudit) -> EvidenceContrast:
@@ -119,17 +116,15 @@ def _mock_contrast(audit: ClaimAudit) -> EvidenceContrast:
             claim_text=audit.claim.claim,
             reference_sources=[
                 ReferenceSource(
-                    url="https://example.org/benchmark-x-report",
-                    title="Benchmark X Report",
+                    title="Internal Benchmark X fixture",
                     source_type="benchmark",
-                    why_relevant="Contains the baseline and CappinCheck benchmark scores used by the claim.",
+                    why_relevant="Deterministic offline fixture containing the baseline and CappinCheck benchmark scores.",
                     authority_score=85,
                 )
             ],
             best_sources=[
                 ContrastSource(
-                    url="https://example.org/benchmark-x-report",
-                    title="Benchmark X Report",
+                    title="Internal Benchmark X fixture",
                     stance="narrows",
                     evidence_summary="The reference reports 84.1% for the baseline and 87.3% for CappinCheck on Benchmark X.",
                     key_qualification="The evidence is one curated benchmark, not real-world tasks; the computed gain is 3.2 percentage points and 3.8% relative.",
@@ -152,17 +147,15 @@ def _mock_contrast(audit: ClaimAudit) -> EvidenceContrast:
             claim_text=audit.claim.claim,
             reference_sources=[
                 ReferenceSource(
-                    url="https://example.org/benchmark-x-report",
-                    title="Benchmark X Report",
+                    title="Internal Benchmark X fixture",
                     source_type="benchmark",
-                    why_relevant="Defines the evaluation setting and its limitations.",
+                    why_relevant="Deterministic offline fixture defining the evaluation setting and limitations.",
                     authority_score=85,
                 )
             ],
             best_sources=[
                 ContrastSource(
-                    url="https://example.org/benchmark-x-report",
-                    title="Benchmark X Report",
+                    title="Internal Benchmark X fixture",
                     stance="narrows",
                     evidence_summary="The reference describes curated technical claims from public documents.",
                     key_qualification="It does not evaluate clinical, legal, private-enterprise, or real-world deployment settings.",
