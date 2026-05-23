@@ -72,6 +72,14 @@
       overflow-wrap: anywhere;
     }
     .claim-row.active { border-color: var(--ink); box-shadow: 0 0 0 2px rgba(31,35,40,.08); }
+    .extracted-row {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
+      overflow-wrap: anywhere;
+    }
     .claim-meta {
       display: flex;
       align-items: center;
@@ -256,6 +264,11 @@
       </div>
       <p class="muted" id="filter-summary"></p>
       <div id="claim-list"></div>
+      <details class="extraction-panel" open>
+        <summary>Claim Extraction</summary>
+        <p class="muted">Gemini first identifies risky factual claims, then CappinCheck audits the selected claims below.</p>
+        <div id="extracted-claims"></div>
+      </details>
     </aside>
     <section>
       <div class="title-row">
@@ -535,6 +548,7 @@
       .filter(audit => filters.verdict === 'all' || audit.verdict === filters.verdict);
     function setupFilters() {
       fillSelect('verdict-filter', 'All verdicts', [...new Set(report.audits.map(audit => audit.verdict))]);
+      renderExtractedClaims();
     }
     function fillSelect(id, allLabel, values) {
       document.getElementById(id).innerHTML = [
@@ -601,6 +615,40 @@
         <div class="panel"><h3>Contradictions / Narrowing Evidence</h3>${items(audit.counter_evidence)}</div>
         <div class="panel"><h3>Missing Context</h3>${list(audit.missing_context)}</div>
       `;
+    }
+    function renderExtractedClaims() {
+      const auditedById = new Map((report.audits || []).map((audit, index) => [audit.claim.id, { audit, index }]));
+      document.getElementById('extracted-claims').innerHTML = (report.claims || []).map((claim, index) => {
+        const audited = auditedById.get(claim.id);
+        const riskScore = claimRiskScore(claim, audited?.audit);
+        const status = audited ? `audited · ${esc(audited.audit.verdict)}` : 'extracted only';
+        return `
+          <div class="extracted-row">
+            <div class="claim-meta">
+              <span class="muted">#${index + 1} · ${esc(claim.claim_type)} · risk ${riskScore}/100 · ${status}</span>
+            </div>
+            <div class="wrap"><strong>${esc(claim.claim)}</strong></div>
+            <div class="meter ${audited ? cls(audited.audit.verdict) : ''}" title="Extraction risk score ${riskScore} / 100"><div style="width: ${riskScore}%"></div></div>
+            <p class="muted wrap">${esc(claim.why_risky || '')}</p>
+            <p class="muted wrap">Audit question: ${esc(claim.audit_question || '')}</p>
+          </div>
+        `;
+      }).join('');
+    }
+    function claimRiskScore(claim, audit) {
+      if (audit) return audit.stretch_score;
+      const base = {
+        numeric: 82,
+        novelty: 78,
+        safety: 76,
+        generalization: 72,
+        causal: 70,
+        benchmark: 68,
+        deployment: 62,
+        citation_stretch: 72,
+        other: 50
+      }[claim.claim_type] ?? 50;
+      return Math.max(0, Math.min(100, base));
     }
     function strengthCard(label, value, verdict, display, tip) {
       return `
