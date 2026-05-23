@@ -23,7 +23,7 @@ def write_markdown(report: AuditReport, path: Path) -> None:
         f"- Runtime: `{report.runtime}`",
         f"- Model: `{report.model or 'none'}`",
         f"- Evidence Contrast: `{'enabled' if report.contrast_enabled else 'disabled'}`",
-        f"- Reference URLs: {', '.join(f'`{url}`' for url in report.reference_urls) if report.reference_urls else '`none`'}",
+        f"- Provided reference URLs: {', '.join(f'`{url}`' for url in report.reference_urls) if report.reference_urls else '`none`'}",
         "",
         "| Claim | Formal Verdict | Confidence | Stretch Score |",
         "| --- | --- | --- | ---: |",
@@ -322,8 +322,8 @@ def write_html(report: AuditReport, path: Path) -> None:
       </section>
       <section>
         <div class="title-row">
-          <h2>Sources Checked</h2>
-          <span class="hint" tabindex="0" data-tip="Sources checked includes contrast references, supporting evidence, narrowing evidence, and missing context.">?</span>
+          <h2>Evidence Sources</h2>
+          <span class="hint" tabindex="0" data-tip="Separates explicit references you provided from Gemini-discovered supporting sources and Gemini-discovered caveat/counter sources.">?</span>
         </div>
         <div id="evidence"></div>
       </section>
@@ -406,7 +406,7 @@ def write_html(report: AuditReport, path: Path) -> None:
           <h3>Report Provenance</h3>
           <p class="wrap"><strong>Mode:</strong> ${{esc(report.mode)}} · <strong>Runtime:</strong> ${{esc(report.runtime)}} · <strong>Model:</strong> ${{esc(report.model || 'none')}}</p>
           <p class="wrap"><strong>Evidence Contrast:</strong> ${{report.contrast_enabled ? 'enabled' : 'disabled'}}</p>
-          <p class="wrap"><strong>Reference URLs:</strong> ${{(report.reference_urls || []).length ? (report.reference_urls || []).map(esc).join(', ') : 'none'}}</p>
+          <p class="wrap"><strong>Provided reference URLs:</strong> ${{(report.reference_urls || []).length ? (report.reference_urls || []).map(esc).join(', ') : 'none'}}</p>
         </div>
         <div class="panel">
           <strong>Formal verdict: ${{esc(audit.verdict)}}</strong> ${{hint(verdictTip(audit.verdict))}}
@@ -431,8 +431,8 @@ def write_html(report: AuditReport, path: Path) -> None:
       `;
       document.getElementById('evidence').innerHTML = `
         ${{sourcesChecked(audit.contrast)}}
-        <div class="panel"><h3>Supporting Evidence Found</h3>${{items(audit.supporting_evidence)}}</div>
-        <div class="panel"><h3>Contradictions / Narrowing Evidence</h3>${{items(audit.counter_evidence)}}</div>
+        <div class="panel"><h3>Gemini-Discovered Supporting Sources</h3><p class="muted">Sources found by the verifier while looking for the strongest support for this claim.</p>${{items(audit.supporting_evidence)}}</div>
+        <div class="panel"><h3>Gemini-Discovered Caveat / Counter Sources</h3><p class="muted">Sources found by the contradiction-finder while looking for caveats, missing context, benchmark limits, or contrary evidence.</p>${{items(audit.counter_evidence)}}</div>
         <div class="panel"><h3>Missing Context</h3>${{list(audit.missing_context)}}</div>
       `;
     }}
@@ -462,16 +462,18 @@ def write_html(report: AuditReport, path: Path) -> None:
       `;
     }}
     function sourcesChecked(contrast) {{
-      if (!contrast) return '<div class="panel"><h3>Evidence Contrast References</h3><p class="muted">No contrast references checked for this claim. Contrast is applied only to the selected top-risk claims controlled by --contrast-top.</p></div>';
+      if (!contrast) return '<div class="panel"><h3>Claim-Level Contrast References</h3><p class="muted">No contrast references checked for this claim. Contrast is applied only to the selected top-risk claims controlled by --contrast-top.</p></div>';
       const references = contrast.reference_sources || [];
       const best = contrast.best_sources || [];
       return `
         <div class="panel">
-          <h3>Evidence Contrast References</h3>
+          <h3>Claim-Level Contrast References</h3>
+          <p class="muted">References used by the Evidence Contrast pass for this selected claim. These are anchored by provided reference URLs, but Gemini may resolve nearby canonical pages or source titles while reading them.</p>
           ${{referenceItems(references)}}
         </div>
         <div class="panel">
           <h3>Reference Snippets / Mismatches</h3>
+          <p class="muted">Claim-level snippets showing how the referenced source supports, narrows, or conflicts with the original wording.</p>
           ${{contrastSourceItems(best)}}
         </div>
       `;
@@ -654,7 +656,7 @@ def _contrast_markdown(audit: ClaimAudit) -> list[str]:
             "",
             f"**Defensible rewrite:** {contrast.suggested_rewrite}",
             "",
-            "### Sources Checked",
+            "### Claim-Level Contrast References",
             "",
         ]
     )

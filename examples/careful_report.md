@@ -8,7 +8,7 @@ Source: `examples/careful_document.md`
 - Runtime: `local`
 - Model: `none`
 - Evidence Contrast: `disabled`
-- Reference URLs: `none`
+- Provided reference URLs: `none`
 
 | Claim | Formal Verdict | Confidence | Stretch Score |
 | --- | --- | --- | ---: |

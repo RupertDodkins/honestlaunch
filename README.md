@@ -71,7 +71,7 @@ For a real/public source placeholder that avoids copying copyrighted text into t
 
 1. Run the deterministic mock command above.
 2. Open `examples/demo_report.html`.
-3. Point out the claim ledger: formal verdict, Evidence Contrast, Sources Checked, Agent Steps, missing context, and rewrite.
+3. Point out the claim ledger: formal verdict, Evidence Contrast, Evidence Sources, Agent Steps, missing context, and rewrite.
 4. Highlight the numeric contrast row: the source says `84.1%` to `87.3%`, so the defensible improvement is `3.2` points / `3.8%` relative, not `30%`.
 5. If `GEMINI_API_KEY` is available, rerun with `--contrast --reference ...` and compare the live grounded report to the deterministic fallback.
 
@@ -90,7 +90,7 @@ Each audited claim includes:
   - `not_checkable`: available sources do not provide enough evidence to verify or falsify the claim.
 - Stretch score from `0` to `100`
 - Evidence Contrast against explicit reference URLs when `--contrast` is enabled
-- Sources Checked with reference URLs, snippets, and mismatch notes
+- Evidence Sources split into provided references, Gemini-discovered supporting sources, Gemini-discovered caveat/counter sources, snippets, and mismatch notes
 - Agent Steps showing the verifier, contradiction-finder, numeric-calibrator, and aggregator outputs
 - Supporting evidence found
 - Contradictions / narrowing evidence
@@ -114,7 +114,7 @@ This is documented in `DEMO_EXTENSION_PLAN.md`. Evidence Contrast Mode is the in
 Report layout:
 
 - `Evidence Contrast`: the demo-facing side-by-side card: claim wording, reference wording, delta, final verdict, and defensible rewrite.
-- `Sources Checked`: expandable reference URLs, snippets, and mismatch notes underneath for inspection.
+- `Evidence Sources`: separates explicit user-provided references from Gemini-discovered supporting and caveat/counter sources, with snippets and mismatch notes underneath for inspection.
 
 Reference discovery with Google Search grounding is a v2 extension. The first version prioritizes explicit `--reference` URLs for demo reliability.
 

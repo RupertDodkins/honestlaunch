@@ -8,7 +8,7 @@ Source: `examples/demo_document.md`
 - Runtime: `local`
 - Model: `none`
 - Evidence Contrast: `enabled`
-- Reference URLs: `none`
+- Provided reference URLs: `none`
 
 | Claim | Formal Verdict | Confidence | Stretch Score |
 | --- | --- | --- | ---: |
@@ -80,7 +80,7 @@ Source: `examples/demo_document.md`
 
 **Defensible rewrite:** CappinCheck improves from 84.1% to 87.3% on Benchmark X, a 3.2 percentage-point gain and 3.8% relative improvement under the benchmark conditions.
 
-### Sources Checked
+### Claim-Level Contrast References
 
 - Internal Benchmark X fixture (benchmark, authority 85/100): internal fixture source. Deterministic offline fixture containing the baseline and CappinCheck benchmark scores.
 
@@ -148,7 +148,7 @@ Source: `examples/demo_document.md`
 
 **Defensible rewrite:** CappinCheck generalizes across the curated domains represented in Benchmark X; real-world deployment performance was not evaluated.
 
-### Sources Checked
+### Claim-Level Contrast References
 
 - Internal Benchmark X fixture (benchmark, authority 85/100): internal fixture source. Deterministic offline fixture defining the evaluation setting and limitations.
 
