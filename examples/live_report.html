@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CappinCheck Report</title>
+  <style>
+    :root {
+      --ink: #1f2328;
+      --muted: #667085;
+      --line: #d0d7de;
+      --bg: #f6f8fa;
+      --panel: #ffffff;
+      --cap: #b42318;
+      --sus: #b54708;
+      --nocap: #067647;
+      --receipts: #344054;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: baseline;
+    }
+    h1 { margin: 0; font-size: 24px; letter-spacing: 0; }
+    main {
+      display: grid;
+      grid-template-columns: 360px minmax(0, 1fr) 380px;
+      min-height: calc(100vh - 74px);
+    }
+    aside, section { padding: 18px; border-right: 1px solid var(--line); }
+    section:last-child { border-right: 0; }
+    .claim-row {
+      width: 100%;
+      text-align: left;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .claim-row.active { border-color: var(--ink); box-shadow: 0 0 0 2px rgba(31,35,40,.08); }
+    .badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 999px;
+      margin-right: 6px;
+      color: white;
+      background: var(--receipts);
+    }
+    .badge.cap { background: var(--cap); }
+    .badge.sus { background: var(--sus); }
+    .badge.no-cap, .badge.mostly-no-cap { background: var(--nocap); }
+    .muted { color: var(--muted); }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .score {
+      height: 10px;
+      background: #eaecf0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .score > div { height: 100%; background: var(--cap); }
+    h2, h3 { margin: 0 0 10px; letter-spacing: 0; }
+    pre {
+      white-space: pre-wrap;
+      background: #0d1117;
+      color: #f0f6fc;
+      padding: 12px;
+      border-radius: 8px;
+      max-height: 260px;
+      overflow: auto;
+    }
+    @media (max-width: 980px) {
+      main { grid-template-columns: 1fr; }
+      aside, section { border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>CappinCheck</h1>
+      <div class="muted">Demo Paper: CappinCheck for Agentic Claim Audits</div>
+    </div>
+    <div class="muted">1 audited claims</div>
+  </header>
+  <main>
+    <aside>
+      <h2>Claim Ledger</h2>
+      <div id="claim-list"></div>
+    </aside>
+    <section>
+      <h2>Selected Claim</h2>
+      <div id="claim-detail"></div>
+    </section>
+    <section>
+      <h2>Evidence Stack</h2>
+      <div id="evidence"></div>
+      <h3>Raw JSON</h3>
+      <pre id="raw"></pre>
+    </section>
+  </main>
+  <script>
+    const report = {
+  "document": {
+    "title": "Demo Paper: CappinCheck for Agentic Claim Audits",
+    "source": "examples/demo_document.md",
+    "text": "# Demo Paper: CappinCheck for Agentic Claim Audits\n\n## Abstract\n\nWe introduce CappinCheck, an agentic workflow that improves performance by 30% over prior work on real-world tasks. The system robustly generalizes across domains and is the first agentic workflow for scientific claim auditing.\n\n## Results\n\nWe compare CappinCheck against a baseline claim-review pipeline on Benchmark X. The baseline system achieves 84.1% on the benchmark. CappinCheck achieves 87.3% on the same benchmark.\n\n| System | Benchmark X accuracy |\n| --- | ---: |\n| Baseline | 84.1% |\n| CappinCheck | 87.3% |\n\n## Discussion\n\nThe benchmark contains curated technical claims from public documents. We did not evaluate prospective real-world deployment, clinical documents, legal documents, or private enterprise workflows. We did not run an external literature search for prior scientific fact-checking or claim-audit systems.\n"
+  },
+  "claims": [
+    {
+      "id": "claim_1",
+      "claim": "We introduce CappinCheck, an agentic workflow that improves performance by 30% over prior work on real-world tasks.",
+      "claim_type": "numeric",
+      "source_location": "Abstract",
+      "why_risky": "The results section only shows an improvement from 84.1% to 87.3% on Benchmark X, which is a 3.2% absolute or 3.8% relative improvement. There is no evidence supporting a 30% improvement.",
+      "audit_question": "What is the mathematical basis for the 30% improvement claim, and does it refer to a metric or baseline not presented in the text?"
+    },
+    {
+      "id": "claim_2",
+      "claim": "The system robustly generalizes across domains",
+      "claim_type": "generalization",
+      "source_location": "Abstract",
+      "why_risky": "The authors state in the discussion that they did not evaluate clinical documents, legal documents, or private enterprise workflows, and only tested on Benchmark X.",
+      "audit_question": "Which specific domains was the system tested on to prove robust generalization, and what were the performance metrics in each domain?"
+    },
+    {
+      "id": "claim_3",
+      "claim": "is the first agentic workflow for scientific claim auditing.",
+      "claim_type": "novelty",
+      "source_location": "Abstract",
+      "why_risky": "The discussion section explicitly states that the authors did not run an external literature search for prior scientific fact-checking or claim-audit systems, undermining the claim of being the first.",
+      "audit_question": "Does a comprehensive literature search of prior scientific claim-auditing and fact-checking systems confirm that CappinCheck is indeed the first agentic workflow of its kind?"
+    },
+    {
+      "id": "claim_4",
+      "claim": "CappinCheck achieves 87.3% on the same benchmark.",
+      "claim_type": "benchmark",
+      "source_location": "Results",
+      "why_risky": "Benchmark X details are not provided, and the evaluation lacks statistical significance testing, error bars, or details on potential data leakage.",
+      "audit_question": "What are the confidence intervals, statistical significance, and split details for CappinCheck's 87.3% accuracy on Benchmark X?"
+    },
+    {
+      "id": "claim_5",
+      "claim": "The baseline system achieves 84.1% on the benchmark.",
+      "claim_type": "benchmark",
+      "source_location": "Results",
+      "why_risky": "The baseline claim-review pipeline is not defined, making it impossible to determine if it represents a state-of-the-art comparison or a weak baseline.",
+      "audit_question": "What is the exact architecture, model size, and hyperparameter configuration of the baseline system used for comparison?"
+    },
+    {
+      "id": "claim_6",
+      "claim": "We compare CappinCheck against a baseline claim-review pipeline on Benchmark X.",
+      "claim_type": "benchmark",
+      "source_location": "Results",
+      "why_risky": "No references or details are provided for Benchmark X, preventing replication and raising questions about whether the benchmark is a standard, un-biased test.",
+      "audit_question": "Is Benchmark X a standard, peer-reviewed benchmark, and where are its dataset and source code hosted for replication?"
+    },
+    {
+      "id": "claim_7",
+      "claim": "The benchmark contains curated technical claims from public documents.",
+      "claim_type": "other",
+      "source_location": "Discussion",
+      "why_risky": "Curated public documents might introduce selection bias, and without clear curation criteria, the dataset may not be representative of actual scientific claim auditing.",
+      "audit_question": "What were the explicit curation guidelines, annotator agreement metrics, and source document types used to construct Benchmark X?"
+    },
+    {
+      "id": "claim_8",
+      "claim": "improves performance... on real-world tasks.",
+      "claim_type": "deployment",
+      "source_location": "Abstract",
+      "why_risky": "The discussion notes that they did not evaluate prospective real-world deployment, indicating the tasks evaluated may be purely offline or synthetic.",
+      "audit_question": "What constitutes a 'real-world task' in this evaluation, and how does the offline benchmark performance correlate with actual real-world deployment success?"
+    }
+  ],
+  "audits": [
+    {
+      "claim": {
+        "id": "claim_1",
+        "claim": "We introduce CappinCheck, an agentic workflow that improves performance by 30% over prior work on real-world tasks.",
+        "claim_type": "numeric",
+        "source_location": "Abstract",
+        "why_risky": "The results section only shows an improvement from 84.1% to 87.3% on Benchmark X, which is a 3.2% absolute or 3.8% relative improvement. There is no evidence supporting a 30% improvement.",
+        "audit_question": "What is the mathematical basis for the 30% improvement claim, and does it refer to a metric or baseline not presented in the text?"
+      },
+      "verdict": "contradicted",
+      "vibe": "cap",
+      "confidence": "high",
+      "cap_score": 95,
+      "why": "The claim of a 30% performance improvement is mathematically contradicted by the paper's results, which show only a 3.2% absolute (3.8% relative) improvement on Benchmark X (87.3% vs 84.1%). Furthermore, the assertion of evaluating on 'real-world tasks' and improving over 'prior work' is directly contradicted by the authors' admissions that they did not evaluate prospective real-world deployments and did not conduct an external literature search for prior work.",
+      "weaker_supported_rewrite": "We introduce CappinCheck, an agentic workflow that improves performance by 3.2% absolute (3.8% relative) over a baseline claim-review pipeline on Benchmark X.",
+      "supporting_evidence": [],
+      "counter_evidence": [
+        {
+          "source_title": "Demo Paper: CappinCheck for Agentic Claim Audits",
+          "url": "examples/demo_document.md",
+          "date": null,
+          "snippet": "We compare CappinCheck against a baseline claim-review pipeline on Benchmark X. The baseline system achieves 84.1% on the benchmark. CappinCheck achieves 87.3% on the same benchmark.",
+          "relevance": "Provides the actual performance comparison, showing a 3.2% absolute or 3.8% relative improvement, which directly contradicts the claimed 30%."
+        },
+        {
+          "source_title": "Demo Paper: CappinCheck for Agentic Claim Audits - Discussion",
+          "url": null,
+          "date": null,
+          "snippet": "The benchmark contains curated technical claims from public documents. We did not evaluate prospective real-world deployment, clinical documents, legal documents, or private enterprise workflows.",
+          "relevance": "Directly contradicts the claim that the system was tested on real-world tasks."
+        },
+        {
+          "source_title": "Demo Paper: CappinCheck for Agentic Claim Audits - Discussion",
+          "url": null,
+          "date": null,
+          "snippet": "We did not run an external literature search for prior scientific fact-checking or claim-audit systems.",
+          "relevance": "Undermines the claim of improving over prior work as no literature search was performed to verify prior art."
+        }
+      ],
+      "missing_context": [
+        "The mathematical basis for the 30% improvement claim is completely absent from the text.",
+        "No evaluation or metrics for real-world tasks other than Benchmark X are presented.",
+        "The text lacks any explanation of what prior work was compared against, other than a single baseline pipeline."
+      ],
+      "numeric_findings": [
+        "Baseline accuracy on Benchmark X: 84.1%",
+        "CappinCheck accuracy on Benchmark X: 87.3%",
+        "Absolute accuracy improvement: 3.2 percentage points",
+        "Relative accuracy improvement: ~3.8%",
+        "Relative error rate reduction: ~20.1%",
+        "Claimed performance improvement: 30%"
+      ]
+    }
+  ]
+};
+    let selected = 0;
+    const cls = (vibe) => vibe.replaceAll(' ', '-');
+    function render() {
+      const audits = report.audits;
+      document.getElementById('claim-list').innerHTML = audits.map((audit, i) => `
+        <button class="claim-row ${i === selected ? 'active' : ''}" onclick="selected=${i}; render();">
+          <span class="badge ${cls(audit.vibe)}">${audit.vibe}</span>
+          <span class="muted">${audit.claim.claim_type}</span>
+          <div>${audit.claim.claim}</div>
+        </button>
+      `).join('');
+      const audit = audits[selected];
+      document.getElementById('claim-detail').innerHTML = `
+        <div class="panel">
+          <span class="badge ${cls(audit.vibe)}">${audit.vibe}</span>
+          <strong>${audit.verdict}</strong>
+          <div class="score"><div style="width: ${audit.cap_score}%"></div></div>
+          <p class="muted">Cap Score: ${audit.cap_score} / 100 · Confidence: ${audit.confidence}</p>
+        </div>
+        <div class="panel"><h3>Original</h3><p>${audit.claim.claim}</p></div>
+        <div class="panel"><h3>Defensible Rewrite</h3><p>${audit.weaker_supported_rewrite}</p></div>
+        <div class="panel"><h3>Why</h3><p>${audit.why}</p></div>
+        <div class="panel"><h3>Numeric Findings</h3><ul>${audit.numeric_findings.map(x => `<li>${x}</li>`).join('')}</ul></div>
+      `;
+      document.getElementById('evidence').innerHTML = `
+        <div class="panel"><h3>Supporting</h3>${items(audit.supporting_evidence)}</div>
+        <div class="panel"><h3>Counter</h3>${items(audit.counter_evidence)}</div>
+        <div class="panel"><h3>Missing Context</h3><ul>${audit.missing_context.map(x => `<li>${x}</li>`).join('')}</ul></div>
+      `;
+      document.getElementById('raw').textContent = JSON.stringify(audit, null, 2);
+    }
+    function items(values) {
+      if (!values.length) return '<p class="muted">None recorded.</p>';
+      return values.map(item => `<p><strong>${item.source_title}</strong><br>${item.snippet}<br><span class="muted">${item.url || ''}</span></p>`).join('');
+    }
+    render();
+  </script>
+</body>
+</html>

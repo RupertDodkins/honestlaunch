@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import re
 from pydantic import BaseModel, Field
 
 from .gemini import GeminiClient
@@ -33,15 +32,18 @@ async def audit_claims(
 
 
 async def _audit_one(document: Document, claim: RiskyClaim) -> ClaimAudit:
+    print(f"Auditing {claim.id}: {claim.claim[:90]}")
     agent_results = await asyncio.gather(
         _run_skill("verifier", document, claim),
         _run_skill("contradiction-finder", document, claim),
         _run_skill("numeric-calibrator", document, claim),
     )
+    print(f"Aggregating {claim.id}")
     return await _aggregate(document, claim, list(agent_results))
 
 
 async def _run_skill(skill_name: str, document: Document, claim: RiskyClaim) -> AgentAudit:
+    print(f"  Running {skill_name} for {claim.id}")
     skill = load_skill(skill_name)
     client = GeminiClient()
     prompt = f"""

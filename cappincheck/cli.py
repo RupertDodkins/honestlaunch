@@ -32,8 +32,10 @@ def audit(
     """Audit risky factual claims in a dense document."""
     document = load_document(source)
     typer.echo(f"Loaded: {document.title}")
+    typer.echo("Extracting risky claims...")
     claims = extract_claims(document, mock=mock, limit=max(limit, 8))
     typer.echo(f"Extracted {len(claims)} risky claims.")
+    typer.echo(f"Auditing top {min(limit, len(claims))} claims...")
     audits = asyncio.run(audit_claims(document, claims, mock=mock, limit=limit))
     report = AuditReport(document=document, claims=claims, audits=audits)
 

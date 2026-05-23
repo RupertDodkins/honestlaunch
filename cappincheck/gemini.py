@@ -23,7 +23,9 @@ class GeminiClient:
         self.model = model or os.getenv("CLAIMLENS_MODEL", "gemini-3.5-flash")
 
     def structured(self, prompt: str, schema: type[T], *, tools: bool = True) -> T:
+        timeout_seconds = int(os.getenv("CAPPINCHECK_TIMEOUT_SECONDS", "90"))
         config = types.GenerateContentConfig(
+            http_options=types.HttpOptions(timeout=timeout_seconds * 1000),
             response_mime_type="application/json",
             response_schema=schema,
             tools=[

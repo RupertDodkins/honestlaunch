@@ -31,7 +31,7 @@ Document source: {document.source}
 DOCUMENT:
 {document.text[:60000]}
 """
-    return client.structured(prompt, ClaimSet).claims[:limit]
+    return client.structured(prompt, ClaimSet, tools=False).claims[:limit]
 
 
 def _mock_claims() -> list[RiskyClaim]:
