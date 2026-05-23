@@ -123,6 +123,10 @@ def write_html(report: AuditReport, path: Path) -> None:
       margin-bottom: 8px;
       overflow-wrap: anywhere;
     }}
+    .extracted-row .claim-text {{
+      font-weight: 700;
+      margin: 4px 0;
+    }}
     .claim-meta {{
       display: flex;
       align-items: center;
@@ -295,9 +299,14 @@ def write_html(report: AuditReport, path: Path) -> None:
   </header>
   <main>
     <aside>
+      <details class="extraction-panel" open>
+        <summary>1. Claim Extraction</summary>
+        <p class="muted">Gemini identifies risky factual claims before any verification runs.</p>
+        <div id="extracted-claims"></div>
+      </details>
       <div class="title-row">
-        <h2>Claim Ledger</h2>
-        <span class="hint" tabindex="0" data-tip="Each row is a risky factual claim extracted from the document. Click one to inspect the audit.">?</span>
+        <h2>2. Claim Ledger</h2>
+        <span class="hint" tabindex="0" data-tip="Each row is an audited claim. Click one to inspect verdict, evidence, contrast, and agent steps.">?</span>
       </div>
       <div class="filters single">
         <label>Verdict
@@ -307,11 +316,6 @@ def write_html(report: AuditReport, path: Path) -> None:
       </div>
       <p class="muted" id="filter-summary"></p>
       <div id="claim-list"></div>
-      <details class="extraction-panel" open>
-        <summary>Claim Extraction</summary>
-        <p class="muted">Gemini first identifies risky factual claims, then CappinCheck audits the selected claims below.</p>
-        <div id="extracted-claims"></div>
-      </details>
     </aside>
     <section>
       <div class="title-row">
@@ -428,16 +432,15 @@ def write_html(report: AuditReport, path: Path) -> None:
       document.getElementById('extracted-claims').innerHTML = (report.claims || []).map((claim, index) => {{
         const audited = auditedById.get(claim.id);
         const riskScore = claimRiskScore(claim, audited?.audit);
-        const status = audited ? `audited · ${{esc(audited.audit.verdict)}}` : 'extracted only';
+        const status = audited ? `audited as ${{esc(audited.audit.verdict)}}` : 'extracted only';
         return `
           <div class="extracted-row">
             <div class="claim-meta">
-              <span class="muted">#${{index + 1}} · ${{esc(claim.claim_type)}} · risk ${{riskScore}}/100 · ${{status}}</span>
+              <span class="muted">#${{index + 1}} · ${{esc(claim.claim_type)}} · risk ${{riskScore}}/100</span>
             </div>
-            <div class="wrap"><strong>${{esc(claim.claim)}}</strong></div>
+            <div class="wrap claim-text">${{esc(claim.claim)}}</div>
             <div class="meter ${{audited ? cls(audited.audit.verdict) : ''}}" title="Extraction risk score ${{riskScore}} / 100"><div style="width: ${{riskScore}}%"></div></div>
-            <p class="muted wrap">${{esc(claim.why_risky || '')}}</p>
-            <p class="muted wrap">Audit question: ${{esc(claim.audit_question || '')}}</p>
+            <p class="muted wrap">${{status}} · ${{esc(claim.why_risky || '')}}</p>
           </div>
         `;
       }}).join('');
