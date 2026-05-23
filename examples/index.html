@@ -143,6 +143,13 @@
         command: 'cappincheck audit examples/xai_grok3_launch_input.md --contrast --reference https://x.ai/news/grok-3 --reference https://lmarena.ai/?leaderboard= --reference https://livecodebench.github.io/ --reference https://crfm.stanford.edu/fmti/December-2025/company-reports/xAI_FinalReport_FMTI2025.html --contrast-top 1 --limit 1 --out examples/xai_grok3_report.md --json examples/xai_grok3_report.json --html examples/xai_grok3_report.html'
       },
       {
+        label: 'OpenAI GPT-4o System Card',
+        badge: 'missing_context',
+        href: 'openai_gpt4o_report.html',
+        summary: 'Live Gemini run on the official OpenAI GPT-4o system card PDF. The HTML page itself returned 403 to the CLI fetcher, so the gallery uses the canonical PDF asset instead.',
+        command: 'cappincheck audit https://cdn.openai.com/gpt-4o-system-card.pdf --limit 1 --profile --out examples/openai_gpt4o_report.md --json examples/openai_gpt4o_report.json --html examples/openai_gpt4o_report.html'
+      },
+      {
         label: 'Careful Scientific Claim',
         badge: 'supported',
         href: 'careful_report.html',

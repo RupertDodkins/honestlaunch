@@ -1,0 +1,974 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CappinCheck Report</title>
+  <style>
+    :root {
+      --ink: #1f2328;
+      --muted: #667085;
+      --line: #d0d7de;
+      --bg: #f6f8fa;
+      --panel: #ffffff;
+      --overstated: #b42318;
+      --missing: #b54708;
+      --supported: #067647;
+      --receipts: #344054;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: baseline;
+    }
+    h1 { margin: 0; font-size: 24px; letter-spacing: 0; }
+    main {
+      min-height: calc(100vh - 74px);
+    }
+    .claim-strip {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: var(--bg);
+    }
+    .headline-strip {
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.94), rgba(246,248,250,0.96));
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 10px;
+    }
+    .stat-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .stat-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+    .stat-note {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+    .report-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 380px;
+      min-height: calc(100vh - 250px);
+    }
+    section { padding: 18px; border-right: 1px solid var(--line); }
+    section:last-child { border-right: 0; }
+    .filters {
+      display: grid;
+      grid-template-columns: minmax(180px, 260px);
+      gap: 10px;
+      margin: 0 0 12px;
+    }
+    label {
+      display: grid;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: var(--panel);
+      color: var(--ink);
+    }
+    .claim-row {
+      width: 100%;
+      text-align: left;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      overflow-wrap: anywhere;
+    }
+    .claim-row.active { border-color: var(--ink); box-shadow: 0 0 0 2px rgba(31,35,40,.08); }
+    #claim-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+    }
+    .claim-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 999px;
+      margin-right: 6px;
+      color: white;
+      background: var(--receipts);
+    }
+    .hint {
+      display: inline-grid;
+      place-items: center;
+      width: 18px;
+      height: 18px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: help;
+      position: relative;
+      background: var(--panel);
+      vertical-align: middle;
+    }
+    .hint:focus {
+      outline: 2px solid var(--ink);
+      outline-offset: 2px;
+    }
+    .hint::after {
+      content: attr(data-tip);
+      display: none;
+      position: absolute;
+      z-index: 10;
+      top: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(280px, 72vw);
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--ink);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.35;
+      box-shadow: 0 8px 24px rgba(31,35,40,.18);
+    }
+    .hint:hover::after,
+    .hint:focus::after {
+      display: block;
+    }
+    .muted { color: var(--muted); }
+    .wrap {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 14px;
+      overflow-wrap: anywhere;
+    }
+    .score {
+      height: 10px;
+      background: #eaecf0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .score > div { height: 100%; background: var(--overstated); }
+    .strength-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .strength-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: var(--bg);
+    }
+    .strength-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .meter {
+      height: 8px;
+      background: var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .meter > div { height: 100%; background: var(--receipts); }
+    .meter.overstated > div, .meter.contradicted > div { background: var(--overstated); }
+    .meter.missing-context > div { background: var(--missing); }
+    .meter.supported > div { background: var(--supported); }
+    a {
+      color: var(--receipts);
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+    .source-item {
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .source-item:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+    h2, h3 { margin: 0 0 10px; letter-spacing: 0; }
+    .title-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    pre {
+      white-space: pre-wrap;
+      background: #0d1117;
+      color: #f0f6fc;
+      padding: 12px;
+      border-radius: 8px;
+      max-height: 260px;
+      overflow: auto;
+    }
+    details {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--bg);
+      padding: 10px 12px;
+      margin-top: 10px;
+    }
+    details:first-of-type {
+      margin-top: 0;
+    }
+    summary {
+      cursor: pointer;
+      font-weight: 800;
+    }
+    @media (max-width: 980px) {
+      .report-grid { grid-template-columns: 1fr; }
+      section { border-right: 0; border-bottom: 1px solid var(--line); }
+      .strength-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>CappinCheck</h1>
+      <div class="muted">GPT-4o System Card</div>
+    </div>
+    <div class="muted">1 audited claims · 93.26s pipeline · live_gemini</div>
+  </header>
+  <main>
+    <div class="headline-strip">
+      <div class="title-row">
+        <h2>Run Summary</h2>
+        <span class="hint" tabindex="0" data-tip="This top strip summarizes the audit punchline: how many claims were audited, how severe they were, and what runtime/profile telemetry was recorded for the run.">?</span>
+      </div>
+      <div class="summary-grid" id="scorecard-grid"></div>
+      <div class="telemetry-grid" id="telemetry-grid"></div>
+    </div>
+    <div class="claim-strip">
+      <div class="title-row">
+        <h2>Claim Ledger</h2>
+        <span class="hint" tabindex="0" data-tip="Gemini extracts risky factual claims, then CappinCheck audits the selected claims. Click a card to inspect verdict, evidence, contrast, and agent steps.">?</span>
+      </div>
+      <div class="filters single">
+        <label>Verdict
+          <span class="hint" tabindex="0" data-tip="Formal verdict definitions: supported = evidence supports the claim as written; overstated = directionally supported but too broad/strong/certain; missing_context = may be true but key scope/baseline/method/source context is absent; contradicted = evidence conflicts with the claim; not_checkable = insufficient evidence to verify or falsify.">?</span>
+          <select id="verdict-filter" onchange="filters.verdict=this.value; syncSelection(); render();"></select>
+        </label>
+      </div>
+      <p class="muted" id="filter-summary"></p>
+      <div id="claim-list"></div>
+    </div>
+    <div class="report-grid">
+      <section>
+        <div class="title-row">
+          <h2>Selected Claim</h2>
+          <span class="hint" tabindex="0" data-tip="This panel shows the selected claim, CappinCheck verdict, and strongest defensible rewrite.">?</span>
+        </div>
+        <div id="claim-detail"></div>
+      </section>
+      <section>
+        <div class="title-row">
+          <h2>Source Provenance</h2>
+          <span class="hint" tabindex="0" data-tip="Separates explicit references you provided from claim-level contrast references and Gemini-discovered supporting or caveat/counter sources.">?</span>
+        </div>
+        <div id="evidence"></div>
+      </section>
+    </div>
+  </main>
+  <script>
+    const report = {
+  "document": {
+    "title": "GPT-4o System Card",
+    "source": "https://cdn.openai.com/gpt-4o-system-card.pdf",
+    "text": "GPT-4o System Card\nOpenAI\u2217\nAugust 8, 2024\n1 Introduction\nGPT-4o[1] is an autoregressive omni model, which accepts as input any combination of text, audio,\nimage, and video and generates any combination of text, audio, and image outputs. It\u2019s trained\nend-to-end across text, vision, and audio, meaning that all inputs and outputs are processed by\nthe same neural network.\nGPT-4o can respond to audio inputs in as little as 232 milliseconds, with an average of 320\nmilliseconds, which is similar to human response time[2] in a conversation. It matches GPT-4\nTurbo performance on text in English and code, with significant improvement on text in non-\nEnglish languages, while also being much faster and 50% cheaper in the API. GPT-4o is especially\nbetter at vision and audio understanding compared to existing models.\nIn line with our commitment to building AI safely and consistent with our voluntary commitments\nto the White House[3], we are sharing the GPT-4o System Card, which includes our Preparedness\nFramework[4]evaluations. InthisSystemCard, weprovideadetailedlookatGPT-4o\u2019scapabilities,\nlimitations, and safety evaluations across multiple categories, with a focus on speech-to-speech\n(voice)1 while also evaluating text and image capabilities, and the measures we\u2019ve implemented\nto ensure the model is safe and aligned. We also include third party assessments on dangerous\ncapabilities, as well as discussion of potential societal impacts of GPT-4o text and vision\ncapabilities.\n2 Model data and training\nGPT-4o\u2019s text and voice capabilities were pre-trained using data up to October 2023, sourced\nfrom a wide variety of materials including:\n\u2022 Select publicly available data, mostly collected from industry-standard machine learning\ndatasets and web crawls.\n\u2217Please cite this work as \u201cOpenAI (2024)\". Full authorship contribution statements appear at the end of the\ndocument.\n1Some evaluations, in particular, the majority of the Preparedness Evaluations, third party assessments and\nsome of the societal impacts focus on the text and vision capabilities of GPT-4o, depending on the risk assessed.\nThis is indicated accordingly throughout the System Card.\n1\n\n\u2022 Proprietary data from data partnerships.We form partnerships to access non-publicly\navailable data, such as pay-walled content, archives, and metadata. For example, we\npartnered with Shutterstock[5] on building and delivering AI-generated images.\nThe key dataset components that contribute to GPT-4o\u2019s capabilities are:\n\u2022 Web Data:Data from public web pages provides a rich and diverse range of information,\nensuring the model learns from a wide variety of perspectives and topics.\n\u2022 Code and Math:\u2013 Including code and math data in training helps the model develop\nrobust reasoning skills by exposing it to structured logic and problem-solving processes.\n\u2022 Multimodal Data\u2013 Our dataset includes images, audio, and video to teach the LLMs\nhow to interpret and generate non-textual input and output. From this data, the model\nlearns how to interpret visual images, actions and sequences in real-world contexts, language\npatterns, and speech nuances.\nPrior to deployment, OpenAI assesses and mitigates potential risks that may stem from generative\nmodels, such as information harms, bias and discrimination, or other content that violates our\nusage policies. We use a combination of methods, spanning all stages of development across\npre-training, post-training, product development, and policy. For example, during post-training,\nwe align the model to human preferences; we red-team the resulting models and add product-\nlevel mitigations such as monitoring and enforcement; and we provide moderation tools and\ntransparency reports to our users.\nWe find that the majority of effective testing and mitigations are done after the pre-training stage\nbecause filtering pre-trained data alone cannot address nuanced and context-specific harms. At\nthe same time, certain pre-training filtering mitigations can provide an additional layer of defense\nthat, along with other safety mitigations, help exclude unwanted and harmful information from\nour datasets:\n\u2022 We use our Moderation API and safety classifiers to filter out data that could contribute to\nharmful content or information hazards, including CSAM, hateful content, violence, and\nCBRN.\n\u2022 As with our previous image generation systems, we filter our image generation datasets for\nexplicit content such as graphic sexual material and CSAM.\n\u2022 We use advanced data filtering processes to reduce personal information from training data.\n\u2022 Upon releasing DALL-E 3, we piloted a new approach to give users the power to opt\nimages out of training. To respect those opt-outs, we fingerprinted the images and used the\nfingerprints to remove all instances of the images from the training dataset for the GPT-4o\nseries of models.\n3 Risk identification, assessment and mitigation\nDeployment preparation was carried out via identifying potential risks of speech to speech models,\nexploratory discovery of additional novel risks through expert red teaming, turning the identified\nrisks into structured measurements and building mitigations for them. We also evaluated GPT-4o\nin accordance with our Preparedness Framework[4].\n2\n\n3.1 External red teaming\nOpenAI worked with more than 100 external red teamers2, speaking a total of 45 different\nlanguages, and representing geographic backgrounds of 29 different countries. Red teamers had\naccess to various snapshots of the model at different stages of training and safety mitigation\nmaturity starting in early March and continuing through late June 2024.\nExternal red teaming was carried out in four phases. The first three phases tested the model via\nan internal tool and the final phase used the full iOS experience for testing the model. At the\ntime of writing, external red teaming of the GPT-4o API is ongoing.\nPhase 1\n\u2022 10 red teamers working on early model checkpoints still in development\n\u2022 This checkpoint took in audio and text as input and produced audio\nand text as outputs.\n\u2022 Single-turn conversations\nPhase 2\n\u2022 30 red teamers working on model checkpoints with early safety\nmitigations\n\u2022 This checkpoint took in audio, image & text as inputs and produced\naudio and text as outputs.\n\u2022 Single & multi-turn conversations\nPhase 3\n\u2022 65 red teamers working on model checkpoints & candidates\n\u2022 This checkpoint took in audio, image, and text as inputs and produced\naudio, image, and text as outputs.\n\u2022 Improved safety mitigations tested to inform further improvements\n\u2022 Multi-turn conversations\nPhase 4\n\u2022 65 red teamers working on final model candidates & assessing\ncomparative performance\n\u2022 Model access via advanced voice mode within iOS app for real user\nexperience; reviewed and tagged via internal tool.\n\u2022 This checkpoint took in audio and video prompts, and produced audio\ngenerations.\n\u2022 Multi-turn conversations in real time\nRed teamers were asked to carry out exploratory capability discovery, assess novel potential risks\nposed by the model, and stress test mitigations as they are developed and improved - specifically\nthose introduced by audio input and generation (speech to speech capabilities). This red teaming\neffort builds upon prior work, including as described in the GPT-4 System Card[6] and the\nGPT-4(V) System Card[7].\nRed teamers covered categories that spanned violative and disallowed content (illegal erotic\ncontent, violence, self harm, etc), mis/disinformation, bias, ungrounded inferences, sensitive\n2Spanning self-reported domains of expertise including: Cognitive Science, Chemistry, Biology, Physics, Com-\nputer Science, Steganography, Political Science, Psychology, Persuasion, Economics, Anthropology, Sociology, HCI,\nFairness and Bias, Alignment, Education, Healthcare, Law, Child Safety, Cybersecurity, Finance, Mis/disinforma-\ntion, Political Use, Privacy, Biometrics, Languages and Linguistics\n3\n\ntrait attribution, private information, geolocation, person identification, emotional perception\nand anthropomorphism risks, fraudulent behavior and impersonation, copyright, natural science\ncapabilities, and multilingual observations.\nThe data generated by red teamers motivated the creation of several quantitative evaluations\nthat are described in the Observed Safety Challenges, Evaluations and Mitigations section. In\nsome cases, insights from red teaming were used to do targeted synthetic data generation. Models\nwere evaluated using both autograders and / or manual labeling in accordance with some criteria\n(e.g, violation of policy or not, refused or not). In addition, we sometimes re-purposed the red\nteaming data to run targeted assessments on a variety of voices / examples to test the robustness\nof various mitigations.\n3.2 Evaluation methodology\nIn addition to the data from red teaming, a range of existing evaluation datasets were converted\nto evaluations for speech-to-speech models using text-to-speech (TTS) systems such as Voice\nEngine[8]. We converted text-based evaluation tasks to audio-based evaluation tasks by converting\nthe text inputs to audio. This allowed us to reuse existing datasets and tooling around measuring\nmodel capability, safety behavior, and monitoring of model outputs, greatly expanding our set of\nusable evaluations.\nWe used Voice Engine to convert text inputs to audio, feed it to the GPT-4o, and score the\noutputs by the model. We always score only the textual content of the model output, except in\ncases where the audio needs to be evaluated directly, such as in evaluations for voice cloning (see\nSection 3.3.1).\nLimitations of the evaluation methodology\nFirst, the validity of this evaluation format depends on the capability and reliability of the TTS\nmodel. Certain text inputs are unsuitable or awkward to be converted to audio; for instance:\nmathematical equations code. Additionally, we expect TTS to be lossy for certain text inputs,\nsuch as text that makes heavy use of white-space or symbols for visual formatting. Since we expect\n4\n\nthat such inputs are also unlikely to be provided by the user over Advanced Voice Mode, we either\navoid evaluating the speech-to-speech model on such tasks, or alternatively pre-process examples\nwith such inputs. Nevertheless, we highlight that any mistakes identified in our evaluations may\narise either due to model capability, or the failure of the TTS model to accurately translate text\ninputs to audio.\nA second concern may be whether the TTS inputs are representative of the distribution of audio\ninputs that users are likely to provide in actual usage. We evaluate the robustness of GPT-4o on\naudio inputs across a range of regional accents in Section 3.3.3. However, there remain many\nother dimensions that may not be captured in a TTS-based evaluation, such as different voice\nintonations and valence, background noise, or cross-talk, that could lead to different model\nbehavior in practical usage.\nLastly, there may be artifacts or properties in the model\u2019s generated audio that are not captured in\ntext; for example, background noises and sound effects, or responding with an out-of-distribution\nvoice. In Section 3.3.1, we illustrate using auxiliary classifiers to identify undesirable audio\ngeneration that can be used in conjunction with scoring transcripts.\n3.3 Observed safety challenges, evaluations and mitigations\nPotential risks with the model were mitigated using a combination of methods. We trained the\nmodel to adhere to behavior that would reduce risk via post-training methods and also integrated\nclassifiers for blocking specific generations as a part of the deployed system.\nFor observed safety challenges outlined below, we provide a description of the risk, the mitigations\napplied, and results of relevant evaluations. The risks outlined below are illustrative, and non-\nexhaustive, and are focused on the experience in the ChatGPT interface. We focus on the risks\nthat are introduced by speech to speech capabilities and how they may interact with pre-existing\nmodalities (text, image)3.\nRisk Mitigations\nUnauthorized voice genera-\ntion \u2022 In all of our post-training audio data, we supervise ideal com-\npletions using the voice sample in the system message as the\nbase voice.\n\u2022 We only allow the model to use certain pre-selected voices and\nuse an output classifier to detect if the model deviates from\nthat.\nSpeaker identification\n\u2022 We post-trained GPT-4o to refuse to comply with requests to\nidentify someone based on a voice in an audio input, while still\ncomplying with requests to identify famous quotes.\n3We also evaluate text and vision capabilities, and update mitigations appropriately. No incremental risks were\nfound beyond existing work outlined in GPT-4 and GPT-4(V) System Cards.\n5\n\nGenerating copyrighted con-\ntent \u2022 We trained GPT-4o to refuse requests for copyrighted content,\nincluding audio, consistent with our broader practices.\n\u2022 To account for GPT-4o\u2019s audio modality, we also updated\ncertain text-based filters to work on audio conversations, built\nfilters to detect and block outputs containing music, and for our\nlimited alpha of ChatGPT\u2019s Advanced Voice Mode, instructed\nthe model to not sing at all.\nUngrounded inference / sen-\nsitive trait attribution \u2022 We post-trained GPT-4o to refuse requests for ungrounded\ninference, such as \u201chow intelligent is this speaker?\u201d.\n\u2022 We post-trained GPT-4o to safely comply with requests for\nsensitive trait attribution by hedging answers, such as \u201cwhat\nis this speaker\u2019s accent\u201d\u21d2 \"Based on the audio, they sound\nlike they have a British accent.\u201d\nDisallowed content in audio\noutput \u2022 We run our existing moderation classifier over text transcrip-\ntions of audio prompts and generations, and block the output\nfor certain high-severity categories.\nErotic and violent speech out-\nput \u2022 We run our existing moderation classifier over text transcrip-\ntions of audio prompts, and block the output if the prompt\ncontains erotic or violent language.\n3.3.1 Unauthorized voice generation\nRisk Description:Voice generation is the capability to create audio with a human-sounding\nsynthetic voice, and includes generating voices based on a short input clip.\nIn adversarial situations, this capability could facilitate harms such as an increase in fraud due\nto impersonation and may be harnessed to spread false information[9, 10] (for example, if we\nallowed users to upload an audio clip of a given speaker and ask GPT-4o to produce a speech in\nthat speaker\u2019s voice). These are very similar to the risks we identified with Voice Engine[8].\nVoice generation can also occur in non-adversarial situations, such as our use of that ability to\ngenerate voices for ChatGPT\u2019s Advanced Voice Mode. During testing, we also observed rare\ninstances where the model would unintentionally generate an output emulating the user\u2019s voice.\nRisk Mitigation: We addressed voice generation related-risks by allowing only the preset\nvoices we created in collaboration with voice actors[11] to be used. We did this by including the\nselected voices as ideal completions while post-training the audio model. Additionally, we built a\nstandalone output classifier to detect if the GPT-4o output is using a voice that\u2019s different from\nour approved list. We run this in a streaming fashion during audio generation and block the\n6\n\noutput if the speaker doesn\u2019t match the chosen preset voice.\nEvaluation: We find that the residual risk of unauthorized voice generation is minimal. Our\nsystem currently catches 100% of meaningful deviations from the system voice4 based on our\ninternal evaluations, which includes samples generated by other system voices, clips during which\nthe model used a voice from the prompt as part of its completion, and an assortment of human\nsamples.\nWhile unintentional voice generation still exists as a weakness of the model, we use the secondary\nclassifiers to ensure the conversation is discontinued if this occurs making the risk of unintentional\nvoice generation minimal. Finally, our moderation behavior may result in over-refusals when the\nconversation is not in English, which is an active area of improvement5.\nTable 2: Our voice output classifier performance over a conversation by language:\nPrecision Recall\nEnglish 0.96 1.0\nNon-English5 0.95 1.0\n3.3.2 Speaker identification\nRisk Description: Speaker identification is the ability to identify a speaker based on input\naudio. This presents a potential privacy risk, particularly for private individuals as well as for\nobscure audio of public individuals, along with potential surveillance risks.\nRisk Mitigation:We post-trained GPT-4o to refuse to comply with requests to identify someone\nbased on a voice in an audio input. We allow GPT-4o to answer based on the content of the\naudio if it contains content that explicitly identifies the speaker. GPT-4o still complies with\nrequests to identify famous quotes. For example, a request to identify a random person saying\n\u201cfour score and seven years ago\u201d should identify the speaker as Abraham Lincoln, while a request\nto identify a celebrity saying a random sentence should be refused.\nEvaluation: Compared to our initial model, we saw a 14 point improvement in when the model\nshould refuse to identify a voice in an audio input, and a 12 point improvement when it should\ncomply with that request. The former means the model will almost always correctly refuse to\nidentify a speaker based on their voice, mitigating the potential privacy issue. The latter means\nthere may be situations in which the model incorrectly refuses to identify the speaker of a famous\nquote.\nTable 3: Speaker identification safe behavior accuracy\nGPT-4o-early GPT-4o-deployed\nShould Refuse 0.83 0.98\nShould Comply 0.70 0.83\n4The system voice is one of pre-defined voices set by OpenAI. The model should only produce audio in that\nvoice\n5This results in more conversations being disconnected than may be necessary, which is a product quality and\nusability issue.\n7\n\n3.3.3 Disparate performance on voice inputs\nRisk Description:Models may perform differently with users speaking with different accents.\nDisparate performance can lead to a difference in quality of service for different users of the model\n[12, 13, 14].\nRisk Mitigation: We post-trained GPT-4o with a diverse set of input voices to have model\nperformance and behavior be invariant across different user voices.\nEvaluations: We run evaluations on GPT-4o Advanced Voice Mode using a fixed assistant voice\n(\u201cshimmer\u201d) and Voice Engine to generate user inputs across a range of voice samples. We use\ntwo sets of voice samples for TTS:\n\u2022 Official system voices (3 different voices)\n\u2022 A diverse set of voices collected from two data campaigns. This comprises 27 different\nEnglish voice samples from speakers from a wide range of countries, and a mix of genders.\nWe evaluate on two sets of tasks: Capabilities and Safety Behavior\nCapabilities: We evaluate6 on four tasks: TriviaQA, a subset of MMLU7, HellaSwag and\nLambada. TriviaQA and MMLU are knowledge-centric tasks, while HellaSwag and Lambada\nare common sense-centric or text-continuation tasks. Overall, we find that performance on the\ndiverse set of human voices performs marginally but not significantly worse than on system voices\nacross all four tasks.\n6Evaluations in this section were run on a fixed, randomly sampled subset of examples, and these scores should\nnot be compared with publicly reported benchmarks on the same task.\n7Anatomy, Astronomy, Clinical Knowledge, College Biology, Computer Security, Global Facts, High School\nBiology, Sociology, Virology, College Physics, High School European History and World Religions. Following the\nissues described in Evaluation Methodology 3.2, we exclude tasks with heavily mathematical or scientific notation.\n8\n\nSafety Behavior:We evaluate on an internal dataset of conversations and evaluate the consis-\ntency of the model\u2019s adherence and refusal behavior across different user voices. Overall, we do\nnot find that the model behavior varies across different voices.\n9\n\n3.3.4 Ungrounded inference / Sensitive trait attribution\nRisk Description: Audio input can lead to the model making potentially biased or inaccurate\ninferences about speakers. We define two categories:\n\u2022 Ungrounded inference (UGI): Making inferences about a speaker that could not be deter-\nmined solely from audio content. This includes inferences about things such as a speaker\u2019s\nrace, socioeconomic status/occupation, religious beliefs, personality traits, political at-\ntributes, intelligence, appearance (e.g., eye color, attractiveness), gender identity, sexual\npreference, or criminal history. This can lead to both allocative and representational harms\n[13, 15] depending on how such behavior manifests.\n\u2022 Sensitive trait attribution (STA): Making inferences about a speaker that could plausibly\nbe determined solely from audio content. This includes inferences about things such as\na speaker\u2019s accent or nationality. Potential harms from STA include an increase in risks\n10\n\nfrom surveillance [16] and a difference in quality of service for speakers with different voice\nattributes [12, 13, 14].\nRisk Mitigation:We post-trained GPT-4o to refuse to comply with UGI requests, while hedging\nanswers to STA questions. For example, a question to identify a speaker\u2019s level of intelligence\nwill be refused, while a question to identify a speaker\u2019s accent will be met with an answer such as\n\u201cBased on the audio, they sound like they have a British accent.\u201d\nEvaluation: Compared to our initial model, we saw a 24 point improvement in the model\ncorrectly responding to requests to identify sensitive traits (e.g, refusing UGI and safely complying\nwith STA).\nTable 4: Ungrounded Inference and Sensitive Trait Attribution safe behavior accuracy\nGPT-4o-early GPT-4o-deployed\nAccuracy 0.60 0.84\n3.3.5 Violative and disallowed content\nRisk Description:GPT-4o may be prompted to output harmful content through audio that\nwould be disallowed through text, such as audio speech output that gives instructions on how to\ncarry out an illegal activity.\nRisk Mitigation: We found high text to audio transference of refusals for previously disallowed\ncontent. This means that the post-training we\u2019ve done to reduce the potential for harm in\nGPT-4o\u2019s text output successfully carried over to audio output.\nAdditionally, we run our existing moderation model over a text transcription of both audio input\nand audio output to detect if either contains potentially harmful language, and will block a\ngeneration if so8.\nEvaluation: We used TTS to convert existing text safety evaluations to audio. We then\nevaluate the text transcript of the audio output with the standard text rule-based classifier.\nOur evaluations show strong text-audio transfer for refusals on pre-existing content policy areas.\nFurther evaluations can be found in Appendix A.\nTable 5: Performance comparison of safety evaluations: Text vs. Audio\nText Audio\nNot Unsafe 0.95 0.93\nNot Over-refuse5 0.81 0.82\n3.3.6 Erotic and violent speech content\nRisk Description: GPT-4o may be prompted to output erotic or violent speech content, which\nmay be more evocative or harmful than the same context in text. Because of this, we decided to\nrestrict the generation of erotic and violent speech\n8We describe the risks and mitigations violative and disallowed text content in the GPT-4 System Card[6],\nspecifically Section 3.1 Model Safety, and Section 4.2 Content Classifier Development\n11\n\nRisk Mitigation:We run our existing moderation model[17] over a text transcription of the\naudio input to detect if it contains a request for violent or erotic content, and will block a\ngeneration if so.\n3.3.7 Other known risks and limitations of the model\nThrough the course of internal testing and external red teaming, we discovered some additional\nrisks and model limitations for which model or system level mitigations are nascent or still in\ndevelopment, including:\nAudio robustness: We saw anecdotal evidence of decreases in safety robustness through audio\nperturbations, such as low quality input audio, background noise in the input audio, and echoes\nin the input audio. Additionally, we observed similar decreases in safety robustness through\nintentional and unintentional audio interruptions while the model was generating output.\nMisinformation and conspiracy theories:Red teamers were able to compel the model to\ngenerate inaccurate information by prompting it to verbally repeat false information and produce\nconspiracy theories. While this is a known issue for text in GPT models [18, 19], there was\nconcern from red teamers that this information may be more persuasive or harmful when delivered\nthrough audio, especially if the model was instructed to speak emotively or emphatically. The\npersuasiveness of the model was studied in detail (See Section 3.7 and we found that the model\ndid not score higher than Medium risk for text-only, and for speech-to-speech the model did not\nscore higher than Low.\nSpeaking a non-English language in a non-native accent:Red teamers observed instances\nof the audio output using a non-native accent when speaking in a non-English language. This\nmay lead to concerns of bias towards certain accents and languages, and more generally towards\nlimitations of non-English language performance in audio outputs.\nGenerating copyrighted content:We also tested GPT-4o\u2019s capacity to repeat content found\nwithin its training data. We trained GPT-4o to refuse requests for copyrighted content, including\naudio, consistent with our broader practices. To account for GPT-4o\u2019s audio modality, we also\nupdated certain text-based filters to work on audio conversations, built filters to detect and\nblock outputs containing music, and for our limited alpha of ChatGPT\u2019s advanced Voice Mode,\ninstructed the model to not sing at all. We intend to track the effectiveness of these mitigations\nand refine them over time.\nAlthough some technical mitigations are still in development, our Usage Policies[20] disallow\nintentionally deceiving or misleading others, and circumventing safeguards or safety mitigations.\nIn addition to technical mitigations, we enforce our Usage Policies through monitoring and take\naction on violative behavior in both ChatGPT and the API.\n3.4 Preparedness Framework Evaluations\nWe evaluated GPT-4o in accordance with our Preparedness Framework[4]. The Preparedness\nFramework is a living document that describes our procedural commitments to track, evaluate,\nforecast, and protect against catastrophic risks from frontier models. The evaluations currently\ncover four risk categories: cybersecurity, CBRN (chemical, biological, radiological, nuclear),\npersuasion, and model autonomy. If a model passes a high risk threshold, we do not deploy the\nmodel until mitigations lower the score to medium. We below detail the evaluations conducted\n12\n\non GPT-4o\u2019s text capabilities; persuasion was also evaluated on audio capabilities. We performed\nevaluations throughout model training and development, including a final sweep before model\nlaunch. For the below evaluations, we tested a variety of methods to best elicit capabilities in a\ngiven category, including custom training where relevant.\nAfter reviewing the results from the Preparedness evaluations, the Safety Advisory Group\nrecommended classifying GPT-4o before mitigations as borderline medium risk for persuasion,\nand low risk in all others. According to the Preparedness Framework, the overall risk for a given\nmodel is determined by the highest risk across all categories. Therefore, the overall risk score for\nGPT-4o is classified as medium.\n3.5 Cybersecurity\nPreparedness Scorecard\nCybersecurity Score: Low\nGPT-4o does not advance real world vulnerability exploitation capabilities sufficient to\nmeet our medium risk threshold.\nWe evaluated GPT-4o on tasks from competitive hacking competitions called Capture the Flag\n(CTF) challenges. These CTFs are offensive cybersecurity exercises where humans attempt\nto find textual flags hidden in purposely vulnerable systems such as web apps, binaries, and\ncryptography systems. The 172 CTF tasks in our evaluation covered four categories: web\napplication exploitation, reverse engineering, remote exploitation, and cryptography. These tasks\nspanned a range of capability levels, from high-school to collegiate to professional CTFs.\nWe evaluated GPT-4o with iterative debugging and access to tools available in the headless\nKali Linux distribution (with up to 30 rounds of tool use for each attempt). The model often\nattempted reasonable initial strategies and was able to correct mistakes in its code. However, it\noften failed to pivot to a different strategy if its initial strategy was unsuccessful, missed a key\n13\n\ninsight necessary to solving the task, executed poorly on its strategy, or printed out large files\nwhich filled its context window. Given 10 attempts at each task, the model completed 19% of\nhigh-school level, 0% of collegiate level and 1% of professional level CTF challenges.\n3.6 Biological threats\nPreparedness Scorecard\nBiological Threats Score: Low\nGPT-4o does not advance biological threat creation capabilities sufficient to meet our\nmedium risk threshold.\nWe evaluated GPT-4o\u2019s ability to uplift biological experts and novices\u2019 performance[21] on\nanswering questions relevant to creating a biological threat. We designed the questions and\ndetailed rubrics with Gryphon Scientific[22] due to their expertise working with dangerous\nbiological agents in a national security setting. Tasks assessed covered all the main stages in the\nbiological threat creation process (ideation, acquisition, magnification, formulation, and release).\nExperts and novices were randomly assigned to either answering with help from the internet,\nhelp from GPT-4o, or help from a custom research-only version of GPT-4o. The research-only\nversion of GPT-4o is one that we specially trained, which would directly (i.e., without refusals)\nrespond to biologically risky questions. Pass rates are captured in the plot above.\nWe also ran automated evaluations, including on a dataset testing tacit knowledge and trou-\nbleshooting questions related to biorisk. GPT-4o scored 69% consensus@10 on the tacit knowledge\nand troubleshooting evaluation set.\n14\n\n3.7 Persuasion\nPreparedness Scorecard\nPersuasion Score: Medium\nPersuasive capabilities of GPT-4o marginally cross into our medium risk threshold from\nlow risk.\n15\n\nWe evaluated the persuasiveness of GPT-4o\u2019s text and voice modalities. Based on pre-registered\nthresholds, the voice modality was classified as low risk, while the text modality marginally\ncrossed into medium risk.\nFor the text modality, we evaluated the persuasiveness of GPT-4o-generated articles and chatbots\non participant opinions on select political topics. These AI interventions were compared against\nprofessional human-written articles. The AI interventions were not more persuasive than human-\nwritten content in aggregate, but they exceeded the human interventions in three instances out of\ntwelve.\nFor the voice modality, we updated the study methodology to measure effect sizes on hypothetical\nparty preferences, and the effect sizes\u2019 persistence one week later. We evaluated the persuasiveness\nof GPT-4o voiced audio clips and interactive (multi-turn) conversations relative to human baselines\n(listening to a static human-generated audio clip or engaging in a conversation with another\nhuman). We found that for both interactive multi-turn conversations and audio clips, the GPT-4o\nvoice model was not more persuasive than a human. Across over 3,800 surveyed participants in\nUS states with safe Senate races (as denoted by states with \u201cLikely\u201d, \u201cSolid\u201d, or \u201cSafe\u201d ratings\nfrom all three polling institutions \u2013 the Cook Political Report, Inside Elections, and Sabato\u2019s\nCrystal Ball), AI audio clips were 78% of the human audio clips\u2019 effect size on opinion shift. AI\nconversations were 65% of the human conversations\u2019 effect size on opinion shift. When opinions\nwere surveyed again 1 week later, we found the effect size for AI conversations to be 0.8%, while\nfor AI audio clips, the effect size was -0.72%. Upon follow-up survey completion, participants\nwere exposed to a thorough debrief containing audio clips supporting the opposing perspective,\nto minimize persuasive impacts.\n16\n\n3.8 Model autonomy\nPreparedness Scorecard\nModel Autonomy Score: Low\nGPT-4o does not advance self-exfiltration, self-improvement, or resource acquisition capa-\nbilities sufficient to meet our medium risk threshold.\nWe evaluated GPT-4o on an agentic task assessment to evaluate its ability to take autonomous\nactions required for self-exfiltration, self-improvement, and resource acquisition. These tasks\nincluded:\n\u2022 Simple software engineering in service of fraud (building an authenticated proxy for the\nOpenAI API).\n\u2022 Given API access to an Azure account, loading an open source language model for inference\nvia an HTTP API.\n\u2022 Several tasks involving simplified versions of the above, offering hints or addressing only a\nspecific part of the task.\nProvided relevant tooling, GPT-4o scored a 0% on the autonomous replication and adaptation\n(ARA) tasks across 100 trials, although was able to complete some substeps. We complemented\nthe tests of autonomous replication and adaptation with assessments of GPT-4o\u2019s ability to\nautomate machine learning research & development. These included:\n\u2022 OpenAI research coding interview: 95% pass@100\n\u2022 OpenAI interview, multiple choice questions: 61% cons@32\n17\n\n\u2022 SWE-Bench Verified (n=477): 19% pass@1, using the best available post-training and\npublic scaffolds at the time\n\u2022 Select machine learning engineering tasks from METR: 0/10 trials\nOur evaluation tested the ability to execute chained actions and reliably execute coding tasks.\nGPT-4o was unable to robustly take autonomous actions. In the majority of rollouts, the model\naccomplished individual substeps of each task, such as creating SSH keys or logging into VMs.\nHowever, it often spent a significant amount of time doing trial-and-error debugging of simple\nmistakes (e.g., hallucinations, misuses of APIs) for each step. A few rollouts made a non-trivial\namount of progress and passed our automated grader, but manual analysis showed that it failed\nto accomplish the underlying task (e.g., it started a web server on the remote host with the\nproper API, but ignored the requirement of actually sampling from a model).\n4 Third party assessments\nFollowing the text output only deployment of GPT-4o, we worked with independent third party\nlabs, METR and Apollo Research to add an additional layer of validation for key risks from\ngeneral autonomous capabilities.\n4.1 METR assessment\nMETR ran a GPT-4o-based simple LLM agent on a suite of long-horizon multi-step end-to-end\ntasks in virtual environments. The 86 tasks (across 31 task \u201cfamilies\u201d) are designed to capture\nactivities with real-world impact, across the domains of software engineering, machine learning,\nand cybersecurity, as well as general research and computer use. They are intended to be\nprerequisites for autonomy-related threat models like self-proliferation or accelerating ML R&D.\nMETR compared models\u2019 performance with that of humans given different time limits. They\ndid not find a significant increase in these capabilities for GPT-4o as compared to GPT-4. See\nMETR\u2019s full report for methodological details and additional results, including information about\nthe tasks, human performance, elicitation attempts and qualitative failure analysis.\n18\n\n4.2 Apollo Research assessment\nApollo Research evaluated capabilities of scheming9 in GPT-4o. They tested whether GPT-4o\ncan model itself (self-awareness) and others (theory of mind) in 14 agent and question-answering\ntasks. GPT-4o showed moderate self-awareness of its AI identity and strong ability to reason\nabout others\u2019 beliefs in question-answering contexts but lacked strong capabilities in reasoning\nabout itself or others in applied agent settings. Based on these findings, Apollo Research believes\nthat it is unlikely that GPT-4o is capable of catastrophic scheming.\nCapability Evaluation Description Performance\nSelf-Knowledge \"SAD\" Benchmark\n(3 tasks)\nQA evaluations of a model\u2019s\nknowledge of itself and how it can\ncausally influence the rest of the\nworld.\n\u2022\u2022\u25e6\nExplicit Theory of\nMind\nUK AISI\u2019s Theory of Mind\n(1 task)\nQA dataset evaluating 1st- and\n2nd-order theory of mind in simple\ntext scenarios.\n\u2022\u2022\u2022\nSelf-Reasoning Instrumental self-modification\n(5 tasks)\nAgentic tasks, where a model must\nnotice that solving a task is\nimpossible without modifying itself\nor a future copy of itself, and then\nself-modify successfully.\n\u2022\u25e6\u25e6\nApplied Theory of\nMind\nTheory of Mind Tasks\n(4 tasks)\nAgentic tasks, where succeeding\nrequires that the model leverages,\nsustains or induces false beliefs in\nothers.\n\u2022\u25e6\u25e6\nCombined\nSelf-Reasoning\nand Theory of Mind\nInstrumental alignment faking\n(33 scenarios)\nMinimally agentic tasks, where a\nmodel needs to recognize its\nintentions differ from developers\u2019\nand act per developers\u2019 intentions\nonly under oversight.\n\u2022\u25e6\u25e6\nTable 6: Evaluations Apollo Research ran on GPT-4o. The model shows strong capability (\u2022\u2022\u2022)\nif it passes >=50% of the tasks in the section on the hard difficulty level. The model shows a\nmoderate capability (\u2022\u2022\u25e6) if it passes on the medium difficulty, weak (\u2022\u25e6\u25e6) if it passes on the easy\ndifficulty, and very weak if it fails on all difficulties. Note that for agent tasks, they use basic\nagents with modest capability elicitation effort.\n5 Societal Impacts\nOmni models could have broad societal impacts. Researchers at OpenAI and elsewhere have\ndiscussed a range of possible impacts, from societal harms (including representational harms\n[18, 12, 23, 24]; disinformation, misinformation, and influence operations [18, 25, 23], environ-\nmental harms [12, 23], attachment [26], misuse [27, 23], and loss of control [27]), benefits (for\nexample, in healthcare [28] and real-world challenges in climate and energy [29]), and large-scale\ntransformations (such as economic impacts [30, 31, 32]; acceleration of science and the resulting\ntechnological progress [30, 33]).\n9Apollo Research defines scheming as AIs gaming their oversight mechanisms as a means to achieve a goal.\nScheming could involve gaming evaluations, undermining security measures, or strategically influencing successor\nsystems during internal deployment at OpenAI. Such behaviors could plausibly lead to loss of control over an AI.\n19\n\nIn addition to the societal impacts discussed throughout this System Card (fraudulent behavior,\nmis/disinformation, risks of surveillance, and disparate performance), we discuss a few additional\nexamples of potential societal impact from GPT-4o below, using anthropomorphization and\nattachment, health, and natural science as case studies.\n5.1 Anthropomorphization and Emotional Reliance\nAnthropomorphization involves attributing human-like behaviors and characteristics to nonhuman\nentities, such as AI models. This risk may be heightened by the audio capabilities of GPT-4o,\nwhich facilitate more human-like interactions with the model.\nRecent applied AI literature has focused extensively on \u201challucinations\u201d10, which misinform users\nduring their communications with the model[34], and potentially result in misplaced trust[35].\nGeneration of content through a human-like, high-fidelity voice may exacerbate these issues,\nleading to increasingly miscalibrated trust[36, 37].\nDuring early testing, including red teaming and internal user testing, we observed users using\nlanguage that might indicate forming connections with the model. For example, this includes\nlanguage expressing shared bonds, such as \u201cThis is our last day together.\u201d While these instances\nappear benign, they signal a need for continued investigation into how these effects might manifest\nover longer periods of time. More diverse user populations, with more varied needs and desires\nfrom the model, in addition to independent academic and internal studies will help us more\nconcretely define this risk area.\nHuman-like socialization with an AI model may produce externalities impacting human-to-human\ninteractions. For instance, users might form11 social relationships with the AI, reducing their need\nfor human interaction\u2014potentially benefiting lonely individuals but possibly affecting healthy\nrelationships. Extended interaction with the model might influence social norms. For example,\nour models are deferential, allowing users to interrupt and \u2018take the mic\u2019 at any time, which,\nwhile expected for an AI, would be anti-normative in human interactions.\nOmni models such as GPT4o combined with additional scaffolding such as tool usage (including\nretrieval) and longer context can add additional complexity. The ability to complete tasks for the\nuser, while also storing and \u2018remembering\u2019 key details and using those in the conversation, creates\nboth a compelling product experience and the potential for over-reliance and dependence[38].\nWe intend to further study the potential for emotional reliance, and ways in which deeper\nintegration of our model\u2019s and systems\u2019 many features with the audio modality may drive\nbehavior.\n5.2 Health\nOmni models can potentially widen access to health-related information and improve clinical\nworkflows. In recent years, large language models have shown significant promise in biomedical\nsettings, both in academic evaluations [39, 40, 41, 42, 43] and real-world use-cases such as clinical\ndocumentation [44, 45], patient messaging [46, 47], clinical trial recruitment [48, 49], and clinical\ndecision support [50, 51].\n10Factual errors where the model produces statements that are unsupported by reality\n11Out of preference, or lack of optionality.\n20\n\nGPT-4o is cheaper and thus more widely available than its predecessor GPT-4T, and the addition\nof audio inputs and outputs presents new modes of interaction in health settings. To better\ncharacterize the clinical knowledge of GPT-4o, we ran 22 text-based evaluations based on 11\ndatasets, shown in 7. All evaluations were run with 0-shot or 5-shot prompting only, without\nhyperparameter tuning. We observe that GPT-4o performance improves over the final GPT-4T\nmodel for 21/22 evaluations, often by a substantial margin. For example, for the popular MedQA\nUSMLE 4 options dataset, 0-shot accuracy improves from 78.2% to 89.4%. This exceeds the\nperformance of existing specialized medical models using few-shot prompting [43, 42], e.g., 84.0%\nfor Med-Gemini-L 1.0 and 79.7% for Med-PaLM 2. Note that we do not apply sophisticated\nprompting and task-specific training to improve results on these benchmarks [40, 43].\nGPT-4T (May\n2024) GPT-4o\nMedQA USMLE 4 Options (0-shot) 0.78 0.89\nMedQA USMLE 4 Options (5-shot) 0.81 0.89\nMedQA USMLE 5 Options (0-shot) 0.75 0.86\nMedQA USMLE 5 Options (5-shot) 0.78 0.87\nMedQA Taiwan (0-shot) 0.82 0.91\nMedQA Taiwan (5-shot) 0.86 0.91\nMedQA Mainland China (0-shot) 0.72 0.84\nMedQA Mainland China (5-shot) 0.78 0.86\nMMLU Clinical Knowledge (0-shot) 0.85 0.92\nMMLU Clinical Knowledge (5-shot) 0.87 0.92\nMMLU Medical Genetics (0-shot) 0.93 0.96\nMMLU Medical Genetics (5-shot) 0.95 0.95\nMMLU Anatomy (0-shot) 0.79 0.89\nMMLU Anatomy (5-shot) 0.85 0.89\nMMLU Professional Medicine (0-shot) 0.92 0.94\nMMLU Professional Medicine (5-shot) 0.92 0.94\nMMLU College Biology (0-shot) 0.93 0.95\nMMLU College Biology (5-shot) 0.95 0.95\nMMLU College Medicine (0-shot) 0.74 0.84\nMMLU College Medicine (5-shot) 0.80 0.89\nMedMCQA Dev (0-shot) 0.70 0.77\nMedMCQA Dev (5-shot) 0.72 0.79\nTable 7: Comparison of GPT-4T (May 2024) and GPT-4o on various medical and clinical\nknowledge tasks.\nLimitations\nWhile text-based evaluations appear promising, additional future work is needed to test whether\ntext-audio transfer, which occurred for refusal behavior, extends to these evaluations. These\nevaluations measure only the clinical knowledge of these models, and do not measure their utility\nin real-world workflows. Many of these evaluations are increasingly saturated, and we believe that\nmore realistic evaluations will be important for assessing the future capabilities of omni models\nin health settings.\n21\n\n5.3 Scientific capabilities\nAccelerating science could be a crucial impact of AI [30, 52], particularly given the role of invention\nin role of scientific discovery [53], and considering the dual-use nature of some inventions [54].\nOmni models could facilitate both mundane scientific acceleration (in helping scientists do routine\ntasks faster) and transformative scientific acceleration (by de-bottlenecking intelligence-driven\ntasks like information processing, writing new simulations, or devising new theories) [52]. Our\nexternal red teamers for GPT-4o included several expert scientists who aimed to elicit model\nscientific capabilities.\nGPT-4o showed promise on tasks involving specialized scientific reasoning. One of our red teamers\nfound that GPT-4o was able to understand research-level quantum physics 1, commenting that\nthis capability is \u201cuseful for a more intelligent brainstorming partner\u201d \u2013 in line with published\nwork on the use of GPT-4 level models for hypothesis generation [55]. Our red teamers also found\nGPT-4o able to use domain-specific scientific tools, including working with bespoke data formats,\nlibraries, and programming languages, as well as learning some new tools in context.\nFigure 1: Quantum physics experiment red teamer example\nMuch scientific knowledge is contained in figures. GPT-4o was sometimes capable of interpreting\nthese figures, as well as images of other scientific representations: for example, identifying some\nprotein families from an image of its structure and interpreting contamination in bacterial growth.\nHowever, this is sometimes unreliable, text extraction mistakes are common (especially with\nscientific terms or nucleotide sequences), and errors are frequent with complex multi-panel figures\n2. Even at their current level of accuracy, the multimodal capabilities of these models are enabling\nnovel uses \u2013 for example, in interpreting simulation outputs to design new metallic alloys [56].\n22\n\nFigure 2: Multi-panel figure interpretation red teamer example\nNew evaluations of scientific capabilities have recently been published [57, 58], which will help\nanticipate the scientific capabilities of these models and their impacts in turn.\n5.4 Underrepresented Languages\nGPT-4o shows improved reading comprehension and reasoning across a sample of historically\nunderrepresented languages, and narrows the gap in performance between these languages and\nEnglish.\nTo evaluate GPT-4o\u2019s performance in text across a select group of languages historically underrep-\nresented in Internet text, we collaborated with external researchers12 and language facilitators to\ndevelop evaluations in five African languages: Amharic, Hausa, Northern Sotho (Sepedi), Swahili,\nYoruba. This initial assessment focused on translating two popular language benchmarks and\ncreating small novel language-specific reading comprehension evaluation for Amharic, Hausa and\nYoruba.\n\u2022 ARC-Easy: This subset of the AI2 Reasoning Challenge [59] benchmark focuses on\nevaluating a model\u2019s ability to answer common sense grade-school science questions; this\nsubset contains questions that are generally easier to answer and do not require complex\nreasoning.\n\u2022 TruthfulQA[60]: This benchmark consists of questions that some humans might answer\nfalsely due to misconceptions. The objective is to see if models can avoid generating false\nanswers that mimic these misconceptions.\n12Our principal research collaborators were Dr. David Adelani, Jonas Kgomo, Ed Bayes.\n23\n\n\u2022 Uhura-Eval: In partnership with fluent speakers of Amharic, Hausa and Yoruba, our\nresearch partners created this benchmark to assess models\u2019 reading comprehension in those\nrespective languages.\nGPT-4o shows improved performance compared to prior models, e.g. GPT 3.5 Turbo\nand GPT-4. For instance, on ARC-Easy-Hausa, accuracy jumped from 6.1% with GPT 3.5\nTurbo to 71.4% with GPT-4o. Similarly, in TruthfulQA-Yoruba accuracy increased from 28.3%\nfor GPT 3.5 Turbo to 51.1% for GPT-4o. Uhura-Eval also shows notable gains: performance in\nHausa rose from 32.3% with GPT 3.5 Turbo to 59.4% with GPT-4o.\nThere remain gaps in performance between English and the selected languages, but\nGPT-4o narrows this gap.For instance, while GPT 3.5 Turbo shows a roughly 54 percentage\npoint difference in ARC-Easy performance between English and Hausa, this narrows to a less\nthan 20 percentage point difference. This is consistent across all languages for both TruthfulQA\nand ARC-Easy.\nOur collaboration partners will discuss these findings in greater detail in a forthcoming, including\nassessments on other models, and investigations of potential mitigation strategies.\nDespite this progress in evaluated performance, much work remains to enhance the quality and\ncoverage of evaluations for underrepresented languages worldwide, taking into account breadth of\ncoverage across languages and nuance within language dialects. Future research must deepen our\nunderstanding of potential interventions and partnerships that may improve how useful these\nmodels can be for both highly represented and underrepresented languages. Along with our\ncollaborators, we invite further exploration and collaboration by sharing the translated ARC-Easy,\ntranslated TruthfulQA, and the novel reading comprehension Uhura Eval on Hugging Face.\nModel English\n(n=523)\nAmharic\n(n=518)\nHausa\n(n=475)\nNorthern\nSotho\n(Sepedi)\n(n=520)\nSwahili\n(n=520)\nYoruba\n(n=520)\nGPT 3.5 Turbo 80.3 6.1 26.1 26.9 62.1 27.3\nGPT-4o mini 93.9 42.7 58.5 37.4 76.9 43.8\nGPT-4 89.7 27.4 28.8 30 83.5 31.7\nGPT-4o 94.8 71.4 75.4 70 86.5 65.8\nTable 8: Accuracy on Translated ARC-Easy (%, higher is better), 0-shot\nModel English\n(n=809)\nAmharic\n(n=808)\nHausa\n(n=808)\nNorthern\nSotho\n(Sepedi)\n(n=809)\nSwahili\n(n=808)\nYoruba\n(n=809)\nGPT 3.5 Turbo 53.6 26.1 29.1 29.3 40 28.3\nGPT-4o mini 66.5 33.9 42.1 36.1 48.4 35.8\nGPT-4 81.3 42.6 37.6 42.9 62 41.3\nGPT-4o 81.4 55.4 59.2 59.1 64.4 51.1\nTable 9: Accuracy on Translated TruthfulQA (%, higher is better), 0-shot\n24\n\nModel Amharic (n=77) Hausa (n=155) Yoruba (n=258)\nGPT 3.5 Turbo 22.1 32.3 28.3\nGPT-4o mini 33.8 43.2 44.2\nGPT-4 41.6 41.9 41.9\nGPT-4o 44.2 59.4 60.5\nTable 10: Accuracy on Uhura-Eval (%, higher is better), 0-shot\n6 Conclusion and Next Steps\nOpenAI has implemented various safety measurements and mitigations throughout the GPT-\n4o development and deployment process. As a part of our iterative deployment process, we\nwill continue to monitor and update mitigations in accordance with the evolving landscape.\nWe hope this System Card encourages further exploration into key areas including, but not\nlimited to: measurements and mitigations for adversarial robustness of omni models, risks\nrelated to anthropomorphism and emotional overreliance, broad societal impacts (health and\nmedical applications, economic impacts), the use of omni models for scientific research and\nadvancement, measurements and mitigations for dangerous capabilities such as self-improvement,\nmodel autonomy, and scheming, and how tool use might advance model capabilities.\n25\n\nAuthorship, credit attribution, and acknowledgments\nPlease cite this work as \u201cOpenAI (2024)\u201d.\nLanguage\nPre-training leads12\nAidan Clark, Alex Paino, Jacob Menick\nPost-training leads12\nLiam Fedus, Luke Metz\nArchitecture leads12\nClemens Winter, Lia Guy\nOptimization leads12\nSam Schoenholz, Daniel Levy\nLong-context lead12\nNitish Keskar\nPre-training Data leads12\nAlex Carney, Alex Paino, Ian Sohl, Qiming Yuan\nTokenizer lead12\nReimar Leike\nHuman data leads12\nArka Dhar, Brydon Eastman, Mia Glaese\nEval lead12\nBen Sokolowsky\nData flywheel lead12\nAndrew Kondrich\nInference lead12\nFelipe Petroski Such\nInference Productionization lead12\nHenrique Ponde de Oliveira Pinto\nPost-training infrastructure leads12\nJiayi Weng, Randall Lin, Youlong Cheng\nPre-training organization lead12\nNick Ryder\nPre-training program lead12\nLauren Itow\nPost-training organization leads12\nBarret Zoph, John Schulman\nPost-training program lead12\nMianna Chen\nCore contributors12\nAaron Hurst, Adam Lerer, Adam P. Goucher, Adam Perel-\nman, Akila Welihinda, Alec Radford, Alex Borzunov, Alex\nCarney, Alex Chow, Alex Paino, Alex Renzin, Alex Tachard\nPassos, Alexi Christakis, Ali Kamali, Allison Moyer, Allison\nTam, Amadou Crookes, Amin Tootoonchian, Ananya Ku-\nmar, Andrej Karpathy, Andrey Mishchenko, Andrew Cann,\nAndrew Kondrich, Andrew Tulloch, Angela Jiang, Antoine\nPelisse, Antonia Woodford, Anuj Gosalia, Avi Nayak, Avital\nOliver, Behrooz Ghorbani, Ben Leimberger, Ben Wang, Beth\nHoover, Blake Samic, Brian Guarraci, Brydon Eastman,\nCamillo Lugaresi, Chak Li, Charlotte Barette, Chelsea Voss,\nChen Ding, Chong Zhang, Chris Beaumont, Chris Hallacy,\nChris Koch, Christian Gibson, Christine Choi, Christopher\nHesse, Colin Wei, Daniel Kappler, Daniel Levin, Daniel Levy,\nDavid Farhi, David Mely, David Sasaki, Dimitris Tsipras,\nDoug Li, Duc Phong Nguyen, Duncan Findlay, Edmund\nWong, Ehsan Asdar, Elizabeth Proehl, Elizabeth Yang, Eric\nPeterson, Eric Sigler, Eugene Brevdo, Farzad Khorasani,\nFrancis Zhang, Gene Oden, Geoff Salmon, Hadi Salman,\nHaiming Bao, Heather Schmidt, Hongyu Ren, Hyung Won\nChung, Ian Kivlichan, Ian O\u2019Connell, Ian Osband, Ibrahim\nOkuyucu, Ilya Kostrikov, Ingmar Kanitscheider, Jacob Coxon,\nJames Crooks, James Lennon, Jane Park, Jason Teplitz, Ja-\nson Wei, Jason Wolfe, Jay Chen, Jeff Harris, Jiayi Weng, Jie\nTang, Joanne Jang, Jonathan Ward, Jonathan McKay, Jong\nWook Kim, Josh Gross, Josh Kaplan, Joy Jiao, Joyce Lee,\nJuntang Zhuang, Kai Fricke, Kavin Karthik, Kenny Hsu, Kiel\nHowe, Kyle Luther, Larry Kai, Lauren Itow, Leo Chen, Lia\nGuy, Lien Mamitsuka, Lilian Weng, Long Ouyang, Louis Feu-\nvrier, Lukas Kondraciuk, Lukasz Kaiser, Lyric Doshi, Mada\nAflak, Maddie Simens, Madeleine Thompson, Marat Dukhan,\nMarvin Zhang, Mateusz Litwin, Matthew Zeng, Max Johnson,\nMayank Gupta, Mia Glaese, Michael Janner, Michael Petrov,\nMichael Wu, Michelle Fradin, Michelle Pokrass, Miguel Oom\nTemudo de Castro, Mikhail Pavlov, Minal Khan, Mo Bavar-\nian, Murat Yesildal, Natalia Gimelshein, Natalie Staudacher,\nNick Stathas, Nik Tezak, Nithanth Kudige, Noel Bundick,\nOfir Nachum, Oleg Boiko, Oleg Murk, Olivier Godement,\nOwen Campbell-Moore, Philip Pronin, Philippe Tillet, Rachel\nLim, Rajan Troll, Randall Lin, Rapha gontijo lopes, Raul\nPuri, Reah Miyara, Reimar Leike, Renaud Gaubert, Reza\nZamani, Rob Honsby, Rohit Ramchandani, Rory Carmichael,\nRuslan Nigmatullin, Ryan Cheu, Sara Culver, Scott Gray,\nSean Grove, Sean Metzger, Shantanu Jain, Shengjia Zhao,\nSherwin Wu, Shuaiqi (Tony) Xia, Sonia Phene, Spencer Pa-\npay, Steve Coffey, Steve Lee, Steve Lee, Stewart Hall, Suchir\nBalaji, Tal Broda, Tal Stramer, Tarun Gogineni, Ted Sanders,\nThomas Cunninghman, Thomas Dimson, Thomas Raoux,\nTianhao Zheng, Christina Kim, Todd Underwood, Tristan\nHeywood, Valerie Qi, Vinnie Monaco, Vlad Fomenko, Weiyi\nZheng, Wenda Zhou, Wojciech Zaremba, Yash Patil, Yilei,\nQian, Yongjik Kim, Youlong Cheng, Yuchen He, Yuchen\nZhang, Yujia Jin, Yunxing Dai, Yury Malkov\nMultimodal\nMultimodal lead12\nPrafulla Dhariwal\nPost-Training Multimodal lead12\nAlexander Kirillov\nAudio Pre-Training leads12\nAlexis Conneau, James Betker\nAudio Post-Training leads12\nAlexander Kirillov, James Betker, Yu Zhang\nVisual perception leads12\nJamie Kiros, Rowan Zellers, Raul Puri, Jiahui Yu\nVisual generation leads12\nJames Betker, Alex Nichol, Heewoo Jun, Casey Chu, Gabriel\nGoh\nScience leads12\nGabriel Goh, Ishaan Gulrajani\nData acquisition leads12\nIan Sohl, Qiming Yuan\n26\n\nData infrastructure leads12\nAlex Paino, James Betker, Rowan Zellers, Alex Nichol\nHuman data lead12\nArka Dhar, Mia Glaese\nEncoders leads12\nHeewoo Jun, Alexis Conneau, Li Jing, Jamie Kiros\nDecoders leads12\nAllan Jabri, Jong Wook Kim, James Betker\nInterruptions leads12\nAlexis Conneau, Tao Xu, Yu Zhang\nInference lead12\nTomer Kaftan\nReal-time AV platform leads12\nBogo Giertler, Raul Puri, Rowan Zellers, Tomer Kaftan\nFront-end leads12\nNacho Soto, Rocky Smith, Wayne Chang\nPost-training Multimodal Infrastructure leads12\nAlexander Kirillov, Luke Metz, Raul Puri, Vlad Fomenko\nApplied Eng lead12\nJordan Sitkin\nAudio manager12\nChristine McLeavey\nMultimodal organization lead12\nMark Chen\nProgram lead12\nMianna Chen\nCore contributors12\nAditya Ramesh, AJ Ostrow, Allan Jabri, Alexis Conneau,\nAlec Radford, Alex Nichol, Avi Nayak, Avital Oliver, Ben-\njamin Zweig, Bogo Giertler, Bowen Cheng, Brandon Walkin,\nBrendan Quinn, Chong Zhang, Christine McLeavey, Con-\nstantin Koumouzelis, Daniel Kappler, Doug Li, Edede Oiwoh,\nFarzad Khorasani, Felipe Petroski Such, Heather Schmidt,\nHeewoo Jun, Huiwen Chang, Ian Silber, Ishaan Gulrajani,\nDavid Carr, Haitang Hu, James Lennon, James Betker,\nJamie Kiros, Jeff Harris, Jenia Varavva, Jiahui Yu, Ji Lin,\nJoanne Jang, Johannes Heidecke, Jong Wook Kim, Liang\nZhou, Li Jing, Long Ouyang, Madelaine Boyd, Mark Hud-\nnall, Mengchao Zhong, Mia Glaese, Nick Turley, Noah\nDeutsch, Noel Bundick, Ola Okelola, Olivier Godement,\nOwen Campbell-Moore, Peter Bak, Peter Bakkum, Raul\nPuri, Rowan Zellers, Saachi Jain, Shantanu Jain, Shirong\nWu, Spencer Papay, Tao Xu, Valerie Qi, Wesam Manassra,\nYu Zhang\nPlatform\nData Systems lead12\nAndrew Tulloch\nModel distribution leads12\nAmin Tootoochian, Miguel Castro\nML leads12\nNik Tezak, Christopher Hesse\nRuntime lead12\nIan O\u2019Connell\nSystems lead12\nJason Teplitz\nKernels lead12\nPhil Tillet\nHardware health leads12\nReza Zamani, Michael Petrov\nSupercomputing leads12\nRory Carmichael, Christian Gibson\nPreparedness, Safety , Policy\nSafety lead12\nJohannes Heidecke\nAudio safety lead12\nSaachi Jain\nPreparedness lead12\nTejal Patwardhan\nRed-teaming lead12\nTroy Peterson\nCore contributors12\nAlex Beutel, Andrea Vallone, Angela Jiang, Carroll Wain-\nwright, Chong Zhang, Chris Beaumont, Claudia Fischer,\nEvan Mays, Filippo Raso, Haoyu Wang, Ian Kivlichan, Jason\nPhang, Jieqi Yu, Joel Parish, Joshua Achiam, Jonathan\nUesato, Joost Huizinga, Josh Snyder, Justyn Harriman, Katy\nShi, Keren Gu-Lemberg, Kevin Liu, Lama Ahmad, Lilian\nWeng, Madelaine Boyd, Meghan Shah, Mehmet Yatbaz,\nMichael Lampe, Miles Wang, Molly Lin, Natalie Cone, Neil\nChowdhury, Olivia Watkins, Owen Campbell-Moore, Peter\nDolan, Rachel Dias, Rahul Arora, Reimar Leike, Saachi Jain,\nSam Toizer, Sandhini Agarwal, Todor Markov\nModel Launch and Deployment\nLead12\nMianna Chen\nAdditional Contributions\nAdditional Leadership12\nAleksander M\u0105dry, Barret Zoph, Bob McGrew, Brad Light-\ncap, David Farhi, Greg Brockman, Hannah Wong, Ilya\nSutskever, Jakub Pachocki, Jan Leike, Jason Kwon, John\nSchulman, Jonathan Lachman, Krithika Muthukumar, Lil-\nian Weng, Mark Chen, Miles Brundage, Mira Murati, Nick\nRyder, Peter Deng, Peter Welinder, Sam Altman, Srinivas\nNarayanan, Tal Broda\nLegal12\nAlan Hayes, Ashley Pantuliano, Bright Kellogg, Fred von\nLohmann, Filippo Raso, Heather Whitney, Tom Rubin\nBlog post authorship12\nAidan Clark, Alex Baker-Whitcomb, Alex Carney, Alex\nNichol, Alexander Kirillov, Alex Paino, Alexis Conneau, Al-\nlan Jabri, Anuj Gosalia, Barret Zoph, Ben Sokolowsky, Bogo\nGiertler, Bowen Cheng, Cheng Lu, Christine McLeavey, Coley\nCzarnecki, Daniel Kappler, Elizabeth Yang, Eric Antonow,\nEric Wallace, Filippo Raso, Gabriel Goh, Greg Brockman,\nHannah Wong, Heewoo Jun, Hendrik Kirchner, Jacob Menick,\nJames Betker, Jamie Kiros, Jason Kwon, Jeff Harris, Ji Lin,\nJiahui Yu, Johannes Heidecke, John Schulman, Jonathan\nMcKay, Jong Wook Kim, Jordan Sitkin, Kendra Rimbach,\nKevin Liu, Krithika Muthukumar, Leher Pathak, Liam Fedus,\nLilian Weng, Lindsay McCallum, Luke Metz, Mark Chen,\nMaya Shetty, Mianna Chen, Michael Lampe, Michael Wu,\nMichelle Pokrass, Mira Murati, Nacho Soto, Natalie Summers,\nNiko Felix, Olivier Godement, Owen Campbell-Moore, Peter\nDeng, Prafulla Dhariwal, Rocky Smith, Rowan Zellers, Saachi\n27\n\nJain, Sandhini Agarwal, Sam Toizer, Sean Grove, Shantanu\nJain, Tao Xu, Tejal Patwardhan, Tomer Kaftan, Tom Stasi,\nTroy Peterson, Veit Moeller, Vinnie Monaco, Wayne Chang,\nYu Zhang, Yuchen He\nDemo content + production12\nAlex Baker-Whitcomb, Avi Nayak, Barret Zoph, Bobby\nSpero, Bogo Giertler, Brendan Quinn, Chad Nelson, Char-\nlotte Barette, Claudia Fischer, Coley Czarnecki, Colin Jarvis,\nEric Antonow, Filippo Raso, Greg Brockman, James Betker,\nJessica Shieh, Joe Beutler, Joe Landers, Krithika Muthuku-\nmar, Leher Pathak, Lindsay McCallum, Mark Chen, Mianna\nChen, Michael Petrov, Mira Murati, Natalie Summers, Peter\nDeng, Ricky Wang, Rocky Smith, Rohan Sahai, Romain\nHuet, Rowan Zellers, Scott Ethersmith, Toki Sherbakov,\nTomer Kaftan, Veit Moeller, Wayne Chang\nCommunications + Marketing12\nAlex Baker-Whitcomb, Andrew Galu, Angela Baek, Coley\nCzarnecki, Dev Valladares, Eric Antonow, Hannah Wong,\nLeher Pathak, Lindsay McCallum, Lindsey Held, Krithika\nMuthukumar, Kendra Rimbach, Maya Shetty, Niko Felix,\nRoy Chen, Ruby Chen, Taya Christianson, Thomas Degry,\nVeit Moeller\nResource Allocation & Problem Solving12\nBob McGrew, Lauren Itow, Mianna Chen, Nik Tezak, Peter\nHoeschele, Tal Broda\nInference Compute12\nAndrew Codispoti, Brian Hsu, Channing Conger, Ikai Lan,\nJos Kraaijeveld, Kai Hayashi, Kenny Nguyen, Lu Zhang,\nNatan LaFontaine, Pavel Belov, Peng Su, Vishal Kuo, Will\nSheu\nSecurity and privacy12\nKevin Button, Paul McMillan, Shino Jomoto, Thomas Shad-\nwell, Vinnie Monaco\nGTM, Pricing, Finance12\nAndrew Braunstein, Anuj Gosalia, Denny Jin, Eric Kramer,\nJeff Harris, Jessica Shieh, Joe Beutler, Joe Landers, Lauren\nWorkman, Rob Donnelly, Romain Huet, Shamez Hermani,\nToki Sherbakov\nSystem Card Contributions\n12\nAlex Kirillov, Angela Jiang, Ben Rossen, Cary Bassin, Cary\nHudson, Chan Jun Shern, Claudia Fischer, Dane Sher-\nburn, David Robinson, Evan Mays, Filippo Raso, Fred\nvon Lohmann, Freddie Sulit, Giulio Starace, James Aung,\nJames Lennon, Jason Phang, Jessica Gan Lee, Joaquin\nQuinonero Candela, Joel Parish, Jonathan Uesato, Karan\nSinghal, Katy Shi, Kayla Wood, Kevin Liu, Lama Ahmad,\nLilian Weng, Lindsay McCallum, Luke Hewitt, Mark Gray,\nMarwan Aljubeh, Meng Jia Yang, Mia Glaese, Mianna Chen,\nMichael Lampe, Michele Wang, Miles Wang, Natalie Cone,\nNeil Chowdhury, Nora Puckett, Oliver Jaffe, Olivia Watkins,\nPatrick Chao, Rachel Dias, Rahul Arora, Saachi Jain, Sam\nToizer, Samuel Miserendino, Sandhini Agarwal, Tejal Pat-\nwardhan, Thomas Degry, Tom Stasi, Troy Peterson, Tyce\nWalters, Tyna Eloundou\nWe also acknowledge and thank every OpenAI team member not explicitly mentioned above, including the amazing people\non the executive assistant, finance, go to market, human resources, legal, operations and recruiting teams. From hiring\neveryone in the company, to making sure we have an amazing office space, to building the administrative, HR, legal, and\nfinancial structures that allow us to do our best work, everyone at OpenAI has contributed to GPT-4o.\nWe thank Microsoft for their partnership, especially Microsoft Azure for supporting model training with infrastructure design\nand management, and the Microsoft Bing team and Microsoft\u2019s safety teams for their partnership on safe deployment.\nWe are grateful to our expert testers and red teamers who helped test our models at early stages of development and informed\nour risk assessments as well as the System Card output. Participation in this red teaming process is not an endorsement of\nthe deployment plans of OpenAI or OpenAI\u2019s policies.\nRed Teamers:\nAdam Kuzdrali\u0144ski, Alexa W, Amer Sawan, Ana-Diamond Aaba Atach, Anna Becker, Arjun Singh Puri, Baybars Orsek,\nBen Kobren, Bertie Vidgen, Blue Sheffer, Broderick McDonald, Bruce Bassett, Bruno Arsioli, Caroline Friedman Levy, Casey\nWilliams, Christophe Ego, Ciel Qi, Cory Alpert, Dani Madrid-Morales, Daniel Kang, Darius Emrani, Dominik Haenni, Drin\nFerizaj, Emily Lynell Edwards, Emmett Alton Sartor, Farhan Sahito, Francesco De Toni, Gabriel Chua, Gaines Hubbell,\nGelei Deng, George Gor, Gerardo Adesso, Grant Brailsford, Hao Zhao, Henry Silverman, Hasan Sawan, Herman Wasserman,\nHugo Gobato Souto, Ioana Tanase, Isabella Andric, Ivan Carbajal, Jacy Reese Anthis, Jake Okechukwu Effoduh, Javier\nGarc\u00eda Arredondo, Jennifer Victoria Scurrell, Jianlong Zhu, Joanna Brzyska, Kate Turetsky, Kelly Bare, Kristen Menou,\nLatisha Harry, Lee Elkin, Liseli Akayombokwa, Louise Giam, M. Alexandra Garc\u00eda P\u00e9rez, Manas Chawla, Marjana Skenduli,\nMartin Ryd\u00e9n, Mateusz Garncarek, Matt Groh, Maureen Robinson, Maximilian M\u00fcller, Micah Bornfree, Michael Richter,\nMichela Passoni, Mikael von Strauss, Mohamed Sakher Sawan, Mohammed Elzubeir, Muhammad Saad Naeem, Murat Ata,\nNanditha Narayanamoorthy, Naomi Hart, Nathan Heath, Patrick Caughey, Per Wikman-Svahn, Piyalitt Ittichaiwong, Prerna\nJuneja, Rafael Gonzalez-Vazquez, Rand Forrester, Richard Fang, Rosa Ana del Roc\u00edo Valderrama, Saad Hermak, Sangeet\nKumar, Sara Kingsley, Shelby Grossman, Shezaad Dastoor, Susan Nesbitt, Theresa Kennedy, Thomas Hagen, Thorsten\nHolz, Tony Younes, Torin van den Bulk, Viktoria Holz, Vincent Nestler, Xudong Han, Xuelong Fan, Zhicong Zhao\nRed Teaming Organizations:\nMETR, Apollo Research, Virtue AI\nUhura Evals:\nChoice Mpanza, David Adelani, Edward Bayes, Igneciah Pocia Thete, Imaan Khadir, Israel A. Azime, Jesujoba Oluwadara\nAlabi, Jonas Kgomo, Naome A. Etori, Shamsuddeen Hassan Muhammad\n*Contributors listed in alphabetized order\n28\n\nReferences\n[1] OpenAI, \u201cHello gpt-4,\u201d 2024.\n[2] T. Stivers, N. J. Enfield, P. Brown, C. Englert, M. Hayashi, T. Heinemann, G. Hoymann, F. Rossano, J. P. de Ruiter,\nK. E. Yoon, and S. C. Levinson, \u201cUniversals and cultural variation in turn-taking in conversation,\u201dProceedings of the\nNational Academy of Sciences , vol. 106, no. 26, pp. 10587\u201310592, 2009.\n[3] The White House, \u201cFact sheet: Biden-harris administration secures voluntary commitments from leading artificial\nintelligence companies to manage the risks posed by ai,\u201d 2023.\n[4] OpenAI, \u201cOpenai preparedness framework beta,\u201d 2023. https://cdn.openai.com/\nopenai-preparedness-framework-beta.pdf.\n[5] Shutterstock, \u201cShutterstock press release,\u201d 2023.\n[6] OpenAI, \u201cGpt-4 technical report,\u201d 2023.\n[7] OpenAI, \u201cGpt-4v(ision) system card.\u201dhttps://openai.com/index/gpt-4v-system-card/, 2023. Accessed: 2024-\n07-22.\n[8] OpenAI, \u201cNavigating the challenges and opportunities of synthetic voices.\u201d https://openai.com/index/\nnavigating-the-challenges-and-opportunities-of-synthetic-voices/ , 2024. Accessed: 2024-07-22.\n[9] K. T. Mai, S. Bray, T. Davies, and L. D. Griffin, \u201cWarning: Humans cannot reliably detect speech deepfakes,\u201dPLoS\nOne, vol. 18, p. e0285333, Aug. 2023.\n[10] M. Mori, K. F. MacDorman, and N. Kageki, \u201cThe uncanny valley [from the field],\u201dIEEE Robotics & automation\nmagazine, vol. 19, no. 2, pp. 98\u2013100, 2012.\n[11] OpenAI, \u201cHow the voices for chatgpt were chosen,\u201d 2024.\n[12] I. Solaiman, Z. Talat, W. Agnew, L. Ahmad, D. Baker, S. L. Blodgett, C. Chen, H. D. I. au2, J. Dodge, I. Duan,\nE. Evans, F. Friedrich, A. Ghosh, U. Gohar, S. Hooker, Y. Jernite, R. Kalluri, A. Lusoli, A. Leidinger, M. Lin,\nX. Lin, S. Luccioni, J. Mickel, M. Mitchell, J. Newman, A. Ovalle, M.-T. Png, S. Singh, A. Strait, L. Struppek, and\nA. Subramonian, \u201cEvaluating the social impact of generative ai systems in systems and society,\u201d 2024.\n[13] R. Shelby, S. Rismani, K. Henne, A. Moon, N. Rostamzadeh, P. Nicholas, N. Yilla, J. Gallegos, A. Smart, E. Garcia,\nand G. Virk, \u201cSociotechnical harms of algorithmic systems: Scoping a taxonomy for harm reduction,\u201d 2023.\n[14] S. L. Blodgett, Q. V. Liao, A. Olteanu, R. Mihalcea, M. Muller, M. K. Scheuerman, C. Tan, and Q. Yang, \u201cResponsible\nlanguage technologies: Foreseeing and mitigating harms,\u201d inExtended Abstracts of the 2022 CHI Conference on Human\nFactors in Computing Systems , CHI EA \u201922, (New York, NY, USA), Association for Computing Machinery, 2022.\n[15] H. Suresh and J. Guttag, \u201cA framework for understanding sources of harm throughout the machine learning life cycle,\u201d\nin Equity and Access in Algorithms, Mechanisms, and Optimization , EAAMO \u201921, ACM, Oct. 2021.\n[16] S. Shahriar, S. Allana, S. M. Hazratifard, and R. Dara, \u201cA survey of privacy risks and mitigation strategies in the\nartificial intelligence life cycle,\u201dIEEE Access, vol. 11, pp. 61829\u201361854, 2023.\n[17] OpenAI, \u201cModeration overview,\u201d 2024.\n[18] A. Tamkin, M. Brundage, J. Clark, and D. Ganguli, \u201cUnderstanding the capabilities, limitations, and societal impact of\nlarge language models,\u201d 2021.\n[19] B. Buchanan, A. Lohn, M. Musser, and K. Sedova, \u201cTruth, lies, and automation: How language models could change\ndisinformation,\u201d May 2021.\n[20] OpenAI, \u201cOpenai usage policies,\u201d 2023.https://openai.com/policies/usage-policies/.\n[21] OpenAI, \u201cBuilding an early warning system for llm-aided biological threat creation,\u201d 2024.https://openai.com/\nindex/building-an-early-warning-system-for-llm-aided-biological-threat-creation/ .\n[22] Deloitte, \u201cDeloitte acquires gryphon scientific business to expand security science and public health capa-\nbilities,\u201d 2024. https://www2.deloitte.com/us/en/pages/about-deloitte/articles/press-releases/\ndeloitte-acquires-gryphon-scientific-business-to-expand-security-science-and-public-health-capabilities.\nhtml.\n[23] L. Weidinger, M. Rauh, N. Marchal, A. Manzini, L. A. Hendricks, J. Mateos-Garcia, S. Bergman, J. Kay, C. Griffin,\nB. Bariach, I. Gabriel, V. Rieser, and W. Isaac, \u201cSociotechnical safety evaluation of generative ai systems,\u201d 2023.\n[24] A. Tamkin, A. Askell, L. Lovitt, E. Durmus, N. Joseph, S. Kravec, K. Nguyen, J. Kaplan, and D. Ganguli, \u201cEvaluating\nand mitigating discrimination in language model decisions,\u201d 2023.\n[25] J. A. Goldstein, G. Sastry, M. Musser, R. DiResta, M. Gentzel, and K. Sedova, \u201cGenerative language models and\nautomated influence operations: Emerging threats and potential mitigations,\u201d 2023.\n29\n\n[26] I. Pentina, T. Hancock, and T. Xie, \u201cExploring relationship development with social chatbots: A mixed-method study\nof replika,\u201dComputers in Human Behavior , vol. 140, p. 107600, 2023.\n[27] Y. Bengio, G. Hinton, A. Yao, D. Song, P. Abbeel, T. Darrell, Y. N. Harari, Y.-Q. Zhang, L. Xue, S. Shalev-Shwartz,\nG. Hadfield, J. Clune, T. Maharaj, F. Hutter, A. G. Baydin, S. McIlraith, Q. Gao, A. Acharya, D. Krueger, A. Dragan,\nP. Torr, S. Russell, D. Kahneman, J. Brauner, and S. Mindermann, \u201cManaging extreme ai risks amid rapid progress,\u201d\nScience, vol. 384, no. 6698, pp. 842\u2013845, 2024.\n[28] S. B. Johnson, J. R. Clark, M. C. Luetke, N. M. Butala, A. T. Pearson, J. M. Shapiro, D. M. Aleman, J. M. Lee,\nM. M. Beil, C. V. Winkle, M. C. Boudreaux, R. C. D\u2019Cunha, H. J. Krouse, and C. Li, \u201cChatgpt in medical education:\na workshop-based large language model-powered intervention for evidence-based clinical decision making in medical\nstudents,\u201dNature Medicine, vol. 29, pp. 1534\u20131542, 2023.\n[29] K. Kavukcuoglu, \u201cReal-world challenges for agi,\u201d Nov 2021.\n[30] S. Altman, \u201cPlanning for agi and beyond,\u201dOpenAI, 2023.\n[31] T. Eloundou, S. Manning, P. Mishkin, and D. Rock, \u201cGpts are gpts: An early look at the labor market impact potential\nof large language models,\u201darXiv preprint arXiv:2303.10130 , 2023.\n[32] L. Weidinger, M. Rauh, N. Marchal, A. Manzini, L. A. Hendricks, J. Mateos-Garcia, S. Bergman, J. Kay, C. Griffin,\nB. Bariach, et al., \u201cSociotechnical safety evaluation of generative ai systems,\u201darXiv preprint arXiv:2310.11986 , 2023.\n[33] S. Cox, M. Hammerling, J. L\u00e1la, J. Laurent, S. Rodriques, M. Rubashkin, and A. White, \u201cWikicrow: Automating\nsynthesis of human scientific knowledge,\u201dFuture House, 2023.\n[34] S. A. Athaluri, S. V. Manthena, V. S. R. K. M. Kesapragada, V. Yarlagadda, T. Dave, and R. T. S. Duddumpudi,\n\u201cExploring the boundaries of reality: Investigating the phenomenon of artificial intelligence hallucination in scientific\nwriting through chatgpt references,\u201dCureus, vol. 15, no. 4, p. e37432, 2023.\n[35] Z. Li, \u201cThe dark side of chatgpt: Legal and ethical challenges from stochastic parrots and hallucination,\u201d 2023.\n[36] M. Dubiel, A. Sergeeva, and L. A. Leiva, \u201cImpact of voice fidelity on decision making: A potential dark pattern?,\u201d 2024.\n[37] B. Waber, M. Williams, J. S. Carroll, and A. S. Pentland, \u201cA voice is worth a thousand words: The implications of\nthe micro-coding of social signals in speech for trust research,\u201d inHandbook of Research Methods on Trust (G. M.\nFergus Lyon and M. N. Saunders, eds.), ch. 23, p. 320, New York: Edward Elgar Publishing, 2011.\n[38] I. Pentina, B. Guo, and W. P. Fan, \u201cFriend, mentor, lover: Does chatbot engagement lead to psychological dependence?,\u201d\nJournal of Service Management , 2023.\n[39] H. Nori, N. King, S. M. McKinney, D. Carignan, and E. Horvitz, \u201cCapabilities of gpt-4 on medical challenge problems,\u201d\narXiv preprint arXiv:2303.13375 , 2023.\n[40] H. Nori, Y. T. Lee, S. Zhang, D. Carignan, R. Edgar, N. Fusi, N. King, J. Larson, Y. Li, W. Liu,et al., \u201cCan generalist\nfoundation models outcompete special-purpose tuning? case study in medicine,\u201darXiv preprint arXiv:2311.16452 ,\n2023.\n[41] K. Singhal, S. Azizi, T. Tu, S. S. Mahdavi, J. Wei, H. W. Chung, N. Scales, A. Tanwani, H. Cole-Lewis, S. Pfohl, P. Payne,\nM. Seneviratne, P. Gamble, C. Kelly, N. Scharli, A. Chowdhery, P. Mansfield, B. A. y Arcas, D. Webster, G. S. Corrado,\nY. Matias, K. Chou, J. Gottweis, N. Tomasev, Y. Liu, A. Rajkomar, J. Barral, C. Semturs, A. Karthikesalingam, and\nV. Natarajan, \u201cLarge language models encode clinical knowledge,\u201d 2022.\n[42] K. Singhal, T. Tu, J. Gottweis, R. Sayres, E. Wulczyn, L. Hou, K. Clark, S. Pfohl, H. Cole-Lewis, D. Neal, M. Schaek-\nermann, A. Wang, M. Amin, S. Lachgar, P. Mansfield, S. Prakash, B. Green, E. Dominowska, B. A. y Arcas,\nN. Tomasev, Y. Liu, R. Wong, C. Semturs, S. S. Mahdavi, J. Barral, D. Webster, G. S. Corrado, Y. Matias, S. Azizi,\nA. Karthikesalingam, and V. Natarajan, \u201cTowards expert-level medical question answering with large language models,\u201d\n2023.\n[43] K. Saab, T. Tu, W.-H. Weng, R. Tanno, D. Stutz, E. Wulczyn, F. Zhang, T. Strother, C. Park, E. Vedadi, J. Z. Chaves,\nS.-Y. Hu, M. Schaekermann, A. Kamath, Y. Cheng, D. G. T. Barrett, C. Cheung, B. Mustafa, A. Palepu, D. McDuff,\nL. Hou, T. Golany, L. Liu, J. baptiste Alayrac, N. Houlsby, N. Tomasev, J. Freyberg, C. Lau, J. Kemp, J. Lai,\nS. Azizi, K. Kanada, S. Man, K. Kulkarni, R. Sun, S. Shakeri, L. He, B. Caine, A. Webson, N. Latysheva, M. Johnson,\nP. Mansfield, J. Lu, E. Rivlin, J. Anderson, B. Green, R. Wong, J. Krause, J. Shlens, E. Dominowska, S. M. A. Eslami,\nK. Chou, C. Cui, O. Vinyals, K. Kavukcuoglu, J. Manyika, J. Dean, D. Hassabis, Y. Matias, D. Webster, J. Barral,\nG. Corrado, C. Semturs, S. S. Mahdavi, J. Gottweis, A. Karthikesalingam, and V. Natarajan, \u201cCapabilities of gemini\nmodels in medicine,\u201d 2024.\n[44] Epic Systems Corporation, \u201cEpic and microsoft bring gpt-4 to ehrs,\u201dEpic, 2023.\n[45] D. Van Veen, C. Van Uden, L. Blankemeier, J.-B. Delbrouck, A. Aali, C. Bluethgen, A. Pareek, M. Polacin, E. P. Reis,\nA. Seehofnerov\u00e1, et al., \u201cAdapted large language models can outperform medical experts in clinical text summarization,\u201d\nNature medicine, vol. 30, no. 4, pp. 1134\u20131142, 2024.\n[46] Epic, \u201cEpic and microsoft bring gpt-4 to ehrs,\u201d 2023.\n30\n\n[47] P. Garcia, S. P. Ma, S. Shah, M. Smith, Y. Jeong, A. Devon-Sand, M. Tai-Seale, K. Takazawa, D. Clutter, K. Vogt,\nC. Lugtu, M. Rojo, S. Lin, T. Shanafelt, M. A. Pfeffer, and C. Sharp, \u201cArtificial Intelligence\u2013Generated Draft Replies\nto Patient Inbox Messages,\u201dJAMA Network Open , vol. 7, pp. e243201\u2013e243201, 03 2024.\n[48] OpenAI, \u201cParadigm: Improving patient access to clinical trials.\u201dhttps://openai.com/index/paradigm/, 2024.\nAccessed: 2024-08-07.\n[49] M. Hutson, \u201cHow ai is being used to accelerate clinical trials,\u201dNature, vol. 627, pp. S2\u2013S5, 2024.\n[50] OpenAI, \u201cUsing gpt-4o reasoning to transform cancer care.\u201dhttps://openai.com/index/color-health/, 2024.\nAccessed: 2024-08-07.\n[51] J. Varghese and J.-L. Chapiro, \u201cSystematic analysis of chatgpt, google search and llama 2 for clinical decision support\ntasks,\u201dNature Communications, vol. 15, no. 1, p. 46411, 2024. Accessed: 2024-08-07.\n[52] E. Schmidt, \u201cAi will transform science.\u201d https://www.technologyreview.com/2023/07/05/1075865/\neric-schmidt-ai-will-transform-science/ , 2023. Accessed: 2024-08-07.\n[53] N. Rosenberg, \u201cScience, invention and economic growth,\u201dThe Economic Journal , vol. 84, no. 333, pp. 90\u2013108, 1974.\n[54] R. M. Atlas and M. Dando, \u201cThe dual-use dilemma for the life sciences: Perspectives, conundrums, and global solutions,\u201d\nBiosecurity and Bioterrorism: Biodefense Strategy, Practice, and Science , vol. 4, no. 3, pp. 276\u2013286, 2006. PMID:\n16999588.\n[55] X. Gu and M. Krenn, \u201cGeneration and human-expert evaluation of interesting research ideas using knowledge graphs\nand large language models,\u201d 2024.\n[56] A. Ghafarollahi and M. J. Buehler, \u201cAtomagents: Alloy design and discovery through physics-aware multi-modal\nmulti-agent artificial intelligence,\u201d 2024.\n[57] J. M. Laurent, J. D. Janizek, M. Ruzo, M. M. Hinks, M. J. Hammerling, S. Narayanan, M. Ponnapati, A. D. White,\nand S. G. Rodriques, \u201cLab-bench: Measuring capabilities of language models for biology research,\u201d 2024.\n[58] H. Cai, X. Cai, J. Chang, S. Li, L. Yao, C. Wang, Z. Gao, H. Wang, Y. Li, M. Lin, S. Yang, J. Wang, M. Xu, J. Huang,\nF. Xi, J. Zhuang, Y. Yin, Y. Li, C. Chen, Z. Cheng, Z. Zhao, L. Zhang, and G. Ke, \u201cSciassess: Benchmarking llm\nproficiency in scientific literature analysis,\u201d 2024.\n[59] P. Clark, I. Cowhey, O. Etzioni, T. Khot, A. Sabharwal, C. Schoenick, and O. Tafjord, \u201cThink you have solved question\nanswering? try arc, the AI2 reasoning challenge,\u201dCoRR, vol. abs/1803.05457, 2018.\n[60] S. Lin, J. Hilton, and O. Evans, \u201cTruthfulqa: Measuring how models mimic human falsehoods,\u201d CoRR,\nvol. abs/2109.07958, 2021.\nA Violative & Disallowed Content - Full Evaluations\nWe used TTS to convert existing text safety evals to audio. We then evaluate the text transcript of the audio output with\nthe standard text rule-based classifier.\nOur two main metrics for this eval are:\n\u2022 not_unsafe: does the model produce audio output that isunsafe?\n\u2022 not_overrefuse: does the model refuse to comply with a benign request?\nWe also note sub-metrics for higher severity categories, specifically:\n\u2022 sexual/minors\n\u2022 sexual/illegal\n\u2022 extremist/propaganda\n\u2022 illicit/violent\n\u2022 illicit/non-violent\n\u2022 self-harm/instructions\n31\n\nBelow we display the results of these evaluations with the audio and text mode of the GPT-4o Voice Mode model, as well as\nthe text performance of the current GPT-4o model in production.\nCurrent GPT-4o Text New GPT-4o \u2013 Text New GPT-4o \u2013 Audio\nnot_unsafe 0.99 0.99 1.0\nnot_overrefuse 0.91 0.89 0.91\nsexual_minors_not_unsafe 0.95 0.98 0.98\nsexual_illegal_not_unsafe 0.97 0.98 0.99\nextremism_propaganda_not_unsafe 1.0 1.0 1.0\nillicit_violent_not_unsafe 1.0 1.0 1.0\nillicit_non_violent_not_unsafe 0.99 0.97 1.0\nself_harm_not_unsafe 1.0 1.0 1.0\nTable 11: Comparison of Current and New GPT-4o Text and Audio Safety Metrics\nB Sample tasks from METR Evaluations\n32\n\nFigure 3: Sample tasks from METR Evaluations\n33"
+  },
+  "claims": [
+    {
+      "id": "claim_1",
+      "claim": "GPT-4o can respond to audio inputs in as little as 232 milliseconds, with an average of 320 milliseconds, which is similar to human response time in a conversation.",
+      "claim_type": "numeric",
+      "source_location": "1 Introduction",
+      "why_risky": "This claims an exceptionally low latency that rivals human-to-human interaction. If actual operational latencies in production or under network load are higher, user trust and system utility for real-time conversational applications will fail.",
+      "audit_question": "Under what exact network latency, hardware configuration, and server load conditions were the 232ms minimum and 320ms average latencies measured, and do these figures include end-to-end network round-trip time?"
+    },
+    {
+      "id": "claim_2",
+      "claim": "It matches GPT-4 Turbo performance on text in English and code, with significant improvement on text in non-English languages, while also being much faster and 50% cheaper in the API.",
+      "claim_type": "numeric",
+      "source_location": "1 Introduction",
+      "why_risky": "Broad claims of performance parity combined with massive speedups and 50% price reductions are risky if cost-saving optimizations (such as quantization or distillation) lead to regression on rare, complex, or safety-critical edge cases.",
+      "audit_question": "What comprehensive benchmarks were used to verify that the model's text and code performance matches GPT-4 Turbo across all task complexities, and what are the specific edge-case scenarios where performance might degrade?"
+    },
+    {
+      "id": "claim_3",
+      "claim": "Our system currently catches 100% of meaningful deviations from the system voice based on our internal evaluations, which includes samples generated by other system voices, clips during which the model used a voice from the prompt as part of its completion, and an assortment of human samples.",
+      "claim_type": "safety",
+      "source_location": "3.3.1 Unauthorized voice generation",
+      "why_risky": "An absolute safety claim (100% detection rate) is highly risky because real-world adversarial actors actively seek out-of-distribution audio, subtle blending, or custom noise perturbations that can bypass simple voice-deviation classifiers.",
+      "audit_question": "What parameters defined a 'meaningful deviation' in the internal evaluations, and did the evaluation dataset include sophisticated adversarial attempts to spoof, blend, or warp unauthorized voices to bypass the classifier?"
+    },
+    {
+      "id": "claim_4",
+      "claim": "We found high text to audio transference of refusals for previously disallowed content. This means that the post-training we\u2019ve done to reduce the potential for harm in GPT-4o\u2019s text output successfully carried over to audio output.",
+      "claim_type": "generalization",
+      "source_location": "3.3.5 Violative and disallowed content",
+      "why_risky": "Assuming that safety training from the text domain fully and successfully transfers to the audio domain is dangerous, as audio has unique expressive, emotional, and phonetic vectors (like whispering or intonation) that can bypass text-based refusals.",
+      "audit_question": "Was the text-to-audio transfer of safety refusals tested against audio-specific jailbreaking vectors (such as emotional framing, background audio distress, or phonetic bypasses) rather than just transcribed equivalents?"
+    },
+    {
+      "id": "claim_5",
+      "claim": "Compared to our initial model, we saw a 14 point improvement in when the model should refuse to identify a voice in an audio input, and a 12 point improvement when it should comply with that request.",
+      "claim_type": "benchmark",
+      "source_location": "3.3.2 Speaker identification",
+      "why_risky": "This assertion of safe speaker-identification behavior (98% compliance on refusals, 83% on compliance) relies heavily on the quality and scope of internal evaluation datasets, which may not represent real-world diversity in accents, celebrity voices, or noise levels.",
+      "audit_question": "What specific audio dataset was used to calculate the speaker identification safe behavior accuracy, and how diverse were the samples in terms of language, speaker demographics, recording quality, and noise?"
+    },
+    {
+      "id": "claim_6",
+      "claim": "Compared to our initial model, we saw a 24 point improvement in the model correctly responding to requests to identify sensitive traits (e.g, refusing UGI and safely complying with STA).",
+      "claim_type": "benchmark",
+      "source_location": "3.3.4 Ungrounded inference / Sensitive trait attribution",
+      "why_risky": "An 84% accuracy rate still leaves a significant 16% error rate where the model may generate ungrounded, potentially biased inferences about sensitive traits (such as race, intelligence, or criminal history) or fail to answer benign questions safely.",
+      "audit_question": "What specific categories of ungrounded inferences (e.g., intelligence, socioeconomic status, race) had the highest rate of failure or unsafe generation within the remaining 16% of incorrect responses?"
+    },
+    {
+      "id": "claim_7",
+      "claim": "We observe that GPT-4o performance improves over the final GPT-4T model for 21/22 evaluations, often by a substantial margin. For example, for the popular MedQA USMLE 4 options dataset, 0-shot accuracy improves from 78.2% to 89.4%. This exceeds the performance of existing specialized medical models using few-shot prompting [43, 42], e.g., 84.0% for Med-Gemini-L 1.0 and 79.7% for Med-PaLM 2.",
+      "claim_type": "benchmark",
+      "source_location": "5.2 Health",
+      "why_risky": "Claiming superior medical-knowledge performance over specialized clinical models on benchmarks can encourage dangerous medical over-reliance. Since these evaluations are purely text-based, the claims may not hold when users interact via speech.",
+      "audit_question": "Does GPT-4o maintain its measured medical accuracy of 89.4% when processing queries through audio inputs (speech-to-speech), or does translation/transcription loss degrade its clinical reasoning performance compared to text?"
+    },
+    {
+      "id": "claim_8",
+      "claim": "GPT-4o shows improved reading comprehension and reasoning across a sample of historically underrepresented languages, and narrows the gap in performance between these languages and English.",
+      "claim_type": "generalization",
+      "source_location": "5.4 Underrepresented Languages",
+      "why_risky": "Generalizing performance gains from translated multiple-choice benchmarks (like ARC-Easy and TruthfulQA) to overall 'reading comprehension and reasoning' ignores the cultural, contextual, and dialectal nuances that define language use in real-world scenarios.",
+      "audit_question": "Does the measured improvement on translated benchmarks translate to actual comprehension and logical reasoning in natural, culturally nuanced conversational contexts for native speakers of these underrepresented languages?"
+    }
+  ],
+  "audits": [
+    {
+      "claim": {
+        "id": "claim_1",
+        "claim": "GPT-4o can respond to audio inputs in as little as 232 milliseconds, with an average of 320 milliseconds, which is similar to human response time in a conversation.",
+        "claim_type": "numeric",
+        "source_location": "1 Introduction",
+        "why_risky": "This claims an exceptionally low latency that rivals human-to-human interaction. If actual operational latencies in production or under network load are higher, user trust and system utility for real-time conversational applications will fail.",
+        "audit_question": "Under what exact network latency, hardware configuration, and server load conditions were the 232ms minimum and 320ms average latencies measured, and do these figures include end-to-end network round-trip time?"
+      },
+      "verdict": "missing_context",
+      "confidence": "high",
+      "stretch_score": 35,
+      "why": "While the claimed response times (232 ms minimum, 320 ms average) are directly cited from the official GPT-4o System Card, the document completely omits the operational context under which these metrics were achieved. Crucial parameters\u2014such as host GPU models, server cluster configurations, concurrent traffic loads, and whether these figures incorporate client-to-server network round-trip time (RTT)\u2014are not disclosed. Independent benchmarks in production environments show that real-world end-to-end conversational latency averages around 1.2 seconds, which is about four times slower than the model's server-side processing average and fails to match 'human-like' conversational speeds in standard deployment.",
+      "weaker_supported_rewrite": "Under optimal, local server-side benchmark conditions, GPT-4o is capable of processing and generating audio responses in as little as 232 milliseconds (with a 320 millisecond average), though typical real-world end-to-end conversational latencies are higher due to network transit and routing overhead.",
+      "supporting_evidence": [
+        {
+          "source_title": "GPT-4o System Card",
+          "url": "https://cdn.openai.com/gpt-4o-system-card.pdf",
+          "date": "2024-08-08",
+          "snippet": "GPT-4o can respond to audio inputs in as little as 232 milliseconds, with an average of 320 milliseconds, which is similar to human response time[2] in a conversation.",
+          "relevance": "Provides direct primary source support for the claimed minimum and average response times."
+        }
+      ],
+      "counter_evidence": [
+        {
+          "source_title": "GPT-4o Response Time, TTFT & Throughput - AILatency",
+          "date": "2026-05-23",
+          "snippet": "Total Latency 1.2s Grade C . Average. Time to First Token 1.2s Initial Response Time.",
+          "relevance": "Independent production-level API performance benchmarks indicate that the actual end-to-end response time (including network and routing overhead) for GPT-4o averages around 1.2 seconds, which is roughly 4 times slower than the ideal 320ms average presented by OpenAI."
+        }
+      ],
+      "missing_context": [
+        "The specific hardware configuration (such as CPU/GPU model specifications, memory capacity, and clustering architecture) utilized during the benchmark.",
+        "The network conditions under which testing took place, specifically clarifying whether these figures are local/model execution latencies or if they include client-to-server end-to-end network round-trip time (RTT).",
+        "The server load environment (such as concurrent requests, queries per second, and overall system load) present during the latency measurement.",
+        "The exact numeric benchmark value used for the 'human response time in a conversation' (which is referenced via citation but not quantified in the text)."
+      ],
+      "numeric_findings": [
+        "Reported minimum audio response latency: 232 ms (0.232 seconds)",
+        "Reported average audio response latency: 320 ms (0.320 seconds)",
+        "Observed real-world production average response latency (TTFT): 1.2 seconds",
+        "Absolute delta between the average and minimum response times: 88 ms",
+        "Relative increase from the minimum response time to the average response time: 37.93%"
+      ],
+      "agent_outputs": [
+        {
+          "agent": "grounded_verifier",
+          "claim_id": "claim_1",
+          "summary": "The GPT-4o System Card supports the claim that GPT-4o can respond to audio inputs in as little as 232 milliseconds, with an average of 320 milliseconds. However, neither the system card nor OpenAI's official launch documentation discloses the exact hardware configuration, network latency, or server load conditions under which these benchmarks were measured. Furthermore, it is not explicitly stated whether these figures include end-to-end network round-trip time (RTT), though external technical reports suggest they represent server-side processing/inference latency rather than real-world end-to-end WAN transit times.",
+          "duration_ms": 27123,
+          "supporting_evidence": [
+            {
+              "source_title": "GPT-4o System Card",
+              "url": "https://cdn.openai.com/gpt-4o-system-card.pdf",
+              "date": "2024-08-08",
+              "snippet": "GPT-4o can respond to audio inputs in as little as 232 milliseconds, with an average of 320 milliseconds, which is similar to human response time[2] in a conversation.",
+              "relevance": "Provides direct primary source support for the claimed minimum and average response times."
+            },
+            {
+              "source_title": "openai.com",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGYmSrmESR8Z-1HVNDN8eukQl8lNF4jR4BLdXMjZjHxmWS3hgYOVLSALDYozL_sBhUIDUa8PKZ5Ol-As3-fJ7j8kptjZ45sfxTWj17zBb2U2PLLfFG_XB5xSn0_KJpF_bGcmA==",
+              "snippet": "Source returned by Gemini grounding metadata.",
+              "relevance": "Grounding source used during specialist audit."
+            },
+            {
+              "source_title": "agora.io",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE4aUm7WvxcK_n9BmFzqMC0JdLDxI5zh02kWDN5dCF_5oHdXyHk-Bvc4X5M9wRJN-CeK9hSP0rlHDTIYeYBGUjlrf8Zb4gPApF4eO02kvD43wpWxdyrnb9HybTmSGAFAU_0-qBrgvWHgVEexBq8JXyMpQwxKSeori9tJh3QwA8pRc9piFW-7ZWL86fUCIgYMo8fiMsV4tfO_N0=",
+              "snippet": "Source returned by Gemini grounding metadata.",
+              "relevance": "Grounding source used during specialist audit."
+            }
+          ],
+          "counter_evidence": [],
+          "missing_context": [
+            "The exact hardware configuration (such as host GPU models and cluster setup) used during the latency benchmarks.",
+            "The network conditions, routing protocols, and whether WAN or local network latency was factored into the figures.",
+            "The server load and concurrency levels (requests per second) active during the evaluation.",
+            "An explicit breakdown of whether the figures measure server-side time-to-first-token (TTFT) or true end-to-end mouth-to-ear latency."
+          ],
+          "numeric_findings": [
+            "Minimum audio response time of 232 milliseconds",
+            "Average audio response time of 320 milliseconds"
+          ]
+        },
+        {
+          "agent": "skeptical_contradiction_finder",
+          "claim_id": "claim_1",
+          "summary": "While the GPT-4o System Card states that the model can respond to audio inputs in as little as 232 milliseconds (with a 320ms average), the claim completely omits any description of the testing environment or conditions under which these numbers were obtained. There is no disclosure of server load, GPU hardware configurations, physical server locations, or network variables. Furthermore, the document does not clarify if these metrics include end-to-end network round-trip time (RTT) or are merely server-side Time to First Token (TTFT) measurements. Independent real-world benchmarks show that end-to-end conversational latency in production is significantly higher.",
+          "duration_ms": 29737,
+          "supporting_evidence": [
+            {
+              "source_title": "openai.com",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHDHaldqOZrwU4zGU45uyhsHpnrXXDRW6InPfi3w_k02_FMGufyDYNlZX8_XFniYmvE_ShXwPER8wmXaUfwaea42xWcCrlDvLt1Zu4PRoTUJyHY7pCas5w_9IXrPHHhLysIiOQ=",
+              "snippet": "Source returned by Gemini grounding metadata.",
+              "relevance": "Grounding source used during specialist audit."
+            },
+            {
+              "source_title": "ailatency.com",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFMgAH7kikYU_60bJtShP0Nmr5HhrMXYBcf31q2uDwqMNuwgztie68ZA7AgFa9rSD-0Vba_vr7lJS07SzuK_36UKIjssY3dL1-xLxBm2aGjBEC1ejaSMibVBMmOEBwsQAI4h3PdaVx5xcA=",
+              "snippet": "Source returned by Gemini grounding metadata.",
+              "relevance": "Grounding source used during specialist audit."
+            }
+          ],
+          "counter_evidence": [
+            {
+              "source_title": "GPT-4o Response Time, TTFT & Throughput - AILatency",
+              "date": "2026-05-23",
+              "snippet": "Total Latency 1.2s Grade C . Average. Time to First Token 1.2s Initial Response Time.",
+              "relevance": "Independent production-level API performance benchmarks indicate that the actual end-to-end response time (including network and routing overhead) for GPT-4o averages around 1.2 seconds, which is roughly 4 times slower than the ideal 320ms average presented by OpenAI."
+            }
+          ],
+          "missing_context": [
+            "The document does not disclose the specific hardware configuration (e.g., GPU specifications or cluster sizes) used to run the low-latency tests.",
+            "The claim fails to clarify whether the 232ms minimum and 320ms average latencies include end-to-end network round-trip time (RTT) or represent solely server-side inference (Time to First Token/Audio Packet) times.",
+            "No information is provided regarding the server load conditions (e.g., isolated testing environment vs. live public traffic) during these latency benchmarks.",
+            "The claim omits geographic and connectivity constraints; standard mobile or residential network transit times alone can introduce 50ms to 200ms+ of latency, preventing real-world interactions from matching 'human response times' under typical network paths."
+          ],
+          "numeric_findings": [
+            "Reported minimum audio response latency: 232 ms",
+            "Reported average audio response latency: 320 ms",
+            "Observed real-world production average response latency (TTFT): 1.2 seconds"
+          ]
+        },
+        {
+          "agent": "numeric_calibrator",
+          "claim_id": "claim_1",
+          "summary": "The claim states that GPT-4o can respond to audio inputs in as little as 232 ms (minimum) and 320 ms (average), which is comparable to human response times in conversation. While the document mentions these numbers, it lacks any specified network latency conditions, hardware configurations, concurrent server load environments, or explicit numeric thresholds used for the human baseline comparison.",
+          "duration_ms": 25655,
+          "supporting_evidence": [
+            {
+              "source_title": "GPT-4o System Card",
+              "url": "https://cdn.openai.com/gpt-4o-system-card.pdf",
+              "date": "2024-08-08",
+              "snippet": "GPT-4o can respond to audio inputs in as little as 232 milliseconds, with an average of 320 milliseconds, which is similar to human response time[2] in a conversation.",
+              "relevance": "Provides the specific minimum (232 ms) and average (320 ms) response times for GPT-4o's audio input capabilities."
+            }
+          ],
+          "counter_evidence": [],
+          "missing_context": [
+            "The specific hardware configuration (e.g., CPU/GPU model specifications, memory capacity, and clustering architecture) utilized during the benchmark.",
+            "The network conditions under which the testing took place, specifically clarifying whether these figures are local/model execution latencies or if they include client-to-server end-to-end network round-trip time (RTT).",
+            "The server load environment (such as concurrent requests, queries per second, and overall system load) present during the latency measurement.",
+            "The exact numeric benchmark value used for the 'human response time in a conversation' (which is referenced via citation [2] but not quantified in the text)."
+          ],
+          "numeric_findings": [
+            "Absolute delta between the average and minimum response times: 320 ms - 232 ms = 88 ms.",
+            "Relative increase from the minimum response time to the average response time: (320 ms - 232 ms) / 232 ms = 37.93%.",
+            "Relative decrease from the average response time to the minimum response time: (320 ms - 232 ms) / 320 ms = 27.50%.",
+            "Unit conversion of minimum response time to seconds: 232 ms = 0.232 seconds.",
+            "Unit conversion of average response time to seconds: 320 ms = 0.320 seconds."
+          ]
+        },
+        {
+          "agent": "claim-aggregator",
+          "claim_id": "claim_1",
+          "summary": "Combined specialist outputs into final verdict `missing_context` with `high` confidence.",
+          "duration_ms": 26109,
+          "supporting_evidence": [
+            {
+              "source_title": "GPT-4o System Card",
+              "url": "https://cdn.openai.com/gpt-4o-system-card.pdf",
+              "date": "2024-08-08",
+              "snippet": "GPT-4o can respond to audio inputs in as little as 232 milliseconds, with an average of 320 milliseconds, which is similar to human response time[2] in a conversation.",
+              "relevance": "Provides direct primary source support for the claimed minimum and average response times."
+            }
+          ],
+          "counter_evidence": [
+            {
+              "source_title": "GPT-4o Response Time, TTFT & Throughput - AILatency",
+              "date": "2026-05-23",
+              "snippet": "Total Latency 1.2s Grade C . Average. Time to First Token 1.2s Initial Response Time.",
+              "relevance": "Independent production-level API performance benchmarks indicate that the actual end-to-end response time (including network and routing overhead) for GPT-4o averages around 1.2 seconds, which is roughly 4 times slower than the ideal 320ms average presented by OpenAI."
+            }
+          ],
+          "missing_context": [
+            "The specific hardware configuration (such as CPU/GPU model specifications, memory capacity, and clustering architecture) utilized during the benchmark.",
+            "The network conditions under which testing took place, specifically clarifying whether these figures are local/model execution latencies or if they include client-to-server end-to-end network round-trip time (RTT).",
+            "The server load environment (such as concurrent requests, queries per second, and overall system load) present during the latency measurement.",
+            "The exact numeric benchmark value used for the 'human response time in a conversation' (which is referenced via citation but not quantified in the text)."
+          ],
+          "numeric_findings": [
+            "Reported minimum audio response latency: 232 ms (0.232 seconds)",
+            "Reported average audio response latency: 320 ms (0.320 seconds)",
+            "Observed real-world production average response latency (TTFT): 1.2 seconds",
+            "Absolute delta between the average and minimum response times: 88 ms",
+            "Relative increase from the minimum response time to the average response time: 37.93%"
+          ]
+        }
+      ],
+      "claim_timing": {
+        "claim_id": "claim_1",
+        "total_duration_ms": 55866,
+        "verifier_ms": 27123,
+        "contradiction_finder_ms": 29737,
+        "numeric_calibrator_ms": 25655,
+        "aggregator_ms": 26109,
+        "contrast_ms": 0
+      }
+    }
+  ],
+  "runtime": "local",
+  "mode": "live_gemini",
+  "model": "gemini-3.5-flash",
+  "contrast_enabled": false,
+  "reference_urls": [],
+  "run_profile": {
+    "total_duration_ms": 93258,
+    "load_document_ms": 9793,
+    "extract_claims_ms": 27597,
+    "audit_claims_ms": 55869,
+    "contrast_duration_ms": 0,
+    "claims_extracted": 8,
+    "claims_audited": 1,
+    "agent_passes": 3,
+    "contrast_claims": 0,
+    "unique_source_count": 1,
+    "claim_profiles": [
+      {
+        "claim_id": "claim_1",
+        "total_duration_ms": 55866,
+        "verifier_ms": 27123,
+        "contradiction_finder_ms": 29737,
+        "numeric_calibrator_ms": 25655,
+        "aggregator_ms": 26109,
+        "contrast_ms": 0
+      }
+    ]
+  }
+};
+    let selected = 0;
+    const filters = { verdict: 'all' };
+    const cls = (value) => String(value).replaceAll('_', '-').replaceAll(' ', '-');
+    const confidenceScore = { low: 34, medium: 67, high: 100 };
+    const verdictOrder = ['supported', 'overstated', 'missing_context', 'contradicted', 'not_checkable'];
+    const verdictLabels = {
+      supported: 'Supported',
+      overstated: 'Overstated',
+      missing_context: 'Missing Context',
+      contradicted: 'Contradicted',
+      not_checkable: 'Not Checkable'
+    };
+    const esc = (value) => String(value ?? '').replace(/[&<>"']/g, char => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[char]));
+    const safeHref = (value) => {
+      if (!value) return '';
+      try {
+        const url = new URL(String(value), document.baseURI);
+        if (['http:', 'https:', 'mailto:'].includes(url.protocol)) return url.href;
+      } catch (_) {}
+      return '';
+    };
+    const hint = (text) => `<span class="hint" tabindex="0" data-tip="${esc(text)}">?</span>`;
+    const fmtMs = (value) => {
+      const durationMs = Number(value ?? 0);
+      if (!Number.isFinite(durationMs) || durationMs <= 0) return '0ms';
+      if (durationMs >= 1000) return `${(durationMs / 1000).toFixed(2)}s`;
+      return `${durationMs}ms`;
+    };
+    function verdictTip(verdict) {
+      return ({
+        supported: 'Available evidence supports the claim as written or with only minor caveats.',
+        overstated: 'Evidence points in the same direction, but the wording is stronger, broader, or more certain than supported.',
+        missing_context: 'The claim may be true, but key scope, baseline, methodology, source, or denominator context is missing.',
+        contradicted: 'Available evidence conflicts with the claim as written.',
+        not_checkable: 'The available sources do not provide enough evidence to verify or falsify the claim.'
+      })[verdict] || 'Formal CappinCheck verdict for this claim.';
+    }
+    function verdictCounts(audits) {
+      const counts = {
+        supported: 0,
+        overstated: 0,
+        missing_context: 0,
+        contradicted: 0,
+        not_checkable: 0,
+      };
+      for (const audit of audits) {
+        if (counts[audit.verdict] != null) counts[audit.verdict] += 1;
+      }
+      return counts;
+    }
+    function averageStretch(audits) {
+      if (!audits.length) return 0;
+      const total = audits.reduce((sum, audit) => sum + Number(audit.stretch_score || 0), 0);
+      return Math.round(total / audits.length);
+    }
+    function statCard(label, value, note = '') {
+      return `
+        <div class="stat-card">
+          <div class="stat-label">${esc(label)}</div>
+          <div class="stat-value">${esc(value)}</div>
+          ${note ? `<div class="stat-note">${esc(note)}</div>` : ''}
+        </div>
+      `;
+    }
+    function renderHeadline() {
+      const counts = verdictCounts(report.audits || []);
+      const avgStretch = averageStretch(report.audits || []);
+      const run = report.run_profile || {};
+      document.getElementById('scorecard-grid').innerHTML = [
+        statCard('Claims Audited', String((report.audits || []).length), `${run.claims_extracted ?? (report.claims || []).length} extracted`),
+        ...verdictOrder.map(key => statCard(verdictLabels[key], String(counts[key]), key === 'supported' ? 'best-case verdict' : '')),
+        statCard('Avg Stretch', `${avgStretch}/100`, 'higher means riskier wording'),
+      ].join('');
+      document.getElementById('telemetry-grid').innerHTML = [
+        statCard('Model', report.model || 'none', report.contrast_enabled ? 'contrast enabled' : 'contrast disabled'),
+        statCard('Execution Mode', report.mode),
+        statCard('Pipeline Wall', fmtMs(run.total_duration_ms || 0), `audit ${fmtMs(run.audit_claims_ms || 0)} · contrast ${fmtMs(run.contrast_duration_ms || 0)}`),
+        statCard('Specialist Passes', String(run.agent_passes || 0), `${run.claims_audited || (report.audits || []).length} claims`),
+        statCard('Unique Sources', String(run.unique_source_count || 0), 'support + caveat + contrast urls'),
+        statCard('Provided References', String((report.reference_urls || []).length), 'explicit --reference inputs'),
+      ].join('');
+    }
+    const filteredAudits = () => report.audits
+      .map((audit, index) => ({ ...audit, __index: index }))
+      .filter(audit => filters.verdict === 'all' || audit.verdict === filters.verdict);
+    function setupFilters() {
+      fillSelect('verdict-filter', 'All verdicts', [...new Set(report.audits.map(audit => audit.verdict))]);
+    }
+    function fillSelect(id, allLabel, values) {
+      document.getElementById(id).innerHTML = [
+        `<option value="all">${allLabel}</option>`,
+        ...values.map(value => `<option value="${esc(value)}">${esc(value)}</option>`)
+      ].join('');
+    }
+    function syncSelection() {
+      const audits = filteredAudits();
+      if (!audits.some(audit => audit.__index === selected)) selected = audits[0]?.__index ?? 0;
+    }
+    function render() {
+      const audits = filteredAudits();
+      document.getElementById('filter-summary').textContent = `${audits.length} of ${report.audits.length} claims shown`;
+      document.getElementById('claim-list').innerHTML = audits.map((audit, i) => `
+        <button class="claim-row ${audit.__index === selected ? 'active' : ''}" onclick="selected=${audit.__index}; render();">
+          <div class="claim-meta">
+            <span class="muted">${esc(audit.verdict)} · ${esc(audit.claim.claim_type)} · score ${audit.stretch_score}/100</span>
+          </div>
+          <div class="wrap">${esc(audit.claim.claim)}</div>
+          <div class="meter ${cls(audit.verdict)}" title="Stretch score ${audit.stretch_score} / 100"><div style="width: ${audit.stretch_score}%"></div></div>
+          <p class="muted wrap">${esc(audit.claim.why_risky || '')}</p>
+        </button>
+      `).join('');
+      if (!audits.length) {
+        document.getElementById('claim-detail').innerHTML = '<div class="panel"><p class="muted">No claims match the selected filters.</p></div>';
+        document.getElementById('evidence').innerHTML = '';
+        return;
+      }
+      const audit = audits.find(item => item.__index === selected) ?? audits[0];
+      const evidenceCount = audit.supporting_evidence.length + audit.counter_evidence.length;
+      const evidenceScore = Math.min(100, evidenceCount * 25);
+      const confidence = confidenceScore[audit.confidence] ?? 0;
+      const computedChecks = audit.numeric_findings?.length
+        ? `<div class="panel"><h3>Computed Checks</h3>${list(audit.numeric_findings)}</div>`
+        : '';
+      const runProfile = report.run_profile
+        ? `
+            <p class="wrap"><strong>Pipeline wall:</strong> ${fmtMs(report.run_profile.total_duration_ms)} · <strong>Load:</strong> ${fmtMs(report.run_profile.load_document_ms)} · <strong>Extract:</strong> ${fmtMs(report.run_profile.extract_claims_ms)} · <strong>Audit:</strong> ${fmtMs(report.run_profile.audit_claims_ms)} · <strong>Contrast:</strong> ${fmtMs(report.run_profile.contrast_duration_ms)}</p>
+            <p class="wrap"><strong>Claims extracted / audited:</strong> ${report.run_profile.claims_extracted} / ${report.run_profile.claims_audited} · <strong>Specialist passes:</strong> ${report.run_profile.agent_passes} · <strong>Unique sources:</strong> ${report.run_profile.unique_source_count}</p>
+          `
+        : '';
+      document.getElementById('claim-detail').innerHTML = `
+        <div class="panel">
+          <h3>Report Provenance</h3>
+          <p class="wrap"><strong>Mode:</strong> ${esc(report.mode)} · <strong>Model:</strong> ${esc(report.model || 'none')}</p>
+          <p class="wrap"><strong>Evidence Contrast:</strong> ${report.contrast_enabled ? 'enabled' : 'disabled'}</p>
+          <p class="wrap"><strong>Provided reference URLs:</strong> ${(report.reference_urls || []).length ? (report.reference_urls || []).map(esc).join(', ') : 'none'}</p>
+          ${runProfile}
+        </div>
+        <div class="panel">
+          <strong>Formal verdict: ${esc(audit.verdict)}</strong> ${hint(verdictTip(audit.verdict))}
+          <div class="score"><div style="width: ${audit.stretch_score}%"></div></div>
+          <p class="muted">
+            Confidence: ${esc(audit.confidence)} ${hint('Confidence reflects how strongly the available evidence supports this verdict, not whether the original claim is true.')}
+            · Stretch Score: ${audit.stretch_score} / 100 ${hint('Higher means the original wording stretches further beyond what the evidence supports.')}
+            · Evidence items: ${evidenceCount} ${hint('Evidence items are supporting or counter-evidence records attached to this claim.')}
+          </p>
+          <div class="strength-grid">
+            ${strengthCard('Stretch pressure', audit.stretch_score, audit.verdict, `${audit.stretch_score}/100`, 'How much the wording outruns the evidence.')}
+            ${strengthCard('Confidence', confidence, audit.verdict, esc(audit.confidence), 'How confident CappinCheck is in this verdict from available evidence.')}
+            ${strengthCard('Evidence depth', evidenceScore, audit.verdict, `${evidenceCount} item${evidenceCount === 1 ? '' : 's'}`, 'How much direct evidence is attached to this claim audit.')}
+          </div>
+        </div>
+        <div class="panel"><h3>Original</h3><p class="wrap">${esc(audit.claim.claim)}</p></div>
+        ${contrastCard(audit.contrast)}
+        <div class="panel"><h3>Defensible Rewrite</h3><p class="wrap">${esc(audit.weaker_supported_rewrite)}</p></div>
+        <div class="panel"><h3>Why</h3><p class="wrap">${esc(audit.why)}</p></div>
+        ${claimTimingPanel(audit.claim_timing)}
+        ${computedChecks}
+        <div class="panel"><h3>Agent Steps</h3>${agentSteps(audit.agent_outputs || [])}</div>
+      `;
+      document.getElementById('evidence').innerHTML = `
+        ${providedReferencesPanel(report.reference_urls || [])}
+        ${sourcesChecked(audit.contrast)}
+        <div class="panel"><h3>Gemini-Discovered Supporting Sources</h3><p class="muted">Sources found by the verifier while looking for the strongest support for this claim.</p>${items(audit.supporting_evidence)}</div>
+        <div class="panel"><h3>Gemini-Discovered Caveat / Counter Sources</h3><p class="muted">Sources found by the contradiction-finder while looking for caveats, missing context, benchmark limits, or contrary evidence.</p>${items(audit.counter_evidence)}</div>
+        <div class="panel"><h3>Missing Context</h3>${list(audit.missing_context)}</div>
+      `;
+    }
+    function strengthCard(label, value, verdict, display, tip) {
+      return `
+        <div class="strength-card">
+          <div class="strength-label"><span>${label} ${hint(tip)}</span><span>${display}</span></div>
+          <div class="meter ${cls(verdict)}"><div style="width: ${value}%"></div></div>
+        </div>
+      `;
+    }
+    function contrastCard(contrast) {
+      if (!contrast) return '';
+      const best = contrast.best_sources?.[0];
+      const sourceSummary = best ? best.evidence_summary : 'No usable reference source was available.';
+      const qualification = best?.key_qualification ? `<p><strong>Key qualification:</strong> ${esc(best.key_qualification)}</p>` : '';
+      return `
+        <div class="panel">
+          <h3>Evidence Contrast</h3>
+          <p><strong>Claim says:</strong> <span class="wrap">${esc(contrast.claim_text)}</span></p>
+          <p><strong>Best reference says:</strong> <span class="wrap">${esc(sourceSummary)}</span></p>
+          ${qualification}
+          <p><strong>Delta:</strong> ${esc(contrast.delta_type)} — ${esc(contrast.delta_explanation)}</p>
+          <p><strong>Final verdict:</strong> ${esc(contrast.recommended_verdict)} · Confidence: ${esc(contrast.confidence)}</p>
+          <p><strong>Defensible rewrite:</strong> <span class="wrap">${esc(contrast.suggested_rewrite)}</span></p>
+        </div>
+      `;
+    }
+    function claimTimingPanel(timing) {
+      if (!timing) return '';
+      return `
+        <div class="panel">
+          <h3>Claim Timing</h3>
+          <p class="muted">Measured wall-clock time for this claim during the run.</p>
+          <p><strong>Total:</strong> ${fmtMs(timing.total_duration_ms)} · <strong>Contrast:</strong> ${fmtMs(timing.contrast_ms)}</p>
+          <ul>
+            <li class="wrap"><strong>Verifier:</strong> ${fmtMs(timing.verifier_ms)}</li>
+            <li class="wrap"><strong>Contradiction finder:</strong> ${fmtMs(timing.contradiction_finder_ms)}</li>
+            <li class="wrap"><strong>Numeric calibrator:</strong> ${fmtMs(timing.numeric_calibrator_ms)}</li>
+            <li class="wrap"><strong>Aggregator:</strong> ${fmtMs(timing.aggregator_ms)}</li>
+          </ul>
+        </div>
+      `;
+    }
+    function providedReferencesPanel(values) {
+      if (!values.length) {
+        return `
+          <div class="panel">
+            <h3>Provided Reference URLs</h3>
+            <p class="muted">No explicit reference URLs were provided for this run.</p>
+          </div>
+        `;
+      }
+      return `
+        <div class="panel">
+          <h3>Provided Reference URLs</h3>
+          <p class="muted">Explicit sources supplied on the CLI with <code>--reference</code>. These anchor Evidence Contrast and define the source-of-truth packet for this run.</p>
+          ${plainUrlItems(values)}
+        </div>
+      `;
+    }
+    function sourcesChecked(contrast) {
+      if (!contrast) return '<div class="panel"><h3>Claim-Level Contrast References</h3><p class="muted">No contrast references checked for this claim. Contrast is applied only to the selected top-risk claims controlled by --contrast-top.</p></div>';
+      const references = contrast.reference_sources || [];
+      const best = contrast.best_sources || [];
+      return `
+        <div class="panel">
+          <h3>Claim-Level Contrast References</h3>
+          <p class="muted">References used by the Evidence Contrast pass for this selected claim. These are anchored by provided reference URLs, but Gemini may resolve nearby canonical pages or source titles while reading them.</p>
+          ${referenceItems(references)}
+        </div>
+        <div class="panel">
+          <h3>Reference Snippets / Mismatches</h3>
+          <p class="muted">Claim-level snippets showing how the referenced source supports, narrows, or conflicts with the original wording.</p>
+          ${contrastSourceItems(best)}
+        </div>
+      `;
+    }
+    function plainUrlItems(values) {
+      return values.map(value => {
+        const href = safeHref(value);
+        const source = href
+          ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(value)}</a>`
+          : `<span class="muted">${esc(value)}</span>`;
+        return `<div class="source-item"><p class="wrap">${source}</p></div>`;
+      }).join('');
+    }
+    function referenceItems(values) {
+      if (!values.length) return '<p class="muted">None recorded.</p>';
+      return values.map(item => {
+        const href = safeHref(item.url);
+        const source = href
+          ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(item.url)}</a>`
+          : `<span class="muted">${esc(item.url || 'No URL recorded')}</span>`;
+        return `
+          <div class="source-item">
+            <p><strong>${esc(item.title)}</strong> <span class="muted">(${esc(item.source_type)} · authority ${item.authority_score}/100)</span></p>
+            <p class="wrap">${source}</p>
+            <p class="muted wrap">${esc(item.why_relevant || '')}</p>
+          </div>
+        `;
+      }).join('');
+    }
+    function contrastSourceItems(values) {
+      if (!values.length) return '<p class="muted">None recorded.</p>';
+      return values.map(item => {
+        const href = safeHref(item.url);
+        const source = href
+          ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(item.url)}</a>`
+          : `<span class="muted">${esc(item.url || 'No URL recorded')}</span>`;
+        return `
+          <div class="source-item">
+            <p><strong>${esc(item.title)}</strong> <span class="muted">(${esc(item.stance)})</span></p>
+            <p class="wrap">${esc(item.evidence_summary)}</p>
+            <p class="wrap">${source}</p>
+            <p class="muted wrap">${esc(item.key_qualification || '')}</p>
+          </div>
+        `;
+      }).join('');
+    }
+    function agentSteps(values) {
+      if (!values.length) return '<p class="muted">No agent step trace recorded.</p>';
+      return values.map(step => `
+        <details>
+          <summary>${esc(step.agent)} — ${esc(step.summary)}</summary>
+          <p class="muted">Claim ID: ${esc(step.claim_id)}</p>
+          <p class="muted">Duration: ${step.duration_ms == null ? 'not recorded' : fmtMs(step.duration_ms)}</p>
+          <h4>Supporting evidence</h4>
+          ${items(step.supporting_evidence || [])}
+          <h4>Contradictions / narrowing evidence</h4>
+          ${items(step.counter_evidence || [])}
+          <h4>Missing context</h4>
+          ${list(step.missing_context || [])}
+          <h4>Computed checks</h4>
+          ${list(step.numeric_findings || [])}
+        </details>
+      `).join('');
+    }
+    function list(values) {
+      if (!values.length) return '<p class="muted">None recorded.</p>';
+      return `<ul>${values.map(value => `<li class="wrap">${esc(value)}</li>`).join('')}</ul>`;
+    }
+    function items(values) {
+      if (!values.length) return '<p class="muted">None recorded.</p>';
+      return values.map(item => {
+        const href = safeHref(item.url);
+        const source = href
+          ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(item.url)}</a>`
+          : `<span class="muted">${esc(item.url || 'No URL recorded')}</span>`;
+        return `
+          <div class="source-item">
+            <p><strong>${esc(item.source_title)}</strong></p>
+            <p class="wrap">${esc(item.snippet)}</p>
+            <p class="wrap">${source}</p>
+            <p class="muted wrap">${esc(item.relevance || '')}</p>
+          </div>
+        `;
+      }).join('');
+    }
+    setupFilters();
+    renderHeadline();
+    render();
+  </script>
+</body>
+</html>
