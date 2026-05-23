@@ -132,8 +132,8 @@
         label: 'Anthropic Sonnet 4.5',
         badge: 'overstated',
         href: 'anthropic_sonnet_45_report.html',
-        summary: 'Live Gemini run on Anthropic’s Claude Sonnet 4.5 launch page. Shows a broad “best coding model” claim being narrowed against provided Anthropic references and Gemini-discovered evidence.',
-        command: 'cappincheck audit https://www.anthropic.com/news/claude-sonnet-4-5 --contrast --reference https://www.anthropic.com/claude-sonnet-4-5-system-card --reference https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy --contrast-top 1 --limit 1 --out examples/anthropic_sonnet_45_report.md --json examples/anthropic_sonnet_45_report.json --html examples/anthropic_sonnet_45_report.html'
+        summary: 'Live Gemini run on Anthropic’s Claude Sonnet 4.5 launch page with three audited claims. Shows broad capability, endurance, and safety/alignment claims being checked against Anthropic references and Gemini-discovered evidence.',
+        command: 'cappincheck audit https://www.anthropic.com/news/claude-sonnet-4-5 --contrast --reference https://www.anthropic.com/claude-sonnet-4-5-system-card --reference https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy --contrast-top 1 --limit 3 --out examples/anthropic_sonnet_45_report.md --json examples/anthropic_sonnet_45_report.json --html examples/anthropic_sonnet_45_report.html'
       },
       {
         label: 'xAI Grok 3 Proxy',

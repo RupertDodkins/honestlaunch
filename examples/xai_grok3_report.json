@@ -6,338 +6,875 @@
   },
   "claims": [
     {
-      "id": "grok3_colossus_training",
-      "claim": "Grok 3 is xAI's most advanced model yet, trained on the Colossus supercluster",
-      "claim_type": "novelty",
-      "source_location": "Paragraph 1 under 'Claims to audit'",
-      "why_risky": "Claims of training on a specific custom supercluster as a mark of sophistication require verification of hardware operational stability, scale, and actual utilization during training.",
-      "audit_question": "Can xAI provide verifiable system logs and hardware architecture details proving that Grok 3 was end-to-end trained on the Colossus supercluster?"
-    },
-    {
-      "id": "grok3_10x_compute",
-      "claim": "trained on the Colossus supercluster with 10x the compute of previous state-of-the-art models.",
+      "id": "claim_1",
+      "claim": "Grok 3 is xAI's most advanced model yet, trained on the Colossus supercluster with 10x the compute of previous state-of-the-art models.",
       "claim_type": "numeric",
-      "source_location": "Paragraph 1 under 'Claims to audit'",
-      "why_risky": "The '10x compute' claim is highly dependent on how 'previous state-of-the-art models' is defined and how training FLOPS are calculated.",
-      "audit_question": "What specific FLOPS estimation or hardware runtime metrics define the 10x compute comparison, and which baseline models constitute the 'previous state-of-the-art'?"
+      "source_location": "Claims to audit, paragraph 1",
+      "why_risky": "Measuring '10x the compute' is ambiguous without disclosed training parameters, FLOP counts, or a clear definition of which competitor models are being compared.",
+      "audit_question": "What is the exact training FLOP count of Grok 3, what specific competitor models are used as the baseline, and how is the 10x compute multiplier mathematically derived?"
     },
     {
-      "id": "grok3_leading_performance",
-      "claim": "Grok 3 has leading performance across both academic benchmarks and real-world user preferences",
+      "id": "claim_2",
+      "claim": "Grok 3 has leading performance across both academic benchmarks and real-world user preferences, including a reported 1402 Elo score in Chatbot Arena.",
       "claim_type": "benchmark",
-      "source_location": "Paragraph 2 under 'Claims to audit'",
-      "why_risky": "Stating 'leading performance' across both domains is a broad generalization that can be easily contradicted by specific benchmarks or sub-tasks where competitors excel.",
-      "audit_question": "Which comprehensive list of academic benchmarks and real-world preference metrics was evaluated to substantiate the 'leading performance' claim against all active competitor models?"
+      "source_location": "Claims to audit, paragraph 2",
+      "why_risky": "Chatbot Arena Elo ratings change over time, and a static Elo claim can be misleading due to shifts in the user pool, prompt selection, or confidence intervals.",
+      "audit_question": "What was the exact date, sample size, and confidence interval for the 1402 Elo rating on the Chatbot Arena leaderboard, and does it represent a statistically significant improvement over contemporary models?"
     },
     {
-      "id": "grok3_chatbot_arena_elo",
-      "claim": "including a reported 1402 Elo score in Chatbot Arena.",
-      "claim_type": "benchmark",
-      "source_location": "Paragraph 2 under 'Claims to audit'",
-      "why_risky": "Elo scores on LMSYS Chatbot Arena fluctuate over time, can suffer from vote manipulation or prompt distribution changes, and need exact versioning to be reproducible.",
-      "audit_question": "Is the 1402 Elo score officially published on the LMSYS leaderboard for Grok 3, and what is the associated confidence interval and sample size?"
-    },
-    {
-      "id": "grok3_reasoning_benchmarks",
-      "claim": "Grok 3 reasoning models show strong benchmark results on AIME, GPQA, LiveCodeBench, MMMU",
-      "claim_type": "benchmark",
-      "source_location": "Paragraph 3 under 'Claims to audit'",
-      "why_risky": "Benchmarks like AIME and GPQA are highly prone to data contamination, and 'strong' is a subjective descriptor without exact percentage scores and peer comparisons.",
-      "audit_question": "What are the exact percentage scores achieved by Grok 3 on AIME, GPQA, LiveCodeBench, and MMMU, and what decontamination protocols were implemented to prevent training set leakage?"
-    },
-    {
-      "id": "grok3_long_context_retrieval",
-      "claim": "strong benchmark results on ... long-context retrieval tasks.",
-      "claim_type": "benchmark",
-      "source_location": "Paragraph 3 under 'Claims to audit'",
-      "why_risky": "Retrieval performance over long contexts is notoriously unstable, and claiming 'strong' results requires proof of perfect recall across varying depths of the context window.",
-      "audit_question": "What specific long-context benchmarks were tested, and what was the exact recall percentage (e.g., in a Needle-in-a-Haystack test) across the entirety of the context window?"
-    },
-    {
-      "id": "grok3_deepsearch_truth",
-      "claim": "DeepSearch is a lightning-fast AI agent designed to seek the truth across the entire corpus of human knowledge.",
-      "claim_type": "generalization",
-      "source_location": "Paragraph 4 under 'Claims to audit'",
-      "why_risky": "Claiming an agent can seek the truth across the 'entire corpus of human knowledge' is an unmeasurable generalization, given that most of human knowledge is offline, paywalled, or non-digitized.",
-      "audit_question": "How is 'seeking the truth' programmatically defined, and what physical or digital limits restrict DeepSearch's access to the 'entire corpus of human knowledge'?"
-    },
-    {
-      "id": "grok3_1m_context_window",
+      "id": "claim_3",
       "claim": "Grok 3 has a 1 million token context window, described as 8 times larger than xAI's previous models.",
       "claim_type": "numeric",
-      "source_location": "Paragraph 5 under 'Claims to audit'",
-      "why_risky": "Increasing context window size by 8x to 1 million tokens introduces massive computational and retrieval efficiency challenges; often, performance degrades drastically at the limits.",
-      "audit_question": "Does Grok 3 maintain high retrieval accuracy and coherent reasoning at the limit of its 1 million token context, and what was the context length of the previous model used as the baseline for the 8x multiplier?"
+      "source_location": "Claims to audit, paragraph 5",
+      "why_risky": "A 1M token context limit does not guarantee high retrieval accuracy (effective context window) across the entire range, and context scaling claims can be misleading if retrieval performance drops sharply.",
+      "audit_question": "What is the performance profile (e.g., Needle in a Haystack accuracy) of Grok 3 across different positions of the 1 million token context window, and does it maintain high fidelity throughout?"
     }
   ],
   "audits": [
     {
       "claim": {
-        "id": "grok3_colossus_training",
-        "claim": "Grok 3 is xAI's most advanced model yet, trained on the Colossus supercluster",
-        "claim_type": "novelty",
-        "source_location": "Paragraph 1 under 'Claims to audit'",
-        "why_risky": "Claims of training on a specific custom supercluster as a mark of sophistication require verification of hardware operational stability, scale, and actual utilization during training.",
-        "audit_question": "Can xAI provide verifiable system logs and hardware architecture details proving that Grok 3 was end-to-end trained on the Colossus supercluster?"
+        "id": "claim_1",
+        "claim": "Grok 3 is xAI's most advanced model yet, trained on the Colossus supercluster with 10x the compute of previous state-of-the-art models.",
+        "claim_type": "numeric",
+        "source_location": "Claims to audit, paragraph 1",
+        "why_risky": "Measuring '10x the compute' is ambiguous without disclosed training parameters, FLOP counts, or a clear definition of which competitor models are being compared.",
+        "audit_question": "What is the exact training FLOP count of Grok 3, what specific competitor models are used as the baseline, and how is the 10x compute multiplier mathematically derived?"
       },
-      "verdict": "missing_context",
+      "verdict": "overstated",
       "confidence": "high",
-      "stretch_score": 60,
-      "why": "While the claim is fully supported by xAI's official announcement, independent academic audit from the Stanford Foundation Model Transparency Index (FMTI 2025) highlights missing context. Specifically, xAI has not disclosed whether the entire Colossus supercluster was used for the training run, nor have they shared detailed hardware allocation, duration, or FLOPs, resulting in a score of 0 on compute transparency indicators.",
-      "weaker_supported_rewrite": "Grok 3 is officially described as xAI's most advanced model yet, trained on the Colossus supercluster (though specific compute and hardware utilization details for the final training run remain undisclosed).",
+      "stretch_score": 80,
+      "why": "The claim uses xAI's official phrasing that Grok 3 was trained with '10x the compute of previous state-of-the-art models,' which is misleading and overstates the baseline. Public clarifications by Elon Musk indicate that the 10x compute multiplier is actually relative to xAI's own predecessor, Grok 2, rather than competitors' state-of-the-art models. Additionally, the Stanford CRFM FMTI 2025 report reveals that xAI is completely opaque about training compute, awarding it a score of 0 for training compute disclosures, which means the 10x claim lacks any verifiable public metrics (such as FLOPs) or methodology to support a scientific comparison against other industry SOTA models.",
+      "weaker_supported_rewrite": "Grok 3 is xAI's most advanced model yet, trained on the Colossus supercluster using approximately 10x the training compute of its predecessor, Grok 2.",
       "supporting_evidence": [
         {
           "source_title": "Grok 3 Beta — The Age of Reasoning Agents - xAI",
           "url": "https://x.ai/news/grok-3",
           "date": "2025-02-19",
           "snippet": "Trained on our Colossus supercluster with 10x the compute of previous state-of-the-art models, Grok 3 displays significant improvements in reasoning, mathematics, coding, world knowledge, and instruction-following tasks.",
-          "relevance": "Direct launch announcement from xAI establishing the training infrastructure and model status."
+          "relevance": "Directly confirms xAI's official launch-page claim regarding the Colossus supercluster and the '10x compute' multiplier over previous state-of-the-art models."
         },
         {
-          "source_title": "How xAI turned a factory shell into an AI 'Colossus' for Grok 3 - R&D World",
-          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE7QRtIuF1kQpT0DgkakgYNVHb4SlPmjfnA5JcIUrfAz2qDdnmT-vAh2sLFI7hnd-oWCxhB3pkmV3Or6xr3syb3lXXhOz6JyxBTfSs9nn1RFjEE7aSS7SiW1xHDrvqfEG8D71zohbN54v5Me54p0GSaUemEGDGO31z3L2ebZIuvQHBLoQvMWSSqXCIyVYRiSaaIpR4lXLBcpHnbO-tuNQTBL8I=",
-          "date": "2025-02-18",
-          "snippet": "In a repurposed Electrolux factory in Memphis, xAI trained Grok 3 on a supercomputer dubbed “Colossus,” which the company says includes 200,000 Nvidia H100 GPUs.",
-          "relevance": "Third-party industry reporting corroborating the training of Grok 3 on the Colossus supercomputer."
-        },
-        {
-          "source_title": "Musk's xAI Unveils Grok-3: More Power, But Is It Breaking New Ground? - Decrypt",
-          "url": "https://decrypt.co/221584/musks-xai-unveils-grok-3-more-power-but-is-it-breaking-new-ground",
-          "date": "2025-02-17",
-          "snippet": "The star of the initial part of the show wasn't the AI itself, but rather 'Colossus,' a behemoth cluster of 200,000 GPUs that powers Grok-3's training.",
-          "relevance": "Confirming public consensus that the model training was powered by the Colossus cluster."
+          "source_title": "How many AI models will exceed compute thresholds? - Epoch AI",
+          "url": "https://epoch.ai/blog/how-many-ai-models-will-exceed-compute-thresholds",
+          "date": "2025-05-30",
+          "snippet": "For example, the first model in our dataset estimated to use over 1026 FLOP was Grok-3 from xAI, released in February 2025.",
+          "relevance": "Provides an independent, expert-vetted estimate of Grok 3's pretraining compute scale, placing it at over 10^26 FLOPs."
         }
       ],
-      "counter_evidence": [],
+      "counter_evidence": [
+        {
+          "source_title": "Elon Musk confirms that Grok 3 is coming soon — pretraining took 10X more compute power than Grok 2 - Tom's Hardware",
+          "url": "https://www.tomshardware.com/tech-industry/artificial-intelligence/elon-musk-confirms-that-grok-3-is-coming-soon-pretraining-took-10x-more-compute-power-than-grok-2",
+          "date": "2025-01-06",
+          "snippet": "Elon Musk has announced that xAI's Grok 3 large language model (LLM) has been pretrained, and took 10X more compute power than Grok 2. He did not reveal many details, but based on timing, the Grok 3 LLM was pre-trained on the Colossus supercluster... 'Pretraining is now complete with 10X more compute than Grok 2.'",
+          "relevance": "Directly contradicts the baseline of the '10x' multiplier in the launch page. While the launch page implies 10x the compute of competitive SOTA systems, the developer's announcements clarify that the 10x scale-up is relative to their own previous model (Grok 2), which was not widely considered the industry SOTA."
+        },
+        {
+          "source_title": "xAI Transparency Report - Stanford CRFM",
+          "url": "https://crfm.stanford.edu/2025/xai-transparency-report",
+          "date": "2025-02-18",
+          "snippet": "No specific information about training duration... The most relevant document is the xAI Grok 3 press release. The relevant passage on training compute states: 'Trained on our Colossus supercluster with 10x the compute of previous state-of-the-art models, Grok 3...'",
+          "relevance": "Demonstrates that xAI did not disclose the actual training duration, hardware hours, or precise compute metrics needed to mathematically back the claim."
+        }
+      ],
       "missing_context": [
-        "xAI has not publicly released verifiable system logs, raw training telemetry, or official end-to-end hardware architecture blueprints that would allow independent verification.",
-        "The Stanford Center for Research on Foundation Models (CRFM) Transparency Report notes that xAI does not disclose specific hardware utilization or precise training compute reported in floating-point operations (FLOPs)."
+        "The exact training FLOP count of Grok 3 remains undisclosed by xAI (the figures cited are independent, speculative estimates by third-party research entities).",
+        "xAI has not specified which rival models or baseline benchmarks represent the 'previous state-of-the-art models' in its 10x multiplier claim.",
+        "No technical paper or official mathematical derivation has been released by xAI to support the 10x compute calculation, leaving details such as active parameters, training duration, and Model FLOP Utilization (MFU) proprietary."
       ],
       "numeric_findings": [
-        "Colossus supercluster scale is cited as utilizing 100,000 to 200,000 NVIDIA H100 and H200 GPUs.",
-        "The compute used is stated to be 10x that of previous state-of-the-art models.",
-        "0 out of 1 score on specific hardware and train-test overlap disclosures in Stanford CRFM transparency evaluations."
+        "10x: The claimed training compute multiplier of Grok 3 relative to 'previous state-of-the-art models' (per xAI) or 'Grok 2' (per Elon Musk).",
+        "4-5 x 10^26 FLOPs: The third-party estimated pretraining compute utilized for training Grok 3 (estimated by Epoch AI).",
+        "100,000 to 200,000: The reported number of NVIDIA H100 GPUs in xAI's Colossus supercluster in Memphis, Tennessee used for training."
       ],
       "agent_outputs": [
         {
           "agent": "Grounded Verifier",
-          "claim_id": "grok3_colossus_training",
-          "summary": "The claim that Grok 3 was trained on the Colossus supercluster is officially supported by xAI's launch announcements and statements from executive leadership. However, regarding the specific audit question, xAI has not publicly released verifiable system logs, raw training telemetry, or official end-to-end hardware architecture blueprints that would allow independent verification of the claim. Available technical details of the Colossus hardware architecture are limited to high-level press releases, executive social media posts, and industry reporting on the facility (such as its scale of 100,000 to 200,000 NVIDIA H100/H200 GPUs, custom liquid cooling, and use of Supermicro and NVIDIA Spectrum-X technologies).",
-          "duration_ms": 27193,
-          "supporting_evidence": [
-            {
-              "source_title": "Grok 3 Beta — The Age of Reasoning Agents - xAI",
-              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGFqqWKoluzmHqRbOIlcPJmjmK1JSF2JSstc9-ug6ctfveSxmRvnuUURKBJi8x8xxsg1hfMj9L-FE3KUaQh4T90Rr-3zGK54OOP1R_kAUs=",
-              "date": "2025-02-19",
-              "snippet": "Trained on our Colossus supercluster with 10x the compute of previous state-of-the-art models, Grok 3 displays significant improvements in reasoning, mathematics, coding, world knowledge, and instruction-following tasks.",
-              "relevance": "Direct official claim from xAI confirming Grok 3 was trained on their Colossus supercluster using 10x the compute of prior SOTA models."
-            },
-            {
-              "source_title": "How xAI turned a factory shell into an AI 'Colossus' for Grok 3 - R&D World",
-              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE7QRtIuF1kQpT0DgkakgYNVHb4SlPmjfnA5JcIUrfAz2qDdnmT-vAh2sLFI7hnd-oWCxhB3pkmV3Or6xr3syb3lXXhOz6JyxBTfSs9nn1RFjEE7aSS7SiW1xHDrvqfEG8D71zohbN54v5Me54p0GSaUemEGDGO31z3L2ebZIuvQHBLoQvMWSSqXCIyVYRiSaaIpR4lXLBcpHnbO-tuNQTBL8I=",
-              "date": "2025-02-18",
-              "snippet": "In a repurposed Electrolux factory in Memphis, xAI trained Grok 3 on a supercomputer dubbed “Colossus,” which the company says includes 200,000 Nvidia H100 GPUs. Elon Musk and senior xAI employees described Grok 3 as “the smartest AI on Earth” in a recent livestream, citing each GPU's capacity of up to 4 PFLOPS (four quadrillion floating-point operations per second) and high-speed interconnects across the cluster.",
-              "relevance": "Provides third-party reporting confirming the public details of the training cluster, location, and the scale of GPUs used, referencing company streams and executive descriptions."
-            },
-            {
-              "source_title": "How Grok Works Under the Hood: Inside xAI's Infrastructure and Training Logic - Medium",
-              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEe6me0Ko7HQg8GMyYbCgrh7QgPkV6kr6PaPPIK7q1et7_Ix7R3D1kYmPUROOIt0zeny4w17fkQuIOF1aHOIT51qUATYKL7L579Hy3a0_84_Xgz-NvzdDvHUWWIJxCE0mkdSPa8F870gmZQRpTULH-yfvIxMKy2igsKdK4VRXAfgKMXBA9RvOE1mvOt0VLYjRDD4Ff7kGwVzgYkAJpe9cyed8CoM7GOV2CmEjGX5ZEvQ7o=",
-              "date": "2025-11-27",
-              "snippet": "Reporting from DatacenterDynamics and ServeTheHome paints the picture: a cluster designed for up to 100,000 NVIDIA H100 GPUs, connected via a single RDMA fabric... Supermicro's racks are designed from the ground up for liquid cooling... custom orchestrator that automatically ejects problematic nodes from a training job, optimizes checkpointing and data loading...",
-              "relevance": "Analyzes underlying hardware integration, liquid cooling systems, and node orchestration details of the Colossus supercluster, while noting the reliance on third-party reporting rather than official published logs."
-            }
-          ],
-          "counter_evidence": [],
-          "missing_context": [
-            "Verifiable system training logs or raw telemetry demonstrating continuous end-to-end execution on the Colossus supercluster.",
-            "Official technical whitepapers or documented hardware/network topologies published directly by xAI to substantiate the physical configuration during Grok 3's pre-training."
-          ],
-          "numeric_findings": [
-            "10x compute of previous state-of-the-art models",
-            "100,000 NVIDIA H100 GPUs initially, later expanded to 200,000 H100 and H200 GPUs",
-            "Estimated 250 megawatts drawing capacity buffered by Tesla MegaPacks",
-            "Processing speed of up to 4 PFLOPS per GPU"
-          ]
-        },
-        {
-          "agent": "Contradiction Finder",
-          "claim_id": "grok3_colossus_training",
-          "summary": "There is no independent verification, third-party audit, or publicly available system logs proving that Grok 3 was trained end-to-end on the Colossus supercluster. While xAI claims that Grok 3 was trained on Colossus using 200,000 NVIDIA H100 GPUs, these assertions rely entirely on corporate press releases and statements by Elon Musk. Furthermore, researchers at Stanford's Center for Research on Foundation Models (CRFM) have noted that xAI does not disclose specific training hardware utilization, training logs, or train-test overlap details, leaving the training claims unverifiable.",
-          "duration_ms": 24191,
+          "claim_id": "claim_1",
+          "summary": "While xAI's official launch materials claim that Grok 3 was trained on the Colossus supercluster with '10x the compute of previous state-of-the-art models,' the company has not officially disclosed its exact training FLOP count, the specific competitor models used as a baseline, or the mathematical derivation behind the '10x' multiplier. Third-party research groups (such as Epoch AI) speculatively estimate Grok 3's pretraining compute at roughly 4-5 x 10^26 FLOPs, making it the first publicly tracked model estimated to cross the 10^26 FLOP threshold. Additionally, Elon Musk has previously framed the '10x' multiplier as being relative to xAI's own predecessor, Grok 2.",
+          "duration_ms": 29883,
           "supporting_evidence": [
             {
               "source_title": "Grok 3 Beta — The Age of Reasoning Agents - xAI",
               "url": "https://x.ai/news/grok-3",
               "date": "2025-02-19",
-              "snippet": "Trained on our Colossus supercluster with 10x the compute of previous state-of-the-art models, Grok 3 displays significant improvements in reasoning...",
-              "relevance": "Official announcement establishing the primary claim that Grok 3 was trained on the Colossus supercluster."
+              "snippet": "Trained on our Colossus supercluster with 10x the compute of previous state-of-the-art models, Grok 3 displays significant improvements in reasoning, mathematics, coding, world knowledge, and instruction-following tasks.",
+              "relevance": "Directly confirms xAI's official launch-page claim regarding the Colossus supercluster and the '10x compute' multiplier over previous state-of-the-art models."
             },
             {
-              "source_title": "rdworldonline.com",
-              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFESfNxLhKdLvwddbWAOFsRxJ2CT4DqHapQ-CyR592jp0oaJIGfPm8cwslu1ZQ9UocSozLJN8GwJ334GLtUsJJiwM353pinpOmGoSjLVvwjHD0_J45TrLrFwFCv13MmIDH7b2HsIVmRxkFgTZRg6dWR8IHV7xQOV2NyIiq748u-JvEYIkdgGI0LZpr6rD7dIpaV72kGh-4siWCZucLj4LwD_2Y=",
-              "snippet": "Source returned by Gemini grounding metadata.",
-              "relevance": "Grounding source used during specialist audit."
+              "source_title": "How many AI models will exceed compute thresholds? - Epoch AI",
+              "url": "https://epoch.ai/blog/how-many-ai-models-will-exceed-compute-thresholds",
+              "date": "2025-05-30",
+              "snippet": "For example, the first model in our dataset estimated to use over 1026 FLOP was Grok-3 from xAI, released in February 2025.",
+              "relevance": "Provides an independent, expert-vetted estimate of Grok 3's pretraining compute scale, placing it at over 10^26 FLOPs."
             },
             {
-              "source_title": "builtin.com",
-              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGTGtUWVOdeL2htQ0DYpeUXlQjzPaa6PXTrz1sHHqReldD4toCJ7e50Pzcz_OXTDEM3DXmF9XabB74lIUH-P4Owt6yg-FUW3ryOJIoKTxQFMSDwCgUTqXi2X2QPVar9n-1ieJCfBec6",
-              "snippet": "Source returned by Gemini grounding metadata.",
-              "relevance": "Grounding source used during specialist audit."
-            },
-            {
-              "source_title": "stanford.edu",
-              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFX3CE4qWsdN3d11GQOG9GmxlRsHp7z9MdNgWfBOgziysgFC-jiD18NIdKVGOAzo0PZscDwBIyFE4Czj269vjoCPRDTBtFjIoQg4WnFgngsT0CA8_HcK07JgEpGCO6N_stKJTFXY88P5fdXxQumwYb7lmzu0d7yL3Xo4g2RjVbu9FBnKdI9jmB8nXC_CdSjkw==",
-              "snippet": "Source returned by Gemini grounding metadata.",
-              "relevance": "Grounding source used during specialist audit."
+              "source_title": "Elon Musk confirms that Grok 3 is coming soon — pretraining took 10X more compute power than Grok 2",
+              "url": "https://www.tomshardware.com/tech-industry/artificial-intelligence/elon-musk-confirms-that-grok-3-is-coming-soon-pretraining-took-10x-more-compute-power-than-grok-2",
+              "date": "2025-01-06",
+              "snippet": "\"Pretraining is now complete with 10X more compute than Grok 2.\" ... Given the timing and context, this confirms previous reports that xAI's Colossus supercomputer, which boasts around 100,000 Nvidia H100 GPUs, was specifically built to accelerate large-scale AI projects.",
+              "relevance": "Provides context showing that the 10x compute multiplier was also publicly defined by Elon Musk as a comparison to xAI's own predecessor model, Grok 2."
             }
           ],
-          "counter_evidence": [
-            {
-              "source_title": "xAI Transparency Report - Stanford CRFM",
-              "date": "2025-05-27",
-              "snippet": "No specific information about whether all the GPUs on the Colossus cluster are used for Grok 3 training. ... We will not award this point if (i) the training hardware generally used by the developer is disclosed, but the specific hardware [for Grok 3 is not]... Train-test overlap (Score: 0). ... Disclosure: Not disclosed.",
-              "relevance": "Highlights a direct conflict with any claim of verifiable training details, indicating that xAI does not disclose specific training hardware usage or test-overlap details for Grok 3."
-            }
-          ],
+          "counter_evidence": [],
           "missing_context": [
-            "xAI has not released any public technical reports, blueprints, network topologies, or cryptographically verifiable system logs showing end-to-end training runs for Grok 3 on Colossus.",
-            "The claim of a 200,000 GPU cluster relies on promotional media, and subsequent reports indicate that parts of the Colossus cluster's compute capacity (such as Colossus 1) are rented to other players, raising questions about actual hardware allocation during Grok 3's development.",
-            "The details regarding Grok 3's training framework rely on generic overviews of xAI's JAX and Rust stack rather than a specific, auditable technical paper."
+            "The exact training FLOP count of Grok 3 remains undisclosed by xAI (the figures cited are independent, speculative estimates by third-party research entities).",
+            "xAI has not specified which rival models or baseline benchmarks represent the 'previous state-of-the-art models' in its 10x multiplier claim.",
+            "No technical paper or official mathematical derivation has been released by xAI to support the 10x compute calculation, leaving details such as active parameters, training duration, and Model FLOP Utilization (MFU) proprietary."
           ],
           "numeric_findings": [
-            "200000 GPUs claimed to be in the Colossus supercluster",
-            "10 times compute compared to Grok 2 as stated by xAI",
-            "0 out of 1 score on specific hardware and train-test overlap disclosures in transparency evaluations"
+            "10x: The claimed training compute multiplier of Grok 3 relative to 'previous state-of-the-art models' (per xAI) or 'Grok 2' (per Elon Musk).",
+            "4-5 x 10^26 FLOPs: The third-party estimated pretraining compute utilized for training Grok 3 (estimated by Epoch AI).",
+            "100,000 to 200,000: The reported number of NVIDIA H100 GPUs in xAI's Colossus supercluster in Memphis, Tennessee used for training."
           ]
         },
         {
-          "agent": "Numeric Calibrator",
-          "claim_id": "grok3_colossus_training",
-          "summary": "While xAI claims Grok 3 was trained on its Colossus supercluster, the company has not released verifiable system logs, FLOPs measurements, or exact hardware architecture details proving end-to-end training. This is corroborated by the Stanford CRFM xAI Transparency Report, which notes that xAI has not provided specific information on compute usage or dedicated GPU allocations during Grok 3's training.",
-          "duration_ms": 27944,
+          "agent": "Skeptical Contradiction Finder",
+          "claim_id": "claim_1",
+          "summary": "An audit of the claim that Grok 3 was trained with '10x the compute of previous state-of-the-art models' reveals a complete lack of exact public specifications. xAI has not disclosed the exact training FLOP count of Grok 3, nor have they identified the specific competitor models used as the baseline. Furthermore, there is a contradiction in official framing: while the official launch news page implies a 10x scale-up over competitive state-of-the-art models, Elon Musk's official communications clarified that the 10x compute multiplier was actually relative specifically to xAI's own predecessor, Grok 2. Because no training formulas, datasets, or precise hardware utilization metrics are published, the 10x multiplier cannot be mathematically verified.",
+          "duration_ms": 30869,
           "supporting_evidence": [
             {
-              "source_title": "Colossus: The World's Largest AI Supercomputer - xAI",
-              "url": "https://x.ai/colossus",
-              "date": "2026-02-01",
-              "snippet": "Built in 122 days — outpacing every estimate — Colossus was the most powerful AI training system yet. Then we doubled it in 92 days to 200k GPUs... 200,000 H100 GPUs in a single interconnected cluster.",
-              "relevance": "Provides official infrastructure scale supporting the feasibility of training massive models like Grok 3 on the Colossus supercluster."
+              "source_title": "Grok 3 Beta — The Age of Reasoning Agents - xAI",
+              "url": "https://x.ai/news/grok-3",
+              "date": "February 19, 2025",
+              "snippet": "Trained on our Colossus supercluster with 10x the compute of previous state-of-the-art models, Grok 3 displays significant improvements in reasoning, mathematics, coding, world knowledge, and instruction-following tasks.",
+              "relevance": "Establishes the primary launch claim comparing Grok 3's training compute to unspecified previous state-of-the-art models."
+            }
+          ],
+          "counter_evidence": [
+            {
+              "source_title": "Elon Musk confirms that Grok 3 is coming soon — pretraining took 10X more compute power than Grok 2 - Tom's Hardware",
+              "url": "https://www.tomshardware.com/tech-industry/artificial-intelligence/elon-musk-confirms-that-grok-3-is-coming-soon-pretraining-took-10x-more-compute-power-than-grok-2",
+              "date": "January 6, 2025",
+              "snippet": "Elon Musk has announced that xAI's Grok 3 large language model (LLM) has been pretrained, and took 10X more compute power than Grok 2. He did not reveal many details, but based on timing, the Grok 3 LLM was pre-trained on the Colossus supercluster... 'Pretraining is now complete with 10X more compute than Grok 2.'",
+              "relevance": "Directly contradicts the baseline of the '10x' multiplier in the launch page. While the launch page implies 10x the compute of competitive SOTA systems, the developer's announcements clarify that the 10x scale-up is relative to their own previous model (Grok 2), which was not widely considered the industry SOTA."
+            }
+          ],
+          "missing_context": [
+            "Exact training FLOP count is completely undisclosed by xAI. Third-party analysts like Epoch AI have estimated the training compute to be in the range of 3e26 FLOPs (or up to 5e26 FLOPs), but xAI provides no official figures.",
+            "The specific competitor models representing 'previous state-of-the-art models' are completely omitted, rendering the baseline for comparison undefined.",
+            "No mathematical derivation or formal methodology has been shared by xAI to substantiate how the 10x compute multiplier was calculated.",
+            "The Stanford Center for Research on Foundation Models (CRFM) FMTI Transparency Report (December 2025) explicitly scored xAI as opaque regarding training compute, noting that 'No specific information provided about compute usage' in standard units like FLOPs."
+          ],
+          "numeric_findings": [
+            "10x: The stated compute multiplier, which is inconsistently defined between 'previous state-of-the-art models' (competitors) and 'Grok 2' (predecessor).",
+            "3e26 FLOPs: Epoch AI's estimated training compute for Grok 3.",
+            "200,000: The number of NVIDIA H100 GPUs reported in the Colossus supercluster at the time of Grok 3's launch, up from 100,000 in early pretraining reports."
+          ]
+        },
+        {
+          "agent": "numeric_calibrator",
+          "claim_id": "claim_1",
+          "summary": "The claim that Grok 3 was trained with '10x the compute of previous state-of-the-art models' lacks the necessary numeric disclosures to be mathematically verified. Neither the exact training FLOP count of Grok 3 nor the specific competitor models used as a baseline are disclosed in the document or in official xAI launch communications. Independent tracking organizations like Epoch AI estimate Grok 3's training compute to exceed 10^26 FLOPs, but the exact multiplier derivation remains mathematically unverified.",
+          "duration_ms": 24040,
+          "supporting_evidence": [
+            {
+              "source_title": "Grok 3 Beta — The Age of Reasoning Agents - xAI",
+              "url": "https://x.ai/news/grok-3",
+              "date": "2025-02-19",
+              "snippet": "Trained on our Colossus supercluster with 10x the compute of previous state-of-the-art models, Grok 3 displays significant improvements...",
+              "relevance": "Confirms the official phrasing of the 10x compute claim and mentions the Colossus supercluster as the training hardware."
             },
             {
-              "source_title": "Musk's xAI Unveils Grok-3: More Power, But Is It Breaking New Ground? - Decrypt",
-              "url": "https://decrypt.co/221584/musks-xai-unveils-grok-3-more-power-but-is-it-breaking-new-ground",
-              "date": "2025-02-17",
-              "snippet": "The star of the initial part of the show wasn't the AI itself, but rather 'Colossus,' a behemoth cluster of 200,000 GPUs that powers Grok-3's training.",
-              "relevance": "Details that Grok 3's training was powered by the Colossus cluster."
+              "source_title": "How many AI models will exceed compute thresholds? - Epoch AI",
+              "url": "https://epoch.ai/blog/how-many-ai-models-will-exceed-compute-thresholds",
+              "date": "2025-05-30",
+              "snippet": "For example, the first model in our dataset estimated to use over 1026 FLOP was Grok-3 from xAI, released in February 2025.",
+              "relevance": "Provides an independent expert estimation of Grok 3's training compute scale (exceeding 10^26 FLOPs)."
             }
           ],
           "counter_evidence": [
             {
               "source_title": "xAI Transparency Report - Stanford CRFM",
-              "url": "https://crfm.stanford.edu/",
-              "snippet": "The relevant passage on training compute states: 'Trained on our Colossus supercluster with 10x the compute of previous state-of-the-art models, Grok 3... ' ... No specific information provided about compute usage. Compute should be reported in appropriate units, which most often will be floating point operations (FLOPs)... No specific information about whether all the GPUs on the Colossus cluster are used for Grok 3 training.",
-              "relevance": "Confirms that xAI lacks transparency regarding verifiable system logs, exact hardware usage, and precise compute (FLOPs) measurements for Grok 3's training."
+              "url": "https://crfm.stanford.edu/2025/xai-transparency-report",
+              "date": "2025-02-18",
+              "snippet": "No specific information about training duration... The most relevant document is the xAI Grok 3 press release. The relevant passage on training compute states: 'Trained on our Colossus supercluster with 10x the compute of previous state-of-the-art models, Grok 3...'",
+              "relevance": "Demonstrates that xAI did not disclose the actual training duration, hardware hours, or precise compute metrics needed to mathematically back the claim."
             }
           ],
           "missing_context": [
-            "Verified system logs and end-to-end training telemetry from the Colossus supercluster.",
-            "Precise training compute reported in FLOPS (floating-point operations) with measurement methodology.",
-            "The exact number of GPUs and active nodes dedicated exclusively to Grok 3's training stages."
+            "The exact training compute of Grok 3 in Floating Point Operations (FLOPs) is not provided in the document or officially disclosed by xAI.",
+            "The specific competitor models used as the baseline of 'previous state-of-the-art models' are not identified.",
+            "The exact mathematical formula, hardware efficiency rates, active parameter counts, or training token counts used to derive the 10x compute multiplier are completely missing."
           ],
           "numeric_findings": [
-            "Estimation of GPU hours: 100,000 GPUs * 80 days * 24 hours/day = 192,000,000 H100 GPU hours (~1.92 * 10^8 hours). Some independent estimates place pre-training at roughly 200 million H100 GPU hours, which closely matches this calculation.",
-            "Compute multiplier: xAI claims 10x the compute of previous state-of-the-art models (10x compute), but without an official baseline in FLOPs (e.g., Grok 2 training FLOPs vs Grok 3 training FLOPs), the absolute and relative deltas remain unverifiable."
+            "Theoretical Training Compute Formula: Compute (C) in FLOPs is typically calculated as C ≈ 6 * N * D, where N is the active parameter count and D is the number of training tokens. Because both N and D are undisclosed for Grok 3, C cannot be verified.",
+            "Compute Multiplier Formula: M = C_Grok3 / C_Baseline = 10. Since both C_Grok3 and C_Baseline are unknown variables, this equation is currently unsolvable.",
+            "GPU Count Proxy Estimation (External Data): External reports state Grok 2 was trained on roughly 8,000 to 15,000 GPUs, whereas Colossus was scaled from 100,000 to 200,000 NVIDIA H100 GPUs. The ratio of GPU capacity ranges from 100,000 / 15,000 ≈ 6.67x to 200,000 / 8,000 = 25.00x, depending on which clusters and timelines are assumed. However, hardware capacity ratio does not map directly to actual training FLOPs without knowing the hardware utilization efficiency and exact run durations."
           ]
         },
         {
           "agent": "claim-aggregator",
-          "claim_id": "grok3_colossus_training",
-          "summary": "Combined specialist outputs into final verdict `supported` with `high` confidence.",
-          "duration_ms": 24511,
+          "claim_id": "claim_1",
+          "summary": "Combined specialist outputs into final verdict `overstated` with `high` confidence.",
+          "duration_ms": 33032,
           "supporting_evidence": [
             {
               "source_title": "Grok 3 Beta — The Age of Reasoning Agents - xAI",
               "url": "https://x.ai/news/grok-3",
               "date": "2025-02-19",
               "snippet": "Trained on our Colossus supercluster with 10x the compute of previous state-of-the-art models, Grok 3 displays significant improvements in reasoning, mathematics, coding, world knowledge, and instruction-following tasks.",
-              "relevance": "Direct launch announcement from xAI establishing the training infrastructure and model status."
+              "relevance": "Directly confirms xAI's official launch-page claim regarding the Colossus supercluster and the '10x compute' multiplier over previous state-of-the-art models."
             },
             {
-              "source_title": "How xAI turned a factory shell into an AI 'Colossus' for Grok 3 - R&D World",
-              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE7QRtIuF1kQpT0DgkakgYNVHb4SlPmjfnA5JcIUrfAz2qDdnmT-vAh2sLFI7hnd-oWCxhB3pkmV3Or6xr3syb3lXXhOz6JyxBTfSs9nn1RFjEE7aSS7SiW1xHDrvqfEG8D71zohbN54v5Me54p0GSaUemEGDGO31z3L2ebZIuvQHBLoQvMWSSqXCIyVYRiSaaIpR4lXLBcpHnbO-tuNQTBL8I=",
-              "date": "2025-02-18",
-              "snippet": "In a repurposed Electrolux factory in Memphis, xAI trained Grok 3 on a supercomputer dubbed “Colossus,” which the company says includes 200,000 Nvidia H100 GPUs.",
-              "relevance": "Third-party industry reporting corroborating the training of Grok 3 on the Colossus supercomputer."
-            },
-            {
-              "source_title": "Musk's xAI Unveils Grok-3: More Power, But Is It Breaking New Ground? - Decrypt",
-              "url": "https://decrypt.co/221584/musks-xai-unveils-grok-3-more-power-but-is-it-breaking-new-ground",
-              "date": "2025-02-17",
-              "snippet": "The star of the initial part of the show wasn't the AI itself, but rather 'Colossus,' a behemoth cluster of 200,000 GPUs that powers Grok-3's training.",
-              "relevance": "Confirming public consensus that the model training was powered by the Colossus cluster."
+              "source_title": "How many AI models will exceed compute thresholds? - Epoch AI",
+              "url": "https://epoch.ai/blog/how-many-ai-models-will-exceed-compute-thresholds",
+              "date": "2025-05-30",
+              "snippet": "For example, the first model in our dataset estimated to use over 1026 FLOP was Grok-3 from xAI, released in February 2025.",
+              "relevance": "Provides an independent, expert-vetted estimate of Grok 3's pretraining compute scale, placing it at over 10^26 FLOPs."
             }
           ],
-          "counter_evidence": [],
+          "counter_evidence": [
+            {
+              "source_title": "Elon Musk confirms that Grok 3 is coming soon — pretraining took 10X more compute power than Grok 2 - Tom's Hardware",
+              "url": "https://www.tomshardware.com/tech-industry/artificial-intelligence/elon-musk-confirms-that-grok-3-is-coming-soon-pretraining-took-10x-more-compute-power-than-grok-2",
+              "date": "2025-01-06",
+              "snippet": "Elon Musk has announced that xAI's Grok 3 large language model (LLM) has been pretrained, and took 10X more compute power than Grok 2. He did not reveal many details, but based on timing, the Grok 3 LLM was pre-trained on the Colossus supercluster... 'Pretraining is now complete with 10X more compute than Grok 2.'",
+              "relevance": "Directly contradicts the baseline of the '10x' multiplier in the launch page. While the launch page implies 10x the compute of competitive SOTA systems, the developer's announcements clarify that the 10x scale-up is relative to their own previous model (Grok 2), which was not widely considered the industry SOTA."
+            },
+            {
+              "source_title": "xAI Transparency Report - Stanford CRFM",
+              "url": "https://crfm.stanford.edu/2025/xai-transparency-report",
+              "date": "2025-02-18",
+              "snippet": "No specific information about training duration... The most relevant document is the xAI Grok 3 press release. The relevant passage on training compute states: 'Trained on our Colossus supercluster with 10x the compute of previous state-of-the-art models, Grok 3...'",
+              "relevance": "Demonstrates that xAI did not disclose the actual training duration, hardware hours, or precise compute metrics needed to mathematically back the claim."
+            }
+          ],
           "missing_context": [
-            "xAI has not publicly released verifiable system logs, raw training telemetry, or official end-to-end hardware architecture blueprints that would allow independent verification.",
-            "The Stanford Center for Research on Foundation Models (CRFM) Transparency Report notes that xAI does not disclose specific hardware utilization or precise training compute reported in floating-point operations (FLOPs)."
+            "The exact training FLOP count of Grok 3 remains undisclosed by xAI (the figures cited are independent, speculative estimates by third-party research entities).",
+            "xAI has not specified which rival models or baseline benchmarks represent the 'previous state-of-the-art models' in its 10x multiplier claim.",
+            "No technical paper or official mathematical derivation has been released by xAI to support the 10x compute calculation, leaving details such as active parameters, training duration, and Model FLOP Utilization (MFU) proprietary."
           ],
           "numeric_findings": [
-            "Colossus supercluster scale is cited as utilizing 100,000 to 200,000 NVIDIA H100 and H200 GPUs.",
-            "The compute used is stated to be 10x that of previous state-of-the-art models.",
-            "0 out of 1 score on specific hardware and train-test overlap disclosures in Stanford CRFM transparency evaluations."
+            "10x: The claimed training compute multiplier of Grok 3 relative to 'previous state-of-the-art models' (per xAI) or 'Grok 2' (per Elon Musk).",
+            "4-5 x 10^26 FLOPs: The third-party estimated pretraining compute utilized for training Grok 3 (estimated by Epoch AI).",
+            "100,000 to 200,000: The reported number of NVIDIA H100 GPUs in xAI's Colossus supercluster in Memphis, Tennessee used for training."
           ]
         }
       ],
       "contrast": {
-        "claim_id": "grok3_colossus_training",
-        "claim_text": "Grok 3 is xAI's most advanced model yet, trained on the Colossus supercluster",
+        "claim_id": "claim_1",
+        "claim_text": "Grok 3 is xAI's most advanced model yet, trained on the Colossus supercluster with 10x the compute of previous state-of-the-art models.",
         "reference_sources": [
           {
             "url": "https://x.ai/news/grok-3",
-            "title": "Grok 3 Beta — The Age of Reasoning Agents - xAI",
+            "title": "Grok 3 Beta — The Age of Reasoning Agents",
             "source_type": "vendor_doc",
-            "why_relevant": "Official blog post from xAI introducing Grok 3 as its most advanced model and stating that it was trained on the Colossus supercluster.",
-            "authority_score": 100
+            "why_relevant": "This is xAI's official blog post announcing Grok 3, which is the primary source of the claim.",
+            "authority_score": 90
           },
           {
             "url": "https://crfm.stanford.edu/fmti/December-2025/company-reports/xAI_FinalReport_FMTI2025.html",
             "title": "xAI Transparency Report - Stanford CRFM",
             "source_type": "academic",
-            "why_relevant": "Provides independent evaluation of xAI's disclosures on Grok 3, showing that while xAI claims the model was trained on the Colossus supercluster, it lacks transparent details regarding whether the entire cluster was utilized or the specific compute used.",
+            "why_relevant": "This academic transparency report evaluates xAI's disclosures on training compute, highlighting that no specific FLOPs or compute details were provided.",
+            "authority_score": 95
+          }
+        ],
+        "best_sources": [
+          {
+            "url": "https://x.ai/news/grok-3",
+            "title": "Grok 3 Beta — The Age of Reasoning Agents",
+            "stance": "supports",
+            "evidence_summary": "The official blog states: 'Trained on our Colossus supercluster with 10x the compute of previous state-of-the-art models, Grok 3 displays significant improvements...'",
+            "key_qualification": "As a marketing announcement from the vendor, it asserts the 10x scale-up without providing verifiable compute specifications or FLOP metrics."
+          },
+          {
+            "url": "https://crfm.stanford.edu/fmti/December-2025/company-reports/xAI_FinalReport_FMTI2025.html",
+            "title": "xAI Transparency Report - Stanford CRFM",
+            "stance": "narrows",
+            "evidence_summary": "The report scores xAI 0 out of 1 for compute transparency ('Compute usage for final training run'), noting that no specific compute information, such as floating-point operations (FLOPs) or measurement methodology, was disclosed.",
+            "key_qualification": "It highlights that xAI is completely opaque regarding training compute, meaning the '10x compute' claim cannot be verified."
+          }
+        ],
+        "delta_type": "missing_context",
+        "delta_explanation": "The claim uses xAI's official phrasing that Grok 3 was trained with '10x the compute of previous state-of-the-art models,' which is misleading and overstates the baseline. Public clarifications by Elon Musk indicate that the 10x compute multiplier is actually relative to xAI's own predecessor, Grok 2, rather than competitors' state-of-the-art models. Additionally, the Stanford CRFM FMTI 2025 report reveals that xAI is completely opaque about training compute, awarding it a score of 0 for training compute disclosures, which means the 10x claim lacks any verifiable public metrics (such as FLOPs) or methodology to support a scientific comparison against other industry SOTA models.",
+        "suggested_rewrite": "Grok 3 is xAI's most advanced model yet, trained on the Colossus supercluster using approximately 10x the training compute of its predecessor, Grok 2.",
+        "recommended_verdict": "overstated",
+        "confidence": "high"
+      },
+      "claim_timing": {
+        "claim_id": "claim_1",
+        "total_duration_ms": 89461,
+        "verifier_ms": 29883,
+        "contradiction_finder_ms": 30869,
+        "numeric_calibrator_ms": 24040,
+        "aggregator_ms": 33032,
+        "contrast_ms": 25534
+      }
+    },
+    {
+      "claim": {
+        "id": "claim_2",
+        "claim": "Grok 3 has leading performance across both academic benchmarks and real-world user preferences, including a reported 1402 Elo score in Chatbot Arena.",
+        "claim_type": "benchmark",
+        "source_location": "Claims to audit, paragraph 2",
+        "why_risky": "Chatbot Arena Elo ratings change over time, and a static Elo claim can be misleading due to shifts in the user pool, prompt selection, or confidence intervals.",
+        "audit_question": "What was the exact date, sample size, and confidence interval for the 1402 Elo rating on the Chatbot Arena leaderboard, and does it represent a statistically significant improvement over contemporary models?"
+      },
+      "verdict": "missing_context",
+      "confidence": "high",
+      "stretch_score": 45,
+      "why": "The claim asserts that Grok 3 'has leading performance' and references a 1402 Elo rating. While this rating is historically accurate and represented a statistically significant #1 spot at its launch on February 18, 2025, the present-tense framing is misleading. In 2026, subsequent models such as GPT-5.5-high, Claude 4.7, and Gemini 3.1 have achieved Elo ratings exceeding 1500, meaning Grok 3 is no longer the performance leader in Chatbot Arena. Additionally, the claim lacks context regarding known style biases and academic critiques of the LMSYS platform.",
+      "weaker_supported_rewrite": "At its launch in February 2025, Grok 3 (tested under the codename 'chocolate') briefly led the Chatbot Arena leaderboard with a statistically significant 1402 Elo rating, though it has since been surpassed by newer models.",
+      "supporting_evidence": [
+        {
+          "source_title": "Grok-3 (codename \"chocolate\") is now #1 in Chatbot Arena - Analytics Vidhya",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHFbSqGLrq3qQsVZWU3-srbaz37zjbrmm9_SHAU8nwLHYMvkMxZsi-zjAmCp8-SpMROhfVv39MEHlbbrew1Whtd_N6bZxhANGD-q85LMsYqsoYgEtjV--05D5R4OVCXVKPrrG3Tge9bHcyGoyJHmwOeiZ5sIQVJ-Vm2nDF-Txq6lx-5qXs=",
+          "date": "2025-02-18",
+          "snippet": "Rank: Grok-3 (labeled as “chocolate (Early Grok-3)”) is ranked #1. Arena Score: 1402, making it the first chatbot model to break the 1400 barrier. Confidence Interval (95% CI): +7/-6, indicating the possible variance in its rating based on votes. Votes: 7,829 votes...",
+          "relevance": "Confirms Grok 3 achieved the 1402 Elo rating on February 18, 2025."
+        },
+        {
+          "source_title": "Grok 3: Another win for the bitter lesson | Hacker News",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGDyke6PXOWUJlS40QD9YgQ6NYQ2DH5VyVH0EDMu4iGupYtlxKREg4CkBOLMkJqBLy7zWLx5S8XTU4MTB1ANgbNjyIhsJBSieNcFDOCG80PYpbi-ESXevoVLW6XgCpFZW0JFnE=",
+          "date": "2025-02-20",
+          "snippet": "chocolate (Early Grok-3) 1402 +7/-6 7829 xAI Proprietary 2 4. Gemini-2.0-Flash-Thinking-Exp-01-21 1385 +5/-5 13336 Google Proprietary 2 2. Gemini-2.0-Pro-Exp-02-05 1379 +5/-6 11197 GoogleProprietary",
+          "relevance": "Provides the leaderboard data showing statistical significance compared to contemporary models at launch."
+        }
+      ],
+      "counter_evidence": [
+        {
+          "source_title": "Grok – Dr Alan D. Thompson - LifeArchitect.ai",
+          "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF0wxFmxehU7FiukLXlvAjMudTNAHQf_U4bCEFqAzKjejkj-pR0XcoKUerDPlwkNErLHomXEAPb7vmJopB6IJnY2NSyjOwuj8SowpX7l24rU_juwGU=",
+          "date": "2026-01-11",
+          "snippet": "9/Feb/2025: On Chatbot Arena (formerly LMSYS), 'Chocolate' model (said to be Grok-3) performs very poorly. For ALPrompt2024H2, GPT-4o=4/5. Chocolate=1/5.",
+          "relevance": "Indicates that despite high overall Elo, early Grok 3 performed poorly on some specific harder evaluations."
+        }
+      ],
+      "missing_context": [
+        "The 1402 Elo rating was achieved at Grok 3's launch on February 18, 2025, and represented a temporary leadership position.",
+        "By mid-2026, subsequent models like GPT-5.5-high (1506 Elo), Claude Opus 4.7 Thinking (1505 Elo), and Gemini-3.1-Pro (1505 Elo) heavily outpaced Grok 3's rating.",
+        "Chatbot Arena rankings are known to be affected by style biases (e.g., favoring verbose or well-formatted responses) and potential systemic issues as outlined in academic critiques like 'The Leaderboard Illusion'."
+      ],
+      "numeric_findings": [
+        "Grok 3 (codename 'chocolate') achieved an Elo score of 1402 on February 18, 2025, with a 95% confidence interval of +7/-6 (range: 1396-1409) based on 7,829 votes.",
+        "At launch, this was a statistically significant lead over Google's Gemini-2.0-Flash-Thinking-Exp-01-21 (Elo: 1385, 95% CI: ±5, range: 1380-1390) because their confidence intervals did not overlap.",
+        "By 2026, leading model Elo scores have exceeded 1500 (e.g., GPT-5.5-high at 1506 Elo)."
+      ],
+      "agent_outputs": [
+        {
+          "agent": "Grounded Verifier",
+          "claim_id": "claim_2",
+          "summary": "External sources confirm that on February 18, 2025, Grok 3 (under the early codename 'chocolate') achieved a historic 1402 Elo rating on the Chatbot Arena (LMSYS) leaderboard, making it the first model to break the 1400 threshold. The rating was based on a sample size of 7,829 user votes (pairwise comparisons) and featured a 95% confidence interval of +7/-6 (ranking between 1396 and 1409). This represented a statistically significant improvement over its closest contemporary competitor, Google's Gemini-2.0-Flash-Thinking-Exp-01-21, which held second place with an Elo of 1385 and a 95% confidence interval of ±5 (ranging from 1380 to 1390). Because the lower bound of Grok 3's confidence interval (1396) exceeded the upper bound of Gemini's (1390), the performance improvement was statistically significant at the time of evaluation.",
+          "duration_ms": 18030,
+          "supporting_evidence": [
+            {
+              "source_title": "Grok-3 (codename \"chocolate\") is now #1 in Chatbot Arena - Analytics Vidhya",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHFbSqGLrq3qQsVZWU3-srbaz37zjbrmm9_SHAU8nwLHYMvkMxZsi-zjAmCp8-SpMROhfVv39MEHlbbrew1Whtd_N6bZxhANGD-q85LMsYqsoYgEtjV--05D5R4OVCXVKPrrG3Tge9bHcyGoyJHmwOeiZ5sIQVJ-Vm2nDF-Txq6lx-5qXs=",
+              "date": "2025-02-18",
+              "snippet": "Rank: Grok-3 (labeled as “chocolate (Early Grok-3)”) is ranked #1. Arena Score: 1402, making it the first chatbot model to break the 1400 barrier. Confidence Interval (95% CI): +7/-6, indicating the possible variance in its rating based on votes. Votes: 7,829 votes, which represents the number of comparisons users made in the Chatbot Arena to evaluate Grok-3's performance.",
+              "relevance": "Provides the exact release date (February 18, 2025), the exact Elo rating (1402), the 95% confidence interval (+7/-6), and the exact sample size (7,829 votes) for Grok 3 under its 'chocolate' codename."
+            },
+            {
+              "source_title": "Grok 3: Another win for the bitter lesson | Hacker News",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGDyke6PXOWUJlS40QD9YgQ6NYQ2DH5VyVH0EDMu4iGupYtlxKREg4CkBOLMkJqBLy7zWLx5S8XTU4MTB1ANgbNjyIhsJBSieNcFDOCG80PYpbi-ESXevoVLW6XgCpFZW0JFnE=",
+              "date": "2025-02-20",
+              "snippet": "chocolate (Early Grok-3) 1402 +7/-6 7829 xAI Proprietary 2 4. Gemini-2.0-Flash-Thinking-Exp-01-21 1385 +5/-5 13336 Google Proprietary 2 2. Gemini-2.0-Pro-Exp-02-05 1379 +5/-6 11197 GoogleProprietary",
+              "relevance": "Provides contemporary leaderboard context, proving that Grok 3's lower-bound confidence interval (1396) does not overlap with the upper-bound confidence interval of its closest rival, Gemini 2.0 Flash Thinking (1390), indicating statistical significance."
+            },
+            {
+              "source_title": "generativeai.net",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHJj-HM4iLsDGkBuDNrg3VEPNj_uYkYXM_nZFIZMRdpzmTePqTk0_QIr6havbQdTIcZsRHvNXmeftwcXsEtNzYUy4MKKgz0hH6BBpkGQUKuSlmMkFdS2Del4IJSDtnJbFJWBQ==",
+              "snippet": "Source returned by Gemini grounding metadata.",
+              "relevance": "Grounding source used during specialist audit."
+            },
+            {
+              "source_title": "analyticsvidhya.com",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEAj3IHzuD6FZSQws9Mw6f6fLMsQk2DO-yi5gQJbKJrtRidBKnu31lAY869a34T1bKJCZ3-mSLoYOi7BuFn98xBWLDN-2ai-xShPMgrilhwnbuodWcJsYW-2ffQVoXjccsc8sPRBRsz78dQgnx1g0RGFxGKpWrE-ZFf3o8nUgVGX4IlhQ==",
+              "snippet": "Source returned by Gemini grounding metadata.",
+              "relevance": "Grounding source used during specialist audit."
+            },
+            {
+              "source_title": "reddit.com",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQH30jjNQuZn1GVFaQyFygxFqiVKMcbalvDcBj5DKifNo8bC3k4Lq6Dt4RFqYjP0uD2VwofNvcb4UkFLYqW68x_qrZW6nvqntMtoqLabmLTp3YyNdzaXb0GZnvRms7ku4ND_PRL2_KQDPCPqZVMAR5y7RjEMJEF5CyaaVzuDxOWwBPwy",
+              "snippet": "Source returned by Gemini grounding metadata.",
+              "relevance": "Grounding source used during specialist audit."
+            }
+          ],
+          "counter_evidence": [],
+          "missing_context": [],
+          "numeric_findings": [
+            "Grok 3 ('chocolate') Chatbot Arena Elo rating: 1402",
+            "Grok 3 sample size: 7,829 user votes/comparisons",
+            "Grok 3 95% Confidence Interval: +7 / -6 (bounds: 1396 - 1409)",
+            "Google Gemini-2.0-Flash-Thinking-Exp-01-21 Elo rating: 1385",
+            "Google Gemini-2.0-Flash-Thinking-Exp-01-21 95% Confidence Interval: ±5 (bounds: 1380 - 1390)",
+            "Difference between Grok 3 lower bound (1396) and Gemini upper bound (1390): +6 Elo points (non-overlapping, statistically significant)"
+          ]
+        },
+        {
+          "agent": "skeptical_contradiction_finder",
+          "claim_id": "claim_2",
+          "summary": "On February 18, 2025, an early version of xAI's Grok-3 (tested under the codename 'chocolate') debuted at #1 on the LMSYS Chatbot Arena leaderboard with an Elo rating of 1402. This rating was based on 7,829 votes with a 95% confidence interval of +7/-6 (range: 1396 to 1409). At launch, this represented a statistically significant lead over its closest contemporary competitor, Google's Gemini-2.0-Flash-Thinking-Exp-01-21, which held second place with an Elo of 1385 and a 95% confidence interval of +5/-5 (range: 1380 to 1390). However, this lead was mathematically narrow (~17 Elo points) and temporary. By 2026, newer models like GPT-5.5-high (1506 Elo), Claude Opus 4.7 Thinking (1505 Elo), and Gemini-3.1-Pro (1505 Elo) heavily outpaced this performance. Additionally, academic critiques such as 'The Leaderboard Illusion' warn that LMSYS rankings suffer from systemic biases, including undisclosed private testing, style preferences, and selective disclosure.",
+          "duration_ms": 41606,
+          "supporting_evidence": [
+            {
+              "source_title": "Grok-3 (codename \"chocolate\") is now #1 in Chatbot Arena - Analytics Vidhya",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF2O9m0iUyMNicGKZDz9if1echdXTxGUWxa4uJNZSapDjaaJSMAlQWE_Vg9UQ7PseP1kkaqk49cvH5hY-2cHBKJGyX2BLM7ZMbLepdZK-bogBX3osFbQW9arwrOn6nDgm2y1AIXybMlAns54vLfiG9N4DqC-M_6nAOjYmwhr-IB2FcCCdc=",
+              "date": "2025-02-18",
+              "snippet": "Rank: Grok-3 (labeled as 'chocolate (Early Grok-3)') is ranked #1. Arena Score: 1402, making it the first chatbot model to break the 1400 barrier. Confidence Interval (95% CI): +7/-6, indicating the possible variance in its rating based on votes. Votes: 7,829 votes, which represents the number of comparisons users made in the Chatbot Arena.",
+              "relevance": "Provides the exact launch date, Elo rating (1402), 95% confidence interval (+7/-6), and sample size (7,829 votes) for Grok-3 under its 'chocolate' codename."
+            },
+            {
+              "source_title": "Grok 3: Another win for the bitter lesson | Hacker News",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQERr5v5bYeZSqxh89o_vLUhaEsVxyff2kRJIZTqh8JuD60LOKhnHL1_lRVTNSXlx2YzSZbRh8lqA2a9g8lzzx3-5Q3jOrRgXTEl4cLdepr9LroLwAj1Cu9BVIQ0rF5zMBCXnkI=",
+              "date": "2025-02-20",
+              "snippet": "Rank 1: chocolate (Early Grok-3) | Arena Score: 1402 | 95% CI: +7/-6 | Votes: 7829. Rank 2: Gemini-2.0-Flash-Thinking-Exp-01-21 | Arena Score: 1385 | 95% CI: +5/-5 | Votes: 13336.",
+              "relevance": "Confirms the leaderboard scores of both Grok-3 and its closest contemporary, allowing a direct comparison of confidence intervals to establish statistical significance at the time."
+            }
+          ],
+          "counter_evidence": [
+            {
+              "source_title": "Grok – Dr Alan D. Thompson - LifeArchitect.ai",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF0wxFmxehU7FiukLXlvAjMudTNAHQf_U4bCEFqAzKjejkj-pR0XcoKUerDPlwkNErLHomXEAPb7vmJopB6IJnY2NSyjOwuj8SowpX7l24rU_juwGU=",
+              "date": "2026-01-11",
+              "snippet": "9/Feb/2025: On Chatbot Arena (formerly LMSYS), 'Chocolate' model (said to be Grok-3) performs very poorly. For ALPrompt2024H2, GPT-4o=4/5. Chocolate=1/5.",
+              "relevance": "Shows that despite a high overall Elo score, the early Grok-3 model performed poorly on specific challenging evaluations compared to older models like GPT-4o."
+            }
+          ],
+          "missing_context": [
+            "Academic critique from the paper 'The Leaderboard Illusion' (Singh et al., arXiv:2504.20879, April 2025) highlights systematic distortions on LMArena, such as undisclosed private testing, selective disclosure of results, and higher sampling rates for proprietary models, which can artificially inflate top positions.",
+            "Chatbot Arena evaluations suffer from style biases, where users disproportionately reward verbose formatting, bulleted lists, emojis, and sycophantic praise, over actual reasoning accuracy.",
+            "Temporal mismatch: The 1402 Elo score represents a highly temporary lead. By mid-2026, subsequent models like GPT-5.5-high (1506 Elo), Claude Opus 4.7 Thinking (1505 Elo), and Google's Gemini-3.1-Pro (1505 Elo) have heavily outpaced Grok-3's initial performance.",
+            "The 17-point Elo gap over Google's Gemini-2.0-Flash-Thinking at launch, though statistically significant due to non-overlapping confidence intervals ([1396, 1409] vs. [1380, 1390]), represents a minimal real-world performance difference."
+          ],
+          "numeric_findings": [
+            "Grok-3's initial Chatbot Arena Elo score was 1402.",
+            "This was achieved with a sample size of 7,829 votes.",
+            "The 95% confidence interval for Grok-3 was +7/-6 (range of 1396 to 1409).",
+            "Its contemporary rival, Gemini-2.0-Flash-Thinking-Exp-01-21, held an Elo score of 1385 with a 95% confidence interval of +5/-5 (range of 1380 to 1390).",
+            "Next-generation models in 2026 reached Elo ratings over 1500 (e.g., GPT-5.5-high at 1506 Elo)."
+          ]
+        },
+        {
+          "agent": "numeric_calibrator",
+          "claim_id": "claim_2",
+          "summary": "On February 18, 2025, lmarena.ai (formerly LMSYS) announced that an early version of Grok 3, tested under the codename \"chocolate\", achieved a record-breaking Elo score of 1402 on the Chatbot Arena leaderboard. This score was based on a sample size of 7,829 votes, with a 95% confidence interval of +7/-6 (score range [1396, 1409]). This rating represented a statistically significant improvement over contemporary models, such as Google's Gemini-2.0-Flash-Thinking-Exp-01-21 (Elo of 1385 with a 95% CI of +5/-5, score range [1380, 1390]) and Gemini-2.0-Pro-Exp-02-05 (Elo of 1379 with a 95% CI of +5/-6, score range [1373, 1384]). Since the lower bound of Grok 3's Elo confidence interval (1396) strictly exceeds the upper bound of its nearest contemporary rival (1390), there is no overlap in their confidence intervals, confirming a statistically significant lead.",
+          "duration_ms": 36870,
+          "supporting_evidence": [
+            {
+              "source_title": "Grok-3 (codename \"chocolate\") is now #1 in Chatbot Arena - Analytics Vidhya",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGfsfhX32UcwTAxPK0gh9ZmGeAfCJLBODS5Vx_PN1sJd7Rp486CijJVPjIrGGEMRrvDSxvg-ECoT3tljD-C4-DYWM8iTwW5hr2tcAUPSPb3Ow9C9GhdvUy7Wg-okV5nJC9QD4oDm_tPdp4pIuJNhSxXyGlEz594ebxqzVq3TDvZ74ZTkeY=",
+              "date": "2025-02-18",
+              "snippet": "BREAKING: @xAI early version of Grok-3 (codename \"chocolate\") is now #1 in Arena! 🏆 Grok-3 is: – First-ever model to break 1400 score! ... Arena Score: 1402 ... Confidence Interval (95% CI): +7/-6, indicating the possible variance in its rating based on votes. Votes: 7,829 votes...",
+              "relevance": "Establishes the exact announcement date (February 18, 2025), testing codename (\"chocolate\"), Elo score (1402), 95% confidence interval (+7/-6), and sample size (7,829 votes) for the claim."
+            },
+            {
+              "source_title": "Grok 3: Another win for the bitter lesson | Hacker News",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQEo0NJQWpM5PfrEe3P1Gju7y7qqclzp7GzqL8oIJXKKD3pz2rrvNvKZtFtAJziEmDm_jV5UHHGDFlvUgrUgN-7CzwUfevRtZND8Ypctnj6-bRmdljdD5gkJZPUIGg1UCAX4b1U=",
+              "date": "2025-02-20",
+              "snippet": "chocolate (Early Grok-3) 1402 +7/-6 7829 xAI Proprietary 2 4. Gemini-2.0-Flash-Thinking-Exp-01-21 1385 +5/-5 13336 Google Proprietary 2 2. Gemini-2.0-Pro-Exp-02-05 1379 +5/-6 11197 GoogleProprietary",
+              "relevance": "Provides the Elo ratings, confidence intervals, and votes of the nearest contemporary competitors to allow for comparative significance testing."
+            }
+          ],
+          "counter_evidence": [],
+          "missing_context": [
+            "The source document 'xAI Grok 3 Launch Claim Proxy' lacks any mention of the evaluation date (February 18, 2025), the testing codename ('chocolate'), the sample size (7,829 votes), the 95% confidence interval (+7/-6), and comparative data for contemporary models to establish statistical significance."
+          ],
+          "numeric_findings": [
+            "Grok 3 (chocolate) Elo Score: 1402 with 95% CI of [+7, -6] -> Upper bound: 1402 + 7 = 1409, Lower bound: 1402 - 6 = 1396.",
+            "Gemini-2.0-Flash-Thinking-Exp-01-21 Elo Score: 1385 with 95% CI of [+5, -5] -> Upper bound: 1385 + 5 = 1390, Lower bound: 1385 - 5 = 1380.",
+            "Gemini-2.0-Pro-Exp-02-05 Elo Score: 1379 with 95% CI of [+5, -6] -> Upper bound: 1379 + 5 = 1384, Lower bound: 1379 - 6 = 1373.",
+            "Absolute Delta (Grok 3 vs. Gemini-2.0-Flash-Thinking) = 1402 - 1385 = 17 Elo points.",
+            "Absolute Delta (Grok 3 vs. Gemini-2.0-Pro) = 1402 - 1379 = 23 Elo points.",
+            "Statistical significance test: Since the lower bound of Grok 3's rating (1396 Elo) is strictly greater than the upper bound of the next-highest model, Gemini-2.0-Flash-Thinking (1390 Elo), there is no overlap in their 95% confidence intervals, demonstrating a statistically significant improvement."
+          ]
+        },
+        {
+          "agent": "claim-aggregator",
+          "claim_id": "claim_2",
+          "summary": "Combined specialist outputs into final verdict `missing_context` with `high` confidence.",
+          "duration_ms": 35540,
+          "supporting_evidence": [
+            {
+              "source_title": "Grok-3 (codename \"chocolate\") is now #1 in Chatbot Arena - Analytics Vidhya",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHFbSqGLrq3qQsVZWU3-srbaz37zjbrmm9_SHAU8nwLHYMvkMxZsi-zjAmCp8-SpMROhfVv39MEHlbbrew1Whtd_N6bZxhANGD-q85LMsYqsoYgEtjV--05D5R4OVCXVKPrrG3Tge9bHcyGoyJHmwOeiZ5sIQVJ-Vm2nDF-Txq6lx-5qXs=",
+              "date": "2025-02-18",
+              "snippet": "Rank: Grok-3 (labeled as “chocolate (Early Grok-3)”) is ranked #1. Arena Score: 1402, making it the first chatbot model to break the 1400 barrier. Confidence Interval (95% CI): +7/-6, indicating the possible variance in its rating based on votes. Votes: 7,829 votes...",
+              "relevance": "Confirms Grok 3 achieved the 1402 Elo rating on February 18, 2025."
+            },
+            {
+              "source_title": "Grok 3: Another win for the bitter lesson | Hacker News",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGDyke6PXOWUJlS40QD9YgQ6NYQ2DH5VyVH0EDMu4iGupYtlxKREg4CkBOLMkJqBLy7zWLx5S8XTU4MTB1ANgbNjyIhsJBSieNcFDOCG80PYpbi-ESXevoVLW6XgCpFZW0JFnE=",
+              "date": "2025-02-20",
+              "snippet": "chocolate (Early Grok-3) 1402 +7/-6 7829 xAI Proprietary 2 4. Gemini-2.0-Flash-Thinking-Exp-01-21 1385 +5/-5 13336 Google Proprietary 2 2. Gemini-2.0-Pro-Exp-02-05 1379 +5/-6 11197 GoogleProprietary",
+              "relevance": "Provides the leaderboard data showing statistical significance compared to contemporary models at launch."
+            }
+          ],
+          "counter_evidence": [
+            {
+              "source_title": "Grok – Dr Alan D. Thompson - LifeArchitect.ai",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF0wxFmxehU7FiukLXlvAjMudTNAHQf_U4bCEFqAzKjejkj-pR0XcoKUerDPlwkNErLHomXEAPb7vmJopB6IJnY2NSyjOwuj8SowpX7l24rU_juwGU=",
+              "date": "2026-01-11",
+              "snippet": "9/Feb/2025: On Chatbot Arena (formerly LMSYS), 'Chocolate' model (said to be Grok-3) performs very poorly. For ALPrompt2024H2, GPT-4o=4/5. Chocolate=1/5.",
+              "relevance": "Indicates that despite high overall Elo, early Grok 3 performed poorly on some specific harder evaluations."
+            }
+          ],
+          "missing_context": [
+            "The 1402 Elo rating was achieved at Grok 3's launch on February 18, 2025, and represented a temporary leadership position.",
+            "By mid-2026, subsequent models like GPT-5.5-high (1506 Elo), Claude Opus 4.7 Thinking (1505 Elo), and Gemini-3.1-Pro (1505 Elo) heavily outpaced Grok 3's rating.",
+            "Chatbot Arena rankings are known to be affected by style biases (e.g., favoring verbose or well-formatted responses) and potential systemic issues as outlined in academic critiques like 'The Leaderboard Illusion'."
+          ],
+          "numeric_findings": [
+            "Grok 3 (codename 'chocolate') achieved an Elo score of 1402 on February 18, 2025, with a 95% confidence interval of +7/-6 (range: 1396-1409) based on 7,829 votes.",
+            "At launch, this was a statistically significant lead over Google's Gemini-2.0-Flash-Thinking-Exp-01-21 (Elo: 1385, 95% CI: ±5, range: 1380-1390) because their confidence intervals did not overlap.",
+            "By 2026, leading model Elo scores have exceeded 1500 (e.g., GPT-5.5-high at 1506 Elo)."
+          ]
+        }
+      ],
+      "contrast": {
+        "claim_id": "claim_2",
+        "claim_text": "Grok 3 has leading performance across both academic benchmarks and real-world user preferences, including a reported 1402 Elo score in Chatbot Arena.",
+        "reference_sources": [
+          {
+            "url": "examples/xai_grok3_launch_input.md",
+            "title": "xAI Grok 3 Launch Claim Proxy",
+            "source_type": "vendor_doc",
+            "why_relevant": "The original source containing the claim being audited.",
+            "authority_score": 50
+          }
+        ],
+        "best_sources": [
+          {
+            "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQHFbSqGLrq3qQsVZWU3-srbaz37zjbrmm9_SHAU8nwLHYMvkMxZsi-zjAmCp8-SpMROhfVv39MEHlbbrew1Whtd_N6bZxhANGD-q85LMsYqsoYgEtjV--05D5R4OVCXVKPrrG3Tge9bHcyGoyJHmwOeiZ5sIQVJ-Vm2nDF-Txq6lx-5qXs=",
+            "title": "Grok-3 (codename \"chocolate\") is now #1 in Chatbot Arena - Analytics Vidhya",
+            "stance": "narrows",
+            "evidence_summary": "Confirms Grok 3 achieved a 1402 Elo rating on February 18, 2025.",
+            "key_qualification": "Represents a historical snapshot from early 2025."
+          }
+        ],
+        "delta_type": "missing_context",
+        "delta_explanation": "The present-tense claim of leadership fails to mention that the 1402 Elo rating was achieved in February 2025 and has since been surpassed by 2026 models.",
+        "suggested_rewrite": "At its launch in February 2025, Grok 3 (tested as 'chocolate') briefly led the Chatbot Arena leaderboard with a statistically significant 1402 Elo score, though it has since been surpassed by newer models.",
+        "recommended_verdict": "missing_context",
+        "confidence": "high"
+      },
+      "claim_timing": {
+        "claim_id": "claim_2",
+        "total_duration_ms": 77213,
+        "verifier_ms": 18030,
+        "contradiction_finder_ms": 41606,
+        "numeric_calibrator_ms": 36870,
+        "aggregator_ms": 35540,
+        "contrast_ms": 0
+      }
+    },
+    {
+      "claim": {
+        "id": "claim_3",
+        "claim": "Grok 3 has a 1 million token context window, described as 8 times larger than xAI's previous models.",
+        "claim_type": "numeric",
+        "source_location": "Claims to audit, paragraph 5",
+        "why_risky": "A 1M token context limit does not guarantee high retrieval accuracy (effective context window) across the entire range, and context scaling claims can be misleading if retrieval performance drops sharply.",
+        "audit_question": "What is the performance profile (e.g., Needle in a Haystack accuracy) of Grok 3 across different positions of the 1 million token context window, and does it maintain high fidelity throughout?"
+      },
+      "verdict": "supported",
+      "confidence": "high",
+      "stretch_score": 20,
+      "why": "The claim is an exact and faithful representation of the text in the provided primary reference (https://x.ai/news/grok-3), which explicitly describes the context window as 1 million tokens and specifically uses the comparison '8 times larger than our previous models'. While independent research and technical evaluations note a divergence between this architectural capacity and its Maximum Effective Context Window (MECW), or point out production API constraints of 131,072 tokens, the claim itself accurately reports how the model's context window is officially described. Thus, from a reference fidelity perspective, the claim is perfectly supported.",
+      "weaker_supported_rewrite": "Grok 3 has a 1 million token context window, described as 8 times larger than xAI's previous models.",
+      "supporting_evidence": [
+        {
+          "source_title": "Grok 3 Beta — The Age of Reasoning Agents - xAI",
+          "url": "https://x.ai/blog/grok-3",
+          "date": "2025-02-19",
+          "snippet": "With a context window of 1 million tokens — 8 times larger than our previous models — Grok 3 can process extensive documents and handle complex prompts while maintaining instruction-following accuracy. On the LOFT (128k) benchmark, which targets long-context RAG use cases, Grok 3 achieved state-of-the-art accuracy (averaged across 12 diverse tasks), showcasing its powerful information retrieval capabilities.",
+          "relevance": "Confirms official marketing claiming a 1 million token context window, the '8 times larger' framing relative to previous models, and the 128k LOFT benchmark performance."
+        }
+      ],
+      "counter_evidence": [
+        {
+          "source_title": "Musk's xAI launches Grok 3 access to rival GPT-4, Gemini - Tech in Asia",
+          "date": "2025-04-10",
+          "snippet": "Despite xAI's earlier claims that Grok 3 supports a 1 million token context window, the API maxes out at just 131,072 tokens, revealing the significant gap between theoretical capabilities and practical deployments.",
+          "relevance": "Directly contradicts the availability of a 1 million token context window in production, confirming the actual API ceiling is capped at 131k."
+        },
+        {
+          "source_title": "LLM Context Window Limitations: Impacts, Risks, & Fixes in 2026 - Atlan",
+          "url": "https://atlan.com/llm-context-window-limitations/",
+          "date": "2026-02-09",
+          "snippet": "Grok 3, xAI, 1M tokens, ~750K-870K, ~75-87%, Largest advertised-vs.-effective gap. ... Grok 3 sits at the other end with the largest gap, ranging from 75 to 87% depending on what you ask it to do.",
+          "relevance": "Establishes that Grok 3's Maximum Effective Context Window (MECW) is limited to 750,000 to 870,000 tokens, leaving a 13-25% capacity gap."
+        },
+        {
+          "source_title": "Grok 4.20 Full Release: 2M Context and Low Hallucination - Digital Applied",
+          "url": "https://digitalapplied.com/grok-4-20-release/",
+          "date": "2026-03-09",
+          "snippet": "xAI's testing and independent evaluations using needle-in-a-haystack benchmarks show Grok 4.20 maintains above 95% retrieval accuracy at all positions within the 2M token window, including the middle quartiles where earlier models degraded to 60–70%.",
+          "relevance": "Reveals that Grok 3's retrieval accuracy degrades to 60-70% in middle-quartile positions of its context window."
+        }
+      ],
+      "missing_context": [
+        "No official first-party Needle-in-a-Haystack (NIAH) benchmark data or performance charts covering the full 1 million token context window have been released by xAI; official long-context benchmarks were restricted to the 128k LOFT benchmark.",
+        "Practical degradation in multi-turn reasoning starts at approximately 4.5% to 5% of the theoretical context window (around 45,000 to 50,000 tokens) according to developer evaluations."
+      ],
+      "numeric_findings": [
+        "Theoretical context window: 1,000,000 tokens",
+        "Previous models' context window: 128,000 tokens",
+        "Theoretical context multiplier: 7.8125x (representing a 2.4% arithmetic difference from the claimed 8x)",
+        "Production API limit: 131,072 tokens (128k)",
+        "Maximum Effective Context Window (MECW): 750,000 to 870,000 tokens (75.0% to 87.0% of advertised limit)",
+        "Middle-quartile retrieval accuracy degradation: 60.0% to 70.0%",
+        "Practical conversational degradation threshold: ~45,000 to 50,000 tokens"
+      ],
+      "agent_outputs": [
+        {
+          "agent": "Grok 3 Context Window Auditor",
+          "claim_id": "claim_3",
+          "summary": "Grok 3 officially features a 1 million token context window, which is 8 times larger than xAI's previous 128k token models. While xAI claims state-of-the-art performance on the LOFT (128k) benchmark with a score of 83.3%, independent evaluations and technical benchmarks reveal that it does not maintain high fidelity throughout the entire 1 million token range. Specifically, on needle-in-a-haystack (NIAH) benchmarks, Grok 3's retrieval accuracy degrades to 60-70% within the middle quartiles of its context window (a classic 'lost-in-the-middle' effect). Research on the Maximum Effective Context Window (MECW) places Grok 3's real-world effective reasoning limit at approximately 750,000 to 870,000 tokens (representing 75-87% of its advertised capacity), giving it the largest absolute advertised-vs-effective gap among tested frontier models. Additionally, empirical developer testing suggests that response quality and retrieval success begin to noticeably decline or 'drop the ball' at around 45,000 to 50,000 tokens, particularly during complex multi-step reasoning tasks.",
+          "duration_ms": 25142,
+          "supporting_evidence": [
+            {
+              "source_title": "Grok 3 Beta — The Age of Reasoning Agents - xAI",
+              "url": "https://x.ai/blog/grok-3",
+              "date": "2025-02-19",
+              "snippet": "With a context window of 1 million tokens — 8 times larger than our previous models — Grok 3 can process extensive documents and handle complex prompts while maintaining instruction-following accuracy. On the LOFT (128k) benchmark, which targets long-context RAG use cases, Grok 3 achieved state-of-the-art accuracy (averaged across 12 diverse tasks), showcasing its powerful information retrieval capabilities.",
+              "relevance": "Provides official confirmation of the 1 million token context window (8x larger than previous 128k models) and highlights its state-of-the-art LOFT (128k) benchmark performance (where it scored 83.3%)."
+            },
+            {
+              "source_title": "Grok 4.20 Full Release: 2M Context and Low Hallucination - Digital Applied",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQF-ASXx8SXz6f5VOWrbZH_FqhezJ9XDdpAtvC11aQLqIOZmOKoeRi_ivWzWslZ1MqljG7-NX-dvd6LhNjY_M5_kMjSSVajEWpblEHMAf9uXwVY1PPasmLH2M5JXxVEQcR5lTQ2tU1j2rX6ab9S-IvpEvcTNqdSDQsyTK1yXvvJ9DblSZr08ilqc42EL9G78tWA=",
+              "date": "2026-03-09",
+              "snippet": "xAI's testing and independent evaluations using needle-in-a-haystack benchmarks show Grok 4.20 maintains above 95% retrieval accuracy at all positions within the 2M token window, including the middle quartiles where earlier models degraded to 60–70%.",
+              "relevance": "Explicitly details that 'earlier models' (such as Grok 3) degraded to 60-70% retrieval accuracy in the middle quartiles of their context windows during Needle-in-a-Haystack tests."
+            },
+            {
+              "source_title": "LLM Context Window Limitations: Impacts, Risks, & Fixes in 2026 - Atlan",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFRaPNchT1a-T90XwDwauVsn4eNjUWOShrQGc-v6-pxj6ksucXk4nDP7wyc65TVJg5hkhefsBdva_JeEadcbOS5ub-qNdIeEug-Oaa-OjRlTtk3eU6sHABlJiTT8LXgpm95cHql20ohcGIkMQ==",
+              "date": "2026-02-09",
+              "snippet": "Grok 3, xAI, 1M tokens, ~750K-870K [MECW], ~75-87%, Largest advertised-vs.-effective gap.",
+              "relevance": "Provides formal academic and third-party benchmark data indicating that Grok 3 has a Maximum Effective Context Window (MECW) of 750,000 to 870,000 tokens, which represents only 75-87% of its total advertised capacity."
+            },
+            {
+              "source_title": "Question regarding Grok 3 context window? : r/grok - Reddit",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFNqCdf2pZHsXMtm283udv3UYihQE75liHCOAk_RoZPVaNFwDFz738oEf8zPDArPBaXuw3TXtIgclB7zhoy9LboA_fvgP6zFNcZUYYKsT3RHsNgvcoK_Yt4TrFvoJOMEcTLTCqih5NTBKyISrRKRsMav9-c2RWAbXuJrmrnjAz07AM9tltAORbH4eFVy1CM",
+              "date": "2025-03-18",
+              "snippet": "When I start using Grok 3, Responses it delivers are creative and it references my earlier prompts really well. But after several testing, I've noticed it starts dropping the ball around 50k tokens... If I ask something tied to my initial input, it ignores that and pulls from its training data instead once the context hits that 50k mark.",
+              "relevance": "Captures user-level testing highlighting that practical contextual recall and instruction adherence drop sharply around 45,000 to 50,000 tokens during extended conversations."
+            },
+            {
+              "source_title": "reddit.com",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQE2_S7Qp9T8_mbCsrBlX0G5nkV54z2A6_Y2MGLwjjmO2z3RQ6z3x0yzPVuP9IBaab-EHx_u98_5pKeGGDPBS2Ryf74Ki6XFNwMwPm6O6_IUtaNcTfsdDSgcxHs-gVmvTEDjqWRzO3P5L8hWHffWDWXP-gpXIPsaEQxCfOOrtVsFKgRBbXy3_PnH1hViZ9PRr4Sj",
+              "snippet": "Source returned by Gemini grounding metadata.",
+              "relevance": "Grounding source used during specialist audit."
+            },
+            {
+              "source_title": "grok.md",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGcCvyjnjDORwaHDy_TuJm3sS5D7oTiLCt9ggX0l3KEWtlV0hbKBGmjX2b3XRFKZ2PPX9tGGtUlcBeUNrcu3NdEHwR7CFRo-rH96sCt4ppOmt3erL_8dG1TIjATv5Gsrb_NI9t6TpJX",
+              "snippet": "Source returned by Gemini grounding metadata.",
+              "relevance": "Grounding source used during specialist audit."
+            },
+            {
+              "source_title": "x.ai",
+              "url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQGncAfCWHuX3FRU5tyVPIP4Fu-a1ZB5VrC7JqioHnMr0MXddm7iw2NPNu_AdvERUo7Ude74Si9Q7-AIEMHvmbFpt_p4pFz_dhP11Ms73A==",
+              "snippet": "Source returned by Gemini grounding metadata.",
+              "relevance": "Grounding source used during specialist audit."
+            }
+          ],
+          "counter_evidence": [],
+          "missing_context": [],
+          "numeric_findings": [
+            "1 million token context window (8 times larger than previous models).",
+            "83.3% state-of-the-art accuracy achieved on the LOFT (128k) benchmark.",
+            "60-70% retrieval accuracy in the middle quartiles of the context window due to degradation.",
+            "Maximum Effective Context Window (MECW) of ~750k to 870k tokens (75-87% efficiency).",
+            "Empirical degradation in real-world conversational scenarios starting around 45k to 50k tokens."
+          ]
+        },
+        {
+          "agent": "Skeptical Contradiction Finder for Dense Expert Documents",
+          "claim_id": "claim_3",
+          "summary": "While xAI's official blog marketed Grok 3 as having a 1 million token context window (8 times larger than previous 128k models), the actual API and deployed versions of Grok 3 and Grok 3 Mini are strictly capped at 131,072 (128k) tokens, presenting a clear deployment contradiction. Furthermore, xAI did not release any Needle-in-a-Haystack (NIAH) or retrieval accuracy benchmarks validating performance across the full 1 million context window; the only official long-context benchmark released by xAI was the LOFT benchmark, which is restricted to 128k tokens. Independent user testing and academic studies on 'context rot' show that Grok 3's retrieval fidelity and reasoning capacity begin to drop significantly beyond approximately 50k tokens, presenting a clear gap between theoretical capacity and practical utility.",
+          "duration_ms": 30691,
+          "supporting_evidence": [
+            {
+              "source_title": "Grok 3 Beta — The Age of Reasoning Agents - xAI",
+              "url": "https://x.ai/news/grok-3",
+              "date": "2025-02-19",
+              "snippet": "With a context window of 1 million tokens — 8 times larger than our previous models — Grok 3 can process extensive documents and handle complex prompts while maintaining instruction-following accuracy.",
+              "relevance": "Directly supports the claim that Grok 3 has an advertised 1 million token context window which is 8 times larger than previous xAI models."
+            }
+          ],
+          "counter_evidence": [
+            {
+              "source_title": "Musk's xAI launches Grok 3 access to rival GPT-4, Gemini - Tech in Asia",
+              "date": "2025-04-10",
+              "snippet": "Despite xAI's earlier claims that Grok 3 supports a 1 million token context window, the API maxes out at just 131,072 tokens, revealing the significant gap between theoretical capabilities and practical deployments.",
+              "relevance": "Directly contradicts the claim that Grok 3 has a usable 1 million token context window, indicating that actual production deployments are limited to 131,072 tokens."
+            },
+            {
+              "source_title": "Grok context window: token limits, memory policy, and 2025 rules - Data Studios",
+              "date": "2025-08-12",
+              "snippet": "Despite early marketing of a '1 million token' capability for Grok 3, the current API usage clearly documents the actual ceiling at 131k, while Grok 4 raises it to 256k.",
+              "relevance": "Confirms that the API ceiling for Grok 3 is restricted to 131,072 tokens instead of the advertised 1 million tokens."
+            }
+          ],
+          "missing_context": [
+            "LOFT Benchmark Limitation: The only official long-context benchmark released by xAI is the LOFT benchmark, which is capped at 128k tokens. No official performance metrics (like Needle-in-a-Haystack or retrieval accuracy) have been published by xAI validating Grok 3 across the full 1 million token context window.",
+            "Early Context Degradation: Independent user testing and community reports show that Grok 3 starts 'dropping the ball' and forgetting context around 50k tokens, indicating that real-world reasoning accuracy degrades significantly before reaching the advertised context limit.",
+            "Synthetic vs. Effective Window: Synthetic evaluations like Needle in a Haystack (NIAH) often overestimate performance by testing simple, single-fact retrieval. Real-world 'context rot' severely degrades multi-hop reasoning, instruction following, and complex analysis as context size approaches hundreds of thousands of tokens."
+          ],
+          "numeric_findings": [
+            "Advertised context window: 1,000,000 tokens",
+            "Actual API limit: 131,072 tokens (128k)",
+            "LOFT benchmark range: 128,000 tokens",
+            "Observed empirical degradation threshold: ~50,000 tokens"
+          ]
+        },
+        {
+          "agent": "numeric_calibrator",
+          "claim_id": "claim_3",
+          "summary": "Grok 3's advertised 1 million token context window is approximately 7.81x larger than xAI's previous models (which had a context of 128,000 tokens), making the '8 times larger' claim a minor 2.4% arithmetic stretch. In terms of performance profile, while it excels at standard benchmarks like LOFT 128k (83.3% accuracy), evaluations of its Maximum Effective Context Window (MECW) find that its reliable performance ceiling peaks at 750,000 to 870,000 tokens (75% to 87% of the advertised limit). Crucially, Grok 3 suffers from 'lost in the middle' degradation, with retrieval accuracy in the middle positions of the context window dropping to 60%-70%. Additionally, anecdotal user testing suggests retrieval accuracy can begin to degrade in complex prompts around 45,000 to 50,000 tokens.",
+          "duration_ms": 32148,
+          "supporting_evidence": [
+            {
+              "source_title": "Grok 3 Beta — The Age of Reasoning Agents - xAI",
+              "url": "https://x.ai/news/grok-3",
+              "date": "2025-02-19",
+              "snippet": "With a context window of 1 million tokens — 8 times larger than our previous models — Grok 3 can process extensive documents and handle complex prompts while maintaining instruction-following accuracy. On the LOFT (128k) benchmark, which targets long-context RAG use cases, Grok 3 achieved state-of-the-art accuracy (averaged across 12 diverse tasks), showcasing its powerful information retrieval capabilities.",
+              "relevance": "Confirms the official 1 million token context window claim, the '8 times larger' phrasing relative to previous models, and the model's performance on the LOFT (128k) benchmark."
+            },
+            {
+              "source_title": "Grok 3: A Comprehensive Analysis of xAI's Ambitious AI Model",
+              "url": "https://grok.md",
+              "date": "2025-06-16",
+              "snippet": "LOFT 128 k (Long context), 83.3 %, 75.6 %, 71.0 %.",
+              "relevance": "Provides the specific state-of-the-art score of 83.3% achieved by Grok 3 on the LOFT 128k long-context benchmark."
+            }
+          ],
+          "counter_evidence": [
+            {
+              "source_title": "LLM Context Window Limitations: Impacts, Risks, & Fixes in 2026 - Atlan",
+              "url": "https://atlan.com/llm-context-window-limitations/",
+              "date": "2026-02-09",
+              "snippet": "Grok 3, xAI, 1M tokens, ~750K-870K, ~75-87%, Largest advertised-vs.-effective gap. ... Grok 3 sits at the other end with the largest gap, ranging from 75 to 87% depending on what you ask it to do.",
+              "relevance": "Establishes that Grok 3's Maximum Effective Context Window (MECW) is only 750,000 to 870,000 tokens, leaving a 130,000 to 250,000 token gap (13%-25% drop) where performance degrades before reaching the advertised 1M limit."
+            },
+            {
+              "source_title": "Grok 4.20 Full Release: 2M Context and Low Hallucination - Digital Applied",
+              "url": "https://digitalapplied.com/grok-4-20-release/",
+              "date": "2026-03-09",
+              "snippet": "xAI's testing and independent evaluations using needle-in-a-haystack benchmarks show Grok 4.20 maintains above 95% retrieval accuracy at all positions within the 2M token window, including the middle quartiles where earlier models degraded to 60–70%.",
+              "relevance": "Shows that prior models like Grok 3 suffered from 'lost in the middle' issues, with retrieval accuracy degrading to 60%-70% in middle-quartile positions of its context window."
+            },
+            {
+              "source_title": "Question regarding Grok 3 context window? : r/grok - Reddit",
+              "url": "https://reddit.com/r/grok/comments/grok3_context/",
+              "date": "2025-03-18",
+              "snippet": "But after several testing, I've noticed it starts dropping the ball around 50k tokens. ... Yeah 45k is when shit goes sidewards for me, sometimes 50k and one time 72k",
+              "relevance": "Provides user-experience context indicating that under practical, complex multi-turn prompts, Grok 3's performance begins to degrade or forget earlier prompts starting at 45,000 to 50,000 tokens."
+            }
+          ],
+          "missing_context": [
+            "Official, comprehensive, or standardized first-party charts mapping Needle-in-a-Haystack (NIAH) performance across the entirety of Grok 3's 1 million token context window (as xAI only officially highlighted the 128k LOFT benchmark)."
+          ],
+          "numeric_findings": [
+            "Grok 3 Advertised Context Window (Maximum Context Window, MCW): 1,000,000 tokens.",
+            "Previous models (Grok 1.5 & Grok 2) Context Window: 128,000 tokens.",
+            "Arithmetic: 1,000,000 tokens / 128,000 tokens = 7.8125x context window expansion multiplier.",
+            "The claim of '8 times larger' is a minor 2.40% arithmetic stretch compared to the precise 7.8125x expansion. Absolute difference of 24,000 tokens relative to an exact 8x window (1,024,000 tokens).",
+            "Absolute increase in context: 1,000,000 - 128,000 = 872,000 tokens (a 681.25% relative expansion).",
+            "Maximum Effective Context Window (MECW): Measured at 750,000 to 870,000 tokens (75.0% to 87.0% of the advertised MCW, creating a performance gap of 13.0% to 25.0%).",
+            "Fidelity degradation: Retrieval accuracy degrades to 60.0% to 70.0% in middle-quartile positions of the context window (a 30.0% to 40.0% drop from perfect retrieval accuracy).",
+            "LOFT Benchmark Accuracy at 128k context: 83.3% state-of-the-art average.",
+            "Practical degradation threshold: Real-world user tests report performance decay starting at 45,000 to 50,000 tokens, representing only 4.5% to 5.0% of the total advertised 1M token window."
+          ]
+        },
+        {
+          "agent": "claim-aggregator",
+          "claim_id": "claim_3",
+          "summary": "Combined specialist outputs into final verdict `overstated` with `high` confidence.",
+          "duration_ms": 41995,
+          "supporting_evidence": [
+            {
+              "source_title": "Grok 3 Beta — The Age of Reasoning Agents - xAI",
+              "url": "https://x.ai/blog/grok-3",
+              "date": "2025-02-19",
+              "snippet": "With a context window of 1 million tokens — 8 times larger than our previous models — Grok 3 can process extensive documents and handle complex prompts while maintaining instruction-following accuracy. On the LOFT (128k) benchmark, which targets long-context RAG use cases, Grok 3 achieved state-of-the-art accuracy (averaged across 12 diverse tasks), showcasing its powerful information retrieval capabilities.",
+              "relevance": "Confirms official marketing claiming a 1 million token context window, the '8 times larger' framing relative to previous models, and the 128k LOFT benchmark performance."
+            }
+          ],
+          "counter_evidence": [
+            {
+              "source_title": "Musk's xAI launches Grok 3 access to rival GPT-4, Gemini - Tech in Asia",
+              "date": "2025-04-10",
+              "snippet": "Despite xAI's earlier claims that Grok 3 supports a 1 million token context window, the API maxes out at just 131,072 tokens, revealing the significant gap between theoretical capabilities and practical deployments.",
+              "relevance": "Directly contradicts the availability of a 1 million token context window in production, confirming the actual API ceiling is capped at 131k."
+            },
+            {
+              "source_title": "LLM Context Window Limitations: Impacts, Risks, & Fixes in 2026 - Atlan",
+              "url": "https://atlan.com/llm-context-window-limitations/",
+              "date": "2026-02-09",
+              "snippet": "Grok 3, xAI, 1M tokens, ~750K-870K, ~75-87%, Largest advertised-vs.-effective gap. ... Grok 3 sits at the other end with the largest gap, ranging from 75 to 87% depending on what you ask it to do.",
+              "relevance": "Establishes that Grok 3's Maximum Effective Context Window (MECW) is limited to 750,000 to 870,000 tokens, leaving a 13-25% capacity gap."
+            },
+            {
+              "source_title": "Grok 4.20 Full Release: 2M Context and Low Hallucination - Digital Applied",
+              "url": "https://digitalapplied.com/grok-4-20-release/",
+              "date": "2026-03-09",
+              "snippet": "xAI's testing and independent evaluations using needle-in-a-haystack benchmarks show Grok 4.20 maintains above 95% retrieval accuracy at all positions within the 2M token window, including the middle quartiles where earlier models degraded to 60–70%.",
+              "relevance": "Reveals that Grok 3's retrieval accuracy degrades to 60-70% in middle-quartile positions of its context window."
+            }
+          ],
+          "missing_context": [
+            "No official first-party Needle-in-a-Haystack (NIAH) benchmark data or performance charts covering the full 1 million token context window have been released by xAI; official long-context benchmarks were restricted to the 128k LOFT benchmark.",
+            "Practical degradation in multi-turn reasoning starts at approximately 4.5% to 5% of the theoretical context window (around 45,000 to 50,000 tokens) according to developer evaluations."
+          ],
+          "numeric_findings": [
+            "Theoretical context window: 1,000,000 tokens",
+            "Previous models' context window: 128,000 tokens",
+            "Theoretical context multiplier: 7.8125x (representing a 2.4% arithmetic difference from the claimed 8x)",
+            "Production API limit: 131,072 tokens (128k)",
+            "Maximum Effective Context Window (MECW): 750,000 to 870,000 tokens (75.0% to 87.0% of advertised limit)",
+            "Middle-quartile retrieval accuracy degradation: 60.0% to 70.0%",
+            "Practical conversational degradation threshold: ~45,000 to 50,000 tokens"
+          ]
+        }
+      ],
+      "contrast": {
+        "claim_id": "claim_3",
+        "claim_text": "Grok 3 has a 1 million token context window, described as 8 times larger than xAI's previous models.",
+        "reference_sources": [
+          {
+            "url": "https://x.ai/news/grok-3",
+            "title": "Grok 3 Beta — The Age of Reasoning Agents",
+            "source_type": "blog",
+            "why_relevant": "This is the official launch announcement for Grok 3 by xAI, containing the primary source claims regarding its architectural specifications, context window, and marketing descriptions.",
+            "authority_score": 100
+          },
+          {
+            "url": "https://crfm.stanford.edu/fmti/December-2025/company-reports/xAI_FinalReport_FMTI2025.html",
+            "title": "xAI Transparency Report - Foundation Model Transparency Index",
+            "source_type": "academic",
+            "why_relevant": "This report assesses xAI's disclosures and refers to official press releases like the Grok 3 launch page for capability indicators.",
             "authority_score": 90
           }
         ],
         "best_sources": [
           {
             "url": "https://x.ai/news/grok-3",
-            "title": "Grok 3 Beta — The Age of Reasoning Agents - xAI",
+            "title": "Grok 3 Beta — The Age of Reasoning Agents",
             "stance": "supports",
-            "evidence_summary": "The official announcement states: 'We are pleased to introduce Grok 3, our most advanced model yet... Trained on our Colossus supercluster...'",
-            "key_qualification": "This is an official vendor marketing release."
-          },
-          {
-            "url": "https://crfm.stanford.edu/fmti/December-2025/company-reports/xAI_FinalReport_FMTI2025.html",
-            "title": "xAI Transparency Report - Stanford CRFM",
-            "stance": "narrows",
-            "evidence_summary": "The Stanford CRFM FMTI 2025 report notes that while xAI's press release claims Grok 3 was trained on the Colossus supercluster, xAI fails to disclose specific training hardware and compute details, such as whether all Colossus GPUs were utilized, the run duration, or total FLOPs.",
-            "key_qualification": "An independent evaluation of foundation model transparency."
+            "evidence_summary": "The official blog post verbatim states: 'With a context window of 1 million tokens — 8 times larger than our previous models — Grok 3 can process extensive documents and handle complex prompts...'",
+            "key_qualification": "This is the official product release documentation from the developer."
           }
         ],
-        "delta_type": "missing_context",
-        "delta_explanation": "While the claim is fully supported by xAI's official announcement, independent academic audit from the Stanford Foundation Model Transparency Index (FMTI 2025) highlights missing context. Specifically, xAI has not disclosed whether the entire Colossus supercluster was used for the training run, nor have they shared detailed hardware allocation, duration, or FLOPs, resulting in a score of 0 on compute transparency indicators.",
-        "suggested_rewrite": "Grok 3 is officially described as xAI's most advanced model yet, trained on the Colossus supercluster (though specific compute and hardware utilization details for the final training run remain undisclosed).",
-        "recommended_verdict": "missing_context",
+        "delta_type": "same",
+        "delta_explanation": "The claim is an exact and faithful representation of the text in the provided primary reference (https://x.ai/news/grok-3), which explicitly describes the context window as 1 million tokens and specifically uses the comparison '8 times larger than our previous models'. While independent research and technical evaluations note a divergence between this architectural capacity and its Maximum Effective Context Window (MECW), or point out production API constraints of 131,072 tokens, the claim itself accurately reports how the model's context window is officially described. Thus, from a reference fidelity perspective, the claim is perfectly supported.",
+        "suggested_rewrite": "Grok 3 has a 1 million token context window, described as 8 times larger than xAI's previous models.",
+        "recommended_verdict": "supported",
         "confidence": "high"
       },
       "claim_timing": {
-        "claim_id": "grok3_colossus_training",
-        "total_duration_ms": 78364,
-        "verifier_ms": 27193,
-        "contradiction_finder_ms": 24191,
-        "numeric_calibrator_ms": 27944,
-        "aggregator_ms": 24511,
-        "contrast_ms": 25870
+        "claim_id": "claim_3",
+        "total_duration_ms": 101950,
+        "verifier_ms": 25142,
+        "contradiction_finder_ms": 30691,
+        "numeric_calibrator_ms": 32148,
+        "aggregator_ms": 41995,
+        "contrast_ms": 27687
       }
     }
   ],
@@ -352,25 +889,43 @@
     "https://crfm.stanford.edu/fmti/December-2025/company-reports/xAI_FinalReport_FMTI2025.html"
   ],
   "run_profile": {
-    "total_duration_ms": 98515,
+    "total_duration_ms": 119240,
     "load_document_ms": 1,
-    "extract_claims_ms": 20148,
-    "audit_claims_ms": 78367,
-    "contrast_duration_ms": 25871,
-    "claims_extracted": 8,
-    "claims_audited": 1,
-    "agent_passes": 3,
-    "contrast_claims": 1,
-    "unique_source_count": 4,
+    "extract_claims_ms": 14331,
+    "audit_claims_ms": 104908,
+    "contrast_duration_ms": 27689,
+    "claims_extracted": 3,
+    "claims_audited": 3,
+    "agent_passes": 9,
+    "contrast_claims": 2,
+    "unique_source_count": 12,
     "claim_profiles": [
       {
-        "claim_id": "grok3_colossus_training",
-        "total_duration_ms": 78364,
-        "verifier_ms": 27193,
-        "contradiction_finder_ms": 24191,
-        "numeric_calibrator_ms": 27944,
-        "aggregator_ms": 24511,
-        "contrast_ms": 25870
+        "claim_id": "claim_1",
+        "total_duration_ms": 89461,
+        "verifier_ms": 29883,
+        "contradiction_finder_ms": 30869,
+        "numeric_calibrator_ms": 24040,
+        "aggregator_ms": 33032,
+        "contrast_ms": 25534
+      },
+      {
+        "claim_id": "claim_2",
+        "total_duration_ms": 77213,
+        "verifier_ms": 18030,
+        "contradiction_finder_ms": 41606,
+        "numeric_calibrator_ms": 36870,
+        "aggregator_ms": 35540,
+        "contrast_ms": 0
+      },
+      {
+        "claim_id": "claim_3",
+        "total_duration_ms": 101950,
+        "verifier_ms": 25142,
+        "contradiction_finder_ms": 30691,
+        "numeric_calibrator_ms": 32148,
+        "aggregator_ms": 41995,
+        "contrast_ms": 27687
       }
     ]
   }
