@@ -77,6 +77,7 @@ class AgentAudit(BaseModel):
     agent: str
     claim_id: str
     summary: str
+    duration_ms: int | None = None
     supporting_evidence: list[EvidenceItem] = Field(default_factory=list)
     counter_evidence: list[EvidenceItem] = Field(default_factory=list)
     missing_context: list[str] = Field(default_factory=list)
@@ -111,6 +112,16 @@ class EvidenceContrast(BaseModel):
     confidence: Confidence = "medium"
 
 
+class ClaimTimingProfile(BaseModel):
+    claim_id: str
+    total_duration_ms: int = 0
+    verifier_ms: int = 0
+    contradiction_finder_ms: int = 0
+    numeric_calibrator_ms: int = 0
+    aggregator_ms: int = 0
+    contrast_ms: int = 0
+
+
 class ClaimAudit(BaseModel):
     claim: RiskyClaim
     verdict: Verdict
@@ -124,6 +135,21 @@ class ClaimAudit(BaseModel):
     numeric_findings: list[str] = Field(default_factory=list)
     agent_outputs: list[AgentAudit] = Field(default_factory=list)
     contrast: EvidenceContrast | None = None
+    claim_timing: ClaimTimingProfile | None = None
+
+
+class RunTimingProfile(BaseModel):
+    total_duration_ms: int = 0
+    load_document_ms: int = 0
+    extract_claims_ms: int = 0
+    audit_claims_ms: int = 0
+    contrast_duration_ms: int = 0
+    claims_extracted: int = 0
+    claims_audited: int = 0
+    agent_passes: int = 0
+    contrast_claims: int = 0
+    unique_source_count: int = 0
+    claim_profiles: list[ClaimTimingProfile] = Field(default_factory=list)
 
 
 class AuditReport(BaseModel):
@@ -135,3 +161,4 @@ class AuditReport(BaseModel):
     model: str | None = None
     contrast_enabled: bool = False
     reference_urls: list[str] = Field(default_factory=list)
+    run_profile: RunTimingProfile | None = None

@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import asyncio
+from dataclasses import dataclass
+from time import perf_counter
+
 from pydantic import BaseModel, Field
 
 from .contrast import apply_contrast
 from .gemini import GeminiClient
 from .numeric import calibrate_numeric_claim
-from .schemas import AgentAudit, ClaimAudit, Document, EvidenceItem, RiskyClaim, Verdict
+from .schemas import AgentAudit, ClaimAudit, ClaimTimingProfile, Document, EvidenceItem, RiskyClaim, Verdict
 from .skills import load_skill
 
 
@@ -16,6 +19,15 @@ class AgentAuditSet(BaseModel):
 
 class ClaimAuditSet(BaseModel):
     audits: list[ClaimAudit] = Field(default_factory=list)
+
+
+@dataclass
+class AuditExecutionProfile:
+    total_duration_ms: int
+    contrast_duration_ms: int
+    agent_passes: int
+    contrast_claims: int
+    claim_profiles: list[ClaimTimingProfile]
 
 
 async def audit_claims(
@@ -28,7 +40,8 @@ async def audit_claims(
     contrast: bool = False,
     reference_urls: list[str] | None = None,
     contrast_top: int = 2,
-) -> list[ClaimAudit]:
+) -> tuple[list[ClaimAudit], AuditExecutionProfile]:
+    started_at = perf_counter()
     if runtime not in {"local", "managed"}:
         raise ValueError("runtime must be local or managed")
     selected = claims[:limit]
@@ -36,30 +49,65 @@ async def audit_claims(
         audits = [_mock_audit(document, claim) for claim in selected]
         for audit in audits:
             audit.agent_outputs = _mock_agent_outputs(audit)
+            audit.contrast = None
         if contrast:
-            return await apply_contrast(
+            audits, contrast_profile = await apply_contrast(
                 document,
                 audits,
                 mock=True,
                 reference_urls=reference_urls or [],
                 contrast_top=contrast_top,
             )
-        return audits
+        else:
+            contrast_profile = None
+        claim_profiles = []
+        for audit in audits:
+            profile = audit.claim_timing or ClaimTimingProfile(claim_id=audit.claim.id)
+            contrast_ms = contrast_profile.by_claim_id.get(audit.claim.id, 0) if contrast_profile else 0
+            profile.contrast_ms = contrast_ms
+            profile.total_duration_ms += contrast_ms
+            audit.claim_timing = profile
+            claim_profiles.append(profile)
+        return audits, AuditExecutionProfile(
+            total_duration_ms=_elapsed_ms(started_at),
+            contrast_duration_ms=contrast_profile.total_duration_ms if contrast_profile else 0,
+            agent_passes=len(audits) * 3,
+            contrast_claims=len(contrast_profile.by_claim_id) if contrast_profile else 0,
+            claim_profiles=claim_profiles,
+        )
 
     per_claim = await asyncio.gather(*[_audit_one(document, claim, runtime=runtime) for claim in selected])
     audits = list(per_claim)
     if contrast:
-        return await apply_contrast(
+        audits, contrast_profile = await apply_contrast(
             document,
             audits,
             mock=False,
             reference_urls=reference_urls or [],
             contrast_top=contrast_top,
         )
-    return audits
+        for audit in audits:
+            if not audit.claim_timing:
+                continue
+            contrast_ms = contrast_profile.by_claim_id.get(audit.claim.id, 0)
+            audit.claim_timing.contrast_ms = contrast_ms
+            audit.claim_timing.total_duration_ms += contrast_ms
+    else:
+        contrast_profile = None
+        for audit in audits:
+            audit.contrast = None
+    claim_profiles = [audit.claim_timing for audit in audits if audit.claim_timing is not None]
+    return audits, AuditExecutionProfile(
+        total_duration_ms=_elapsed_ms(started_at),
+        contrast_duration_ms=contrast_profile.total_duration_ms if contrast_profile else 0,
+        agent_passes=len(audits) * 3,
+        contrast_claims=len(contrast_profile.by_claim_id) if contrast_profile else 0,
+        claim_profiles=claim_profiles,
+    )
 
 
 async def _audit_one(document: Document, claim: RiskyClaim, *, runtime: str) -> ClaimAudit:
+    started_at = perf_counter()
     print(f"Auditing {claim.id}: {claim.claim[:90]}")
     agent_results = await asyncio.gather(
         _run_skill("verifier", document, claim, runtime=runtime),
@@ -67,13 +115,39 @@ async def _audit_one(document: Document, claim: RiskyClaim, *, runtime: str) -> 
         _run_skill("numeric-calibrator", document, claim, runtime=runtime),
     )
     print(f"Aggregating {claim.id}")
+    aggregate_started_at = perf_counter()
     aggregated = await _aggregate(document, claim, list(agent_results), runtime=runtime)
-    aggregated.agent_outputs = list(agent_results)
-    return _merge_numeric_calibration(document, aggregated)
+    aggregate_duration_ms = _elapsed_ms(aggregate_started_at)
+    aggregated = _merge_numeric_calibration(document, aggregated)
+    aggregated.agent_outputs = list(agent_results) + [
+        AgentAudit(
+            agent="claim-aggregator",
+            claim_id=claim.id,
+            summary=(
+                f"Combined specialist outputs into final verdict `{aggregated.verdict.value}` "
+                f"with `{aggregated.confidence}` confidence."
+            ),
+            duration_ms=aggregate_duration_ms,
+            supporting_evidence=aggregated.supporting_evidence,
+            counter_evidence=aggregated.counter_evidence,
+            missing_context=aggregated.missing_context,
+            numeric_findings=aggregated.numeric_findings,
+        )
+    ]
+    aggregated.claim_timing = ClaimTimingProfile(
+        claim_id=claim.id,
+        total_duration_ms=_elapsed_ms(started_at),
+        verifier_ms=agent_results[0].duration_ms or 0,
+        contradiction_finder_ms=agent_results[1].duration_ms or 0,
+        numeric_calibrator_ms=agent_results[2].duration_ms or 0,
+        aggregator_ms=aggregate_duration_ms,
+    )
+    return aggregated
 
 
 async def _run_skill(skill_name: str, document: Document, claim: RiskyClaim, *, runtime: str) -> AgentAudit:
     print(f"  Running {skill_name} for {claim.id}")
+    started_at = perf_counter()
     skill = load_skill(skill_name)
     client = GeminiClient()
     prompt = f"""
@@ -89,18 +163,21 @@ Relevant document text:
 {document.text[:50000]}
 """
     if runtime == "managed":
-        return await asyncio.to_thread(
+        result = await asyncio.to_thread(
             client.structured_interaction,
             input_text=prompt,
             system_instruction=f"{skill}\n\nReturn only JSON matching the AgentAudit schema.",
             schema=AgentAudit,
             tools=skill_name != "numeric-calibrator",
         )
-    return await asyncio.to_thread(
-        client.structured,
-        f"{skill}\n\nReturn only JSON matching the AgentAudit schema.\n\n{prompt}",
-        AgentAudit,
-    )
+    else:
+        result = await asyncio.to_thread(
+            client.structured,
+            f"{skill}\n\nReturn only JSON matching the AgentAudit schema.\n\n{prompt}",
+            AgentAudit,
+        )
+    result.duration_ms = _elapsed_ms(started_at)
+    return result
 
 
 async def _aggregate(
@@ -263,6 +340,7 @@ def _mock_agent_outputs(audit: ClaimAudit) -> list[AgentAudit]:
             agent="verifier",
             claim_id=audit.claim.id,
             summary=support_summary,
+            duration_ms=0,
             supporting_evidence=audit.supporting_evidence,
             counter_evidence=[],
             missing_context=[],
@@ -272,6 +350,7 @@ def _mock_agent_outputs(audit: ClaimAudit) -> list[AgentAudit]:
             agent="contradiction-finder",
             claim_id=audit.claim.id,
             summary=contradiction_summary,
+            duration_ms=0,
             supporting_evidence=[],
             counter_evidence=audit.counter_evidence,
             missing_context=audit.missing_context,
@@ -281,6 +360,7 @@ def _mock_agent_outputs(audit: ClaimAudit) -> list[AgentAudit]:
             agent="numeric-calibrator",
             claim_id=audit.claim.id,
             summary=numeric_summary,
+            duration_ms=0,
             supporting_evidence=[],
             counter_evidence=[],
             missing_context=[],
@@ -293,6 +373,7 @@ def _mock_agent_outputs(audit: ClaimAudit) -> list[AgentAudit]:
                 f"Combined specialist outputs into final verdict `{audit.verdict.value}` "
                 f"with `{audit.confidence}` confidence."
             ),
+            duration_ms=0,
             supporting_evidence=audit.supporting_evidence,
             counter_evidence=audit.counter_evidence,
             missing_context=audit.missing_context,
@@ -312,3 +393,10 @@ def _merge_numeric_calibration(document: Document, audit: ClaimAudit) -> ClaimAu
     if calibration.suggested_rewrite and audit.verdict == Verdict.OVERSTATED:
         audit.weaker_supported_rewrite = calibration.suggested_rewrite
     return audit
+
+
+def _elapsed_ms(started_at: float) -> int:
+    elapsed_ms = (perf_counter() - started_at) * 1000
+    if elapsed_ms > 0:
+        return max(1, int(elapsed_ms + 0.999))
+    return 0

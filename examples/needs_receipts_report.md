@@ -6,9 +6,21 @@ Source: `examples/needs_receipts_document.md`
 
 - Mode: `deterministic_fallback`
 - Runtime: `local`
+- Pipeline wall: `1ms`
+- Load / Extract / Audit / Contrast: `1ms` / `1ms` / `1ms` / `0ms`
+- Claims extracted / audited: `3` / `3`
+- Specialist passes / unique sources: `9` / `0`
+
 - Model: `none`
 - Evidence Contrast: `disabled`
 - Provided reference URLs: `none`
+
+## Scorecard
+
+- Claims audited: `3`
+- Verdict counts: `supported=0` · `overstated=0` · `missing_context=0` · `contradicted=0` · `not_checkable=3`
+- Average stretch score: `63/100`
+- Provided reference URL count: `0`
 
 | Claim | Formal Verdict | Confidence | Stretch Score |
 | --- | --- | --- | ---: |
@@ -28,13 +40,20 @@ Source: `examples/needs_receipts_document.md`
 
 **Defensible rewrite:** The document presents this as an aspiration or positioning claim, not an evidenced result.
 
+**Claim timing:**
+- Total / Verifier / Contradiction / Numeric / Aggregator / Contrast: 0ms / 0ms / 0ms / 0ms / 0ms / 0ms
+
 ### Agent Steps
 
 <details><summary>verifier: No direct supporting evidence was available in the deterministic fixture.</summary>
 
+**Duration:** 0ms
+
 </details>
 
 <details><summary>contradiction-finder: Found scope limitations, missing deployment evidence, or wording that narrows the claim.</summary>
+
+**Duration:** 0ms
 
 **Missing context:**
 - No measurement method is reported.
@@ -44,9 +63,13 @@ Source: `examples/needs_receipts_document.md`
 
 <details><summary>numeric-calibrator: No numeric calibration was applicable.</summary>
 
+**Duration:** 0ms
+
 </details>
 
 <details><summary>claim-aggregator: Combined specialist outputs into final verdict `not_checkable` with `medium` confidence.</summary>
+
+**Duration:** 0ms
 
 **Missing context:**
 - No measurement method is reported.
@@ -71,13 +94,20 @@ Source: `examples/needs_receipts_document.md`
 
 **Defensible rewrite:** The document presents this as an aspiration or positioning claim, not an evidenced result.
 
+**Claim timing:**
+- Total / Verifier / Contradiction / Numeric / Aggregator / Contrast: 0ms / 0ms / 0ms / 0ms / 0ms / 0ms
+
 ### Agent Steps
 
 <details><summary>verifier: No direct supporting evidence was available in the deterministic fixture.</summary>
 
+**Duration:** 0ms
+
 </details>
 
 <details><summary>contradiction-finder: Found scope limitations, missing deployment evidence, or wording that narrows the claim.</summary>
+
+**Duration:** 0ms
 
 **Missing context:**
 - No measurement method is reported.
@@ -87,9 +117,13 @@ Source: `examples/needs_receipts_document.md`
 
 <details><summary>numeric-calibrator: No numeric calibration was applicable.</summary>
 
+**Duration:** 0ms
+
 </details>
 
 <details><summary>claim-aggregator: Combined specialist outputs into final verdict `not_checkable` with `medium` confidence.</summary>
+
+**Duration:** 0ms
 
 **Missing context:**
 - No measurement method is reported.
@@ -114,13 +148,20 @@ Source: `examples/needs_receipts_document.md`
 
 **Defensible rewrite:** The document presents this as an aspiration or positioning claim, not an evidenced result.
 
+**Claim timing:**
+- Total / Verifier / Contradiction / Numeric / Aggregator / Contrast: 0ms / 0ms / 0ms / 0ms / 0ms / 0ms
+
 ### Agent Steps
 
 <details><summary>verifier: No direct supporting evidence was available in the deterministic fixture.</summary>
 
+**Duration:** 0ms
+
 </details>
 
 <details><summary>contradiction-finder: Found scope limitations, missing deployment evidence, or wording that narrows the claim.</summary>
+
+**Duration:** 0ms
 
 **Missing context:**
 - No measurement method is reported.
@@ -130,9 +171,13 @@ Source: `examples/needs_receipts_document.md`
 
 <details><summary>numeric-calibrator: No numeric calibration was applicable.</summary>
 
+**Duration:** 0ms
+
 </details>
 
 <details><summary>claim-aggregator: Combined specialist outputs into final verdict `not_checkable` with `medium` confidence.</summary>
+
+**Duration:** 0ms
 
 **Missing context:**
 - No measurement method is reported.

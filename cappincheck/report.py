@@ -12,6 +12,8 @@ def write_json(report: AuditReport, path: Path) -> None:
 
 
 def write_markdown(report: AuditReport, path: Path) -> None:
+    verdict_counts = _verdict_counts(report)
+    average_stretch = _average_stretch(report.audits)
     lines = [
         f"# CappinCheck Report: {report.document.title}",
         "",
@@ -25,9 +27,43 @@ def write_markdown(report: AuditReport, path: Path) -> None:
         f"- Evidence Contrast: `{'enabled' if report.contrast_enabled else 'disabled'}`",
         f"- Provided reference URLs: {', '.join(f'`{url}`' for url in report.reference_urls) if report.reference_urls else '`none`'}",
         "",
+        "## Scorecard",
+        "",
+        f"- Claims audited: `{len(report.audits)}`",
+        (
+            "- Verdict counts: "
+            f"`supported={verdict_counts['supported']}` · "
+            f"`overstated={verdict_counts['overstated']}` · "
+            f"`missing_context={verdict_counts['missing_context']}` · "
+            f"`contradicted={verdict_counts['contradicted']}` · "
+            f"`not_checkable={verdict_counts['not_checkable']}`"
+        ),
+        f"- Average stretch score: `{average_stretch}/100`",
+        f"- Provided reference URL count: `{len(report.reference_urls)}`",
+        "",
         "| Claim | Formal Verdict | Confidence | Stretch Score |",
         "| --- | --- | --- | ---: |",
     ]
+    if report.run_profile:
+        lines[8:8] = [
+            f"- Pipeline wall: `{_format_duration_ms(report.run_profile.total_duration_ms)}`",
+            (
+                f"- Load / Extract / Audit / Contrast: "
+                f"`{_format_duration_ms(report.run_profile.load_document_ms)}` / "
+                f"`{_format_duration_ms(report.run_profile.extract_claims_ms)}` / "
+                f"`{_format_duration_ms(report.run_profile.audit_claims_ms)}` / "
+                f"`{_format_duration_ms(report.run_profile.contrast_duration_ms)}`"
+            ),
+            (
+                f"- Claims extracted / audited: `{report.run_profile.claims_extracted}` / "
+                f"`{report.run_profile.claims_audited}`"
+            ),
+            (
+                f"- Specialist passes / unique sources: `{report.run_profile.agent_passes}` / "
+                f"`{report.run_profile.unique_source_count}`"
+            ),
+            "",
+        ]
     for audit in report.audits:
         lines.append(
             f"| {audit.claim.claim} | {audit.verdict.value} | {audit.confidence} | {audit.stretch_score} |"
@@ -41,6 +77,10 @@ def write_markdown(report: AuditReport, path: Path) -> None:
 
 def write_html(report: AuditReport, path: Path) -> None:
     data = json.dumps(report.model_dump(exclude_none=True), indent=2).replace("</", "<\\/")
+    header_summary = f"{len(report.audits)} audited claims"
+    if report.run_profile:
+        header_summary += f" · {_format_duration_ms(report.run_profile.total_duration_ms)} pipeline"
+    header_summary += f" · {html.escape(report.mode)} · {html.escape(report.runtime)}"
     markup = f"""<!doctype html>
 <html lang="en">
 <head>
@@ -82,6 +122,47 @@ def write_html(report: AuditReport, path: Path) -> None:
       padding: 16px 18px;
       border-bottom: 1px solid var(--line);
       background: var(--bg);
+    }}
+    .headline-strip {{
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.94), rgba(246,248,250,0.96));
+    }}
+    .summary-grid {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }}
+    .telemetry-grid {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 10px;
+    }}
+    .stat-card {{
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+    }}
+    .stat-label {{
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }}
+    .stat-value {{
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }}
+    .stat-note {{
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      overflow-wrap: anywhere;
     }}
     .report-grid {{
       display: grid;
@@ -295,9 +376,17 @@ def write_html(report: AuditReport, path: Path) -> None:
       <h1>CappinCheck</h1>
       <div class="muted">{html.escape(report.document.title)}</div>
     </div>
-    <div class="muted">{len(report.audits)} audited claims · {html.escape(report.mode)} · {html.escape(report.runtime)}</div>
+    <div class="muted">{header_summary}</div>
   </header>
   <main>
+    <div class="headline-strip">
+      <div class="title-row">
+        <h2>Run Summary</h2>
+        <span class="hint" tabindex="0" data-tip="This top strip summarizes the audit punchline: how many claims were audited, how severe they were, and what runtime/profile telemetry was recorded for the run.">?</span>
+      </div>
+      <div class="summary-grid" id="scorecard-grid"></div>
+      <div class="telemetry-grid" id="telemetry-grid"></div>
+    </div>
     <div class="claim-strip">
       <div class="title-row">
         <h2>Claim Ledger</h2>
@@ -322,8 +411,8 @@ def write_html(report: AuditReport, path: Path) -> None:
       </section>
       <section>
         <div class="title-row">
-          <h2>Evidence Sources</h2>
-          <span class="hint" tabindex="0" data-tip="Separates explicit references you provided from Gemini-discovered supporting sources and Gemini-discovered caveat/counter sources.">?</span>
+          <h2>Source Provenance</h2>
+          <span class="hint" tabindex="0" data-tip="Separates explicit references you provided from claim-level contrast references and Gemini-discovered supporting or caveat/counter sources.">?</span>
         </div>
         <div id="evidence"></div>
       </section>
@@ -335,6 +424,14 @@ def write_html(report: AuditReport, path: Path) -> None:
     const filters = {{ verdict: 'all' }};
     const cls = (value) => String(value).replaceAll('_', '-').replaceAll(' ', '-');
     const confidenceScore = {{ low: 34, medium: 67, high: 100 }};
+    const verdictOrder = ['supported', 'overstated', 'missing_context', 'contradicted', 'not_checkable'];
+    const verdictLabels = {{
+      supported: 'Supported',
+      overstated: 'Overstated',
+      missing_context: 'Missing Context',
+      contradicted: 'Contradicted',
+      not_checkable: 'Not Checkable'
+    }};
     const esc = (value) => String(value ?? '').replace(/[&<>"']/g, char => ({{
       '&': '&amp;',
       '<': '&lt;',
@@ -351,6 +448,12 @@ def write_html(report: AuditReport, path: Path) -> None:
       return '';
     }};
     const hint = (text) => `<span class="hint" tabindex="0" data-tip="${{esc(text)}}">?</span>`;
+    const fmtMs = (value) => {{
+      const durationMs = Number(value ?? 0);
+      if (!Number.isFinite(durationMs) || durationMs <= 0) return '0ms';
+      if (durationMs >= 1000) return `${{(durationMs / 1000).toFixed(2)}}s`;
+      return `${{durationMs}}ms`;
+    }};
     function verdictTip(verdict) {{
       return ({{
         supported: 'Available evidence supports the claim as written or with only minor caveats.',
@@ -359,6 +462,51 @@ def write_html(report: AuditReport, path: Path) -> None:
         contradicted: 'Available evidence conflicts with the claim as written.',
         not_checkable: 'The available sources do not provide enough evidence to verify or falsify the claim.'
       }})[verdict] || 'Formal CappinCheck verdict for this claim.';
+    }}
+    function verdictCounts(audits) {{
+      const counts = {{
+        supported: 0,
+        overstated: 0,
+        missing_context: 0,
+        contradicted: 0,
+        not_checkable: 0,
+      }};
+      for (const audit of audits) {{
+        if (counts[audit.verdict] != null) counts[audit.verdict] += 1;
+      }}
+      return counts;
+    }}
+    function averageStretch(audits) {{
+      if (!audits.length) return 0;
+      const total = audits.reduce((sum, audit) => sum + Number(audit.stretch_score || 0), 0);
+      return Math.round(total / audits.length);
+    }}
+    function statCard(label, value, note = '') {{
+      return `
+        <div class="stat-card">
+          <div class="stat-label">${{esc(label)}}</div>
+          <div class="stat-value">${{esc(value)}}</div>
+          ${{note ? `<div class="stat-note">${{esc(note)}}</div>` : ''}}
+        </div>
+      `;
+    }}
+    function renderHeadline() {{
+      const counts = verdictCounts(report.audits || []);
+      const avgStretch = averageStretch(report.audits || []);
+      const run = report.run_profile || {{}};
+      document.getElementById('scorecard-grid').innerHTML = [
+        statCard('Claims Audited', String((report.audits || []).length), `${{run.claims_extracted ?? (report.claims || []).length}} extracted`),
+        ...verdictOrder.map(key => statCard(verdictLabels[key], String(counts[key]), key === 'supported' ? 'best-case verdict' : '')),
+        statCard('Avg Stretch', `${{avgStretch}}/100`, 'higher means riskier wording'),
+      ].join('');
+      document.getElementById('telemetry-grid').innerHTML = [
+        statCard('Model', report.model || 'none', report.contrast_enabled ? 'contrast enabled' : 'contrast disabled'),
+        statCard('Runtime Path', `${{report.mode}} · ${{report.runtime}}`),
+        statCard('Pipeline Wall', fmtMs(run.total_duration_ms || 0), `audit ${{fmtMs(run.audit_claims_ms || 0)}} · contrast ${{fmtMs(run.contrast_duration_ms || 0)}}`),
+        statCard('Specialist Passes', String(run.agent_passes || 0), `${{run.claims_audited || (report.audits || []).length}} claims`),
+        statCard('Unique Sources', String(run.unique_source_count || 0), 'support + caveat + contrast urls'),
+        statCard('Provided References', String((report.reference_urls || []).length), 'explicit --reference inputs'),
+      ].join('');
     }}
     const filteredAudits = () => report.audits
       .map((audit, index) => ({{ ...audit, __index: index }}))
@@ -401,12 +549,19 @@ def write_html(report: AuditReport, path: Path) -> None:
       const computedChecks = audit.numeric_findings?.length
         ? `<div class="panel"><h3>Computed Checks</h3>${{list(audit.numeric_findings)}}</div>`
         : '';
+      const runProfile = report.run_profile
+        ? `
+            <p class="wrap"><strong>Pipeline wall:</strong> ${{fmtMs(report.run_profile.total_duration_ms)}} · <strong>Load:</strong> ${{fmtMs(report.run_profile.load_document_ms)}} · <strong>Extract:</strong> ${{fmtMs(report.run_profile.extract_claims_ms)}} · <strong>Audit:</strong> ${{fmtMs(report.run_profile.audit_claims_ms)}} · <strong>Contrast:</strong> ${{fmtMs(report.run_profile.contrast_duration_ms)}}</p>
+            <p class="wrap"><strong>Claims extracted / audited:</strong> ${{report.run_profile.claims_extracted}} / ${{report.run_profile.claims_audited}} · <strong>Specialist passes:</strong> ${{report.run_profile.agent_passes}} · <strong>Unique sources:</strong> ${{report.run_profile.unique_source_count}}</p>
+          `
+        : '';
       document.getElementById('claim-detail').innerHTML = `
         <div class="panel">
           <h3>Report Provenance</h3>
           <p class="wrap"><strong>Mode:</strong> ${{esc(report.mode)}} · <strong>Runtime:</strong> ${{esc(report.runtime)}} · <strong>Model:</strong> ${{esc(report.model || 'none')}}</p>
           <p class="wrap"><strong>Evidence Contrast:</strong> ${{report.contrast_enabled ? 'enabled' : 'disabled'}}</p>
           <p class="wrap"><strong>Provided reference URLs:</strong> ${{(report.reference_urls || []).length ? (report.reference_urls || []).map(esc).join(', ') : 'none'}}</p>
+          ${{runProfile}}
         </div>
         <div class="panel">
           <strong>Formal verdict: ${{esc(audit.verdict)}}</strong> ${{hint(verdictTip(audit.verdict))}}
@@ -426,10 +581,12 @@ def write_html(report: AuditReport, path: Path) -> None:
         ${{contrastCard(audit.contrast)}}
         <div class="panel"><h3>Defensible Rewrite</h3><p class="wrap">${{esc(audit.weaker_supported_rewrite)}}</p></div>
         <div class="panel"><h3>Why</h3><p class="wrap">${{esc(audit.why)}}</p></div>
+        ${{claimTimingPanel(audit.claim_timing)}}
         ${{computedChecks}}
         <div class="panel"><h3>Agent Steps</h3>${{agentSteps(audit.agent_outputs || [])}}</div>
       `;
       document.getElementById('evidence').innerHTML = `
+        ${{providedReferencesPanel(report.reference_urls || [])}}
         ${{sourcesChecked(audit.contrast)}}
         <div class="panel"><h3>Gemini-Discovered Supporting Sources</h3><p class="muted">Sources found by the verifier while looking for the strongest support for this claim.</p>${{items(audit.supporting_evidence)}}</div>
         <div class="panel"><h3>Gemini-Discovered Caveat / Counter Sources</h3><p class="muted">Sources found by the contradiction-finder while looking for caveats, missing context, benchmark limits, or contrary evidence.</p>${{items(audit.counter_evidence)}}</div>
@@ -461,6 +618,39 @@ def write_html(report: AuditReport, path: Path) -> None:
         </div>
       `;
     }}
+    function claimTimingPanel(timing) {{
+      if (!timing) return '';
+      return `
+        <div class="panel">
+          <h3>Claim Timing</h3>
+          <p class="muted">Measured wall-clock time for this claim during the run.</p>
+          <p><strong>Total:</strong> ${{fmtMs(timing.total_duration_ms)}} · <strong>Contrast:</strong> ${{fmtMs(timing.contrast_ms)}}</p>
+          <ul>
+            <li class="wrap"><strong>Verifier:</strong> ${{fmtMs(timing.verifier_ms)}}</li>
+            <li class="wrap"><strong>Contradiction finder:</strong> ${{fmtMs(timing.contradiction_finder_ms)}}</li>
+            <li class="wrap"><strong>Numeric calibrator:</strong> ${{fmtMs(timing.numeric_calibrator_ms)}}</li>
+            <li class="wrap"><strong>Aggregator:</strong> ${{fmtMs(timing.aggregator_ms)}}</li>
+          </ul>
+        </div>
+      `;
+    }}
+    function providedReferencesPanel(values) {{
+      if (!values.length) {{
+        return `
+          <div class="panel">
+            <h3>Provided Reference URLs</h3>
+            <p class="muted">No explicit reference URLs were provided for this run.</p>
+          </div>
+        `;
+      }}
+      return `
+        <div class="panel">
+          <h3>Provided Reference URLs</h3>
+          <p class="muted">Explicit sources supplied on the CLI with <code>--reference</code>. These anchor Evidence Contrast and define the source-of-truth packet for this run.</p>
+          ${{plainUrlItems(values)}}
+        </div>
+      `;
+    }}
     function sourcesChecked(contrast) {{
       if (!contrast) return '<div class="panel"><h3>Claim-Level Contrast References</h3><p class="muted">No contrast references checked for this claim. Contrast is applied only to the selected top-risk claims controlled by --contrast-top.</p></div>';
       const references = contrast.reference_sources || [];
@@ -477,6 +667,15 @@ def write_html(report: AuditReport, path: Path) -> None:
           ${{contrastSourceItems(best)}}
         </div>
       `;
+    }}
+    function plainUrlItems(values) {{
+      return values.map(value => {{
+        const href = safeHref(value);
+        const source = href
+          ? `<a href="${{esc(href)}}" target="_blank" rel="noopener noreferrer">${{esc(value)}}</a>`
+          : `<span class="muted">${{esc(value)}}</span>`;
+        return `<div class="source-item"><p class="wrap">${{source}}</p></div>`;
+      }}).join('');
     }}
     function referenceItems(values) {{
       if (!values.length) return '<p class="muted">None recorded.</p>';
@@ -517,6 +716,7 @@ def write_html(report: AuditReport, path: Path) -> None:
         <details>
           <summary>${{esc(step.agent)}} — ${{esc(step.summary)}}</summary>
           <p class="muted">Claim ID: ${{esc(step.claim_id)}}</p>
+          <p class="muted">Duration: ${{step.duration_ms == null ? 'not recorded' : fmtMs(step.duration_ms)}}</p>
           <h4>Supporting evidence</h4>
           ${{items(step.supporting_evidence || [])}}
           <h4>Contradictions / narrowing evidence</h4>
@@ -550,6 +750,7 @@ def write_html(report: AuditReport, path: Path) -> None:
       }}).join('');
     }}
     setupFilters();
+    renderHeadline();
     render();
   </script>
 </body>
@@ -574,6 +775,22 @@ def _audit_markdown(audit: ClaimAudit) -> list[str]:
         f"**Defensible rewrite:** {audit.weaker_supported_rewrite}",
         "",
     ]
+    if audit.claim_timing:
+        lines.extend(
+            [
+                "**Claim timing:**",
+                (
+                    f"- Total / Verifier / Contradiction / Numeric / Aggregator / Contrast: "
+                    f"{_format_duration_ms(audit.claim_timing.total_duration_ms)} / "
+                    f"{_format_duration_ms(audit.claim_timing.verifier_ms)} / "
+                    f"{_format_duration_ms(audit.claim_timing.contradiction_finder_ms)} / "
+                    f"{_format_duration_ms(audit.claim_timing.numeric_calibrator_ms)} / "
+                    f"{_format_duration_ms(audit.claim_timing.aggregator_ms)} / "
+                    f"{_format_duration_ms(audit.claim_timing.contrast_ms)}"
+                ),
+                "",
+            ]
+        )
     if audit.agent_outputs:
         lines.extend(_agent_outputs_markdown(audit))
     if audit.contrast:
@@ -583,11 +800,11 @@ def _audit_markdown(audit: ClaimAudit) -> list[str]:
         lines.extend(f"- {finding}" for finding in audit.numeric_findings)
         lines.append("")
     if audit.supporting_evidence:
-        lines.append("**Supporting evidence found:**")
+        lines.append("**Gemini-discovered supporting sources:**")
         lines.extend(_evidence_markdown_item(item) for item in audit.supporting_evidence)
         lines.append("")
     if audit.counter_evidence:
-        lines.append("**Contradictions / narrowing evidence:**")
+        lines.append("**Gemini-discovered caveat / counter sources:**")
         lines.extend(_evidence_markdown_item(item) for item in audit.counter_evidence)
         lines.append("")
     if audit.missing_context:
@@ -606,6 +823,8 @@ def _agent_outputs_markdown(audit: ClaimAudit) -> list[str]:
                 "",
             ]
         )
+        if step.duration_ms is not None:
+            lines.extend([f"**Duration:** {_format_duration_ms(step.duration_ms)}", ""])
         if step.supporting_evidence:
             lines.append("**Supporting evidence:**")
             lines.extend(_evidence_markdown_item(item) for item in step.supporting_evidence)
@@ -688,3 +907,30 @@ def _evidence_markdown_item(item) -> str:
         source = f"[{item.source_title}]({item.url})"
     suffix = f" Relevance: {item.relevance}" if item.relevance else ""
     return f"- {item.snippet} ({source}).{suffix}"
+
+
+def _verdict_counts(report: AuditReport) -> dict[str, int]:
+    counts = {
+        "supported": 0,
+        "overstated": 0,
+        "missing_context": 0,
+        "contradicted": 0,
+        "not_checkable": 0,
+    }
+    for audit in report.audits:
+        key = audit.verdict.value
+        if key in counts:
+            counts[key] += 1
+    return counts
+
+
+def _average_stretch(audits: list[ClaimAudit]) -> int:
+    if not audits:
+        return 0
+    return round(sum(audit.stretch_score for audit in audits) / len(audits))
+
+
+def _format_duration_ms(duration_ms: int) -> str:
+    if duration_ms >= 1000:
+        return f"{duration_ms / 1000:.2f}s"
+    return f"{duration_ms}ms"

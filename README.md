@@ -31,7 +31,7 @@ pip install -e .
 Run the no-key demo:
 
 ```bash
-cappincheck audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
+cappincheck audit examples/demo_document.md --mock --profile --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
 open examples/demo_report.html
 ```
 
@@ -40,7 +40,7 @@ The deterministic fixture is `examples/demo_document.md`; use `--mock` for publi
 Run the no-key Evidence Contrast demo:
 
 ```bash
-cappincheck audit examples/demo_document.md --mock --contrast --contrast-top 2 --out examples/contrast_demo.md --json examples/contrast_demo.json --html examples/contrast_demo.html
+cappincheck audit examples/demo_document.md --mock --contrast --contrast-top 2 --profile --out examples/contrast_demo.md --json examples/contrast_demo.json --html examples/contrast_demo.html
 open examples/contrast_demo.html
 ```
 
@@ -57,6 +57,7 @@ Run Evidence Contrast against explicit reference URLs:
 cappincheck audit examples/demo_document.md \
   --contrast \
   --reference https://ai.google.dev/gemini-api/docs/models \
+  --profile \
   --contrast-top 2 \
   --out examples/contrast_live.md \
   --json examples/contrast_live.json \
@@ -92,6 +93,7 @@ Each audited claim includes:
 - Evidence Contrast against explicit reference URLs when `--contrast` is enabled
 - Evidence Sources split into provided references, Gemini-discovered supporting sources, Gemini-discovered caveat/counter sources, snippets, and mismatch notes
 - Agent Steps showing the verifier, contradiction-finder, numeric-calibrator, and aggregator outputs
+- Run telemetry covering pipeline wall time, per-claim timing, and per-agent timing
 - Supporting evidence found
 - Contradictions / narrowing evidence
 - Missing context

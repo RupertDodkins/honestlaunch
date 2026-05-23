@@ -64,6 +64,7 @@
           "agent": "verifier",
           "claim_id": "careful_1",
           "summary": "Found direct benchmark support for the narrower table values.",
+          "duration_ms": 0,
           "supporting_evidence": [
             {
               "source_title": "Careful document benchmark table",
@@ -79,6 +80,7 @@
           "agent": "contradiction-finder",
           "claim_id": "careful_1",
           "summary": "No contradictions were found for the scoped claim.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [],
@@ -88,6 +90,7 @@
           "agent": "numeric-calibrator",
           "claim_id": "careful_1",
           "summary": "Computed the absolute and relative difference from the benchmark values.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [],
@@ -101,6 +104,7 @@
           "agent": "claim-aggregator",
           "claim_id": "careful_1",
           "summary": "Combined specialist outputs into final verdict `supported` with `high` confidence.",
+          "duration_ms": 0,
           "supporting_evidence": [
             {
               "source_title": "Careful document benchmark table",
@@ -116,7 +120,16 @@
             "The document uses percentage-point wording, so the numeric claim is properly scoped."
           ]
         }
-      ]
+      ],
+      "claim_timing": {
+        "claim_id": "careful_1",
+        "total_duration_ms": 0,
+        "verifier_ms": 0,
+        "contradiction_finder_ms": 0,
+        "numeric_calibrator_ms": 0,
+        "aggregator_ms": 0,
+        "contrast_ms": 0
+      }
     },
     {
       "claim": {
@@ -147,6 +160,7 @@
           "agent": "verifier",
           "claim_id": "careful_2",
           "summary": "Found direct benchmark support for the narrower table values.",
+          "duration_ms": 0,
           "supporting_evidence": [
             {
               "source_title": "Careful document benchmark table",
@@ -162,6 +176,7 @@
           "agent": "contradiction-finder",
           "claim_id": "careful_2",
           "summary": "No contradictions were found for the scoped claim.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [],
@@ -171,6 +186,7 @@
           "agent": "numeric-calibrator",
           "claim_id": "careful_2",
           "summary": "No numeric calibration was applicable.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [],
@@ -180,6 +196,7 @@
           "agent": "claim-aggregator",
           "claim_id": "careful_2",
           "summary": "Combined specialist outputs into final verdict `supported` with `high` confidence.",
+          "duration_ms": 0,
           "supporting_evidence": [
             {
               "source_title": "Careful document benchmark table",
@@ -191,7 +208,16 @@
           "missing_context": [],
           "numeric_findings": []
         }
-      ]
+      ],
+      "claim_timing": {
+        "claim_id": "careful_2",
+        "total_duration_ms": 0,
+        "verifier_ms": 0,
+        "contradiction_finder_ms": 0,
+        "numeric_calibrator_ms": 0,
+        "aggregator_ms": 0,
+        "contrast_ms": 0
+      }
     },
     {
       "claim": {
@@ -222,6 +248,7 @@
           "agent": "verifier",
           "claim_id": "careful_3",
           "summary": "Found direct benchmark support for the narrower table values.",
+          "duration_ms": 0,
           "supporting_evidence": [
             {
               "source_title": "Careful document benchmark table",
@@ -237,6 +264,7 @@
           "agent": "contradiction-finder",
           "claim_id": "careful_3",
           "summary": "No contradictions were found for the scoped claim.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [],
@@ -246,6 +274,7 @@
           "agent": "numeric-calibrator",
           "claim_id": "careful_3",
           "summary": "No numeric calibration was applicable.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [],
@@ -255,6 +284,7 @@
           "agent": "claim-aggregator",
           "claim_id": "careful_3",
           "summary": "Combined specialist outputs into final verdict `supported` with `high` confidence.",
+          "duration_ms": 0,
           "supporting_evidence": [
             {
               "source_title": "Careful document benchmark table",
@@ -266,11 +296,61 @@
           "missing_context": [],
           "numeric_findings": []
         }
-      ]
+      ],
+      "claim_timing": {
+        "claim_id": "careful_3",
+        "total_duration_ms": 0,
+        "verifier_ms": 0,
+        "contradiction_finder_ms": 0,
+        "numeric_calibrator_ms": 0,
+        "aggregator_ms": 0,
+        "contrast_ms": 0
+      }
     }
   ],
   "runtime": "local",
   "mode": "deterministic_fallback",
   "contrast_enabled": false,
-  "reference_urls": []
+  "reference_urls": [],
+  "run_profile": {
+    "total_duration_ms": 2,
+    "load_document_ms": 1,
+    "extract_claims_ms": 1,
+    "audit_claims_ms": 1,
+    "contrast_duration_ms": 0,
+    "claims_extracted": 3,
+    "claims_audited": 3,
+    "agent_passes": 9,
+    "contrast_claims": 0,
+    "unique_source_count": 0,
+    "claim_profiles": [
+      {
+        "claim_id": "careful_1",
+        "total_duration_ms": 0,
+        "verifier_ms": 0,
+        "contradiction_finder_ms": 0,
+        "numeric_calibrator_ms": 0,
+        "aggregator_ms": 0,
+        "contrast_ms": 0
+      },
+      {
+        "claim_id": "careful_2",
+        "total_duration_ms": 0,
+        "verifier_ms": 0,
+        "contradiction_finder_ms": 0,
+        "numeric_calibrator_ms": 0,
+        "aggregator_ms": 0,
+        "contrast_ms": 0
+      },
+      {
+        "claim_id": "careful_3",
+        "total_duration_ms": 0,
+        "verifier_ms": 0,
+        "contradiction_finder_ms": 0,
+        "numeric_calibrator_ms": 0,
+        "aggregator_ms": 0,
+        "contrast_ms": 0
+      }
+    ]
+  }
 }

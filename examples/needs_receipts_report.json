@@ -57,6 +57,7 @@
           "agent": "verifier",
           "claim_id": "receipts_1",
           "summary": "No direct supporting evidence was available in the deterministic fixture.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [],
@@ -66,6 +67,7 @@
           "agent": "contradiction-finder",
           "claim_id": "receipts_1",
           "summary": "Found scope limitations, missing deployment evidence, or wording that narrows the claim.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [
@@ -78,6 +80,7 @@
           "agent": "numeric-calibrator",
           "claim_id": "receipts_1",
           "summary": "No numeric calibration was applicable.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [],
@@ -87,6 +90,7 @@
           "agent": "claim-aggregator",
           "claim_id": "receipts_1",
           "summary": "Combined specialist outputs into final verdict `not_checkable` with `medium` confidence.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [
@@ -95,7 +99,16 @@
           ],
           "numeric_findings": []
         }
-      ]
+      ],
+      "claim_timing": {
+        "claim_id": "receipts_1",
+        "total_duration_ms": 0,
+        "verifier_ms": 0,
+        "contradiction_finder_ms": 0,
+        "numeric_calibrator_ms": 0,
+        "aggregator_ms": 0,
+        "contrast_ms": 0
+      }
     },
     {
       "claim": {
@@ -123,6 +136,7 @@
           "agent": "verifier",
           "claim_id": "receipts_2",
           "summary": "No direct supporting evidence was available in the deterministic fixture.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [],
@@ -132,6 +146,7 @@
           "agent": "contradiction-finder",
           "claim_id": "receipts_2",
           "summary": "Found scope limitations, missing deployment evidence, or wording that narrows the claim.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [
@@ -144,6 +159,7 @@
           "agent": "numeric-calibrator",
           "claim_id": "receipts_2",
           "summary": "No numeric calibration was applicable.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [],
@@ -153,6 +169,7 @@
           "agent": "claim-aggregator",
           "claim_id": "receipts_2",
           "summary": "Combined specialist outputs into final verdict `not_checkable` with `medium` confidence.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [
@@ -161,7 +178,16 @@
           ],
           "numeric_findings": []
         }
-      ]
+      ],
+      "claim_timing": {
+        "claim_id": "receipts_2",
+        "total_duration_ms": 0,
+        "verifier_ms": 0,
+        "contradiction_finder_ms": 0,
+        "numeric_calibrator_ms": 0,
+        "aggregator_ms": 0,
+        "contrast_ms": 0
+      }
     },
     {
       "claim": {
@@ -189,6 +215,7 @@
           "agent": "verifier",
           "claim_id": "receipts_3",
           "summary": "No direct supporting evidence was available in the deterministic fixture.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [],
@@ -198,6 +225,7 @@
           "agent": "contradiction-finder",
           "claim_id": "receipts_3",
           "summary": "Found scope limitations, missing deployment evidence, or wording that narrows the claim.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [
@@ -210,6 +238,7 @@
           "agent": "numeric-calibrator",
           "claim_id": "receipts_3",
           "summary": "No numeric calibration was applicable.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [],
@@ -219,6 +248,7 @@
           "agent": "claim-aggregator",
           "claim_id": "receipts_3",
           "summary": "Combined specialist outputs into final verdict `not_checkable` with `medium` confidence.",
+          "duration_ms": 0,
           "supporting_evidence": [],
           "counter_evidence": [],
           "missing_context": [
@@ -227,11 +257,61 @@
           ],
           "numeric_findings": []
         }
-      ]
+      ],
+      "claim_timing": {
+        "claim_id": "receipts_3",
+        "total_duration_ms": 0,
+        "verifier_ms": 0,
+        "contradiction_finder_ms": 0,
+        "numeric_calibrator_ms": 0,
+        "aggregator_ms": 0,
+        "contrast_ms": 0
+      }
     }
   ],
   "runtime": "local",
   "mode": "deterministic_fallback",
   "contrast_enabled": false,
-  "reference_urls": []
+  "reference_urls": [],
+  "run_profile": {
+    "total_duration_ms": 1,
+    "load_document_ms": 1,
+    "extract_claims_ms": 1,
+    "audit_claims_ms": 1,
+    "contrast_duration_ms": 0,
+    "claims_extracted": 3,
+    "claims_audited": 3,
+    "agent_passes": 9,
+    "contrast_claims": 0,
+    "unique_source_count": 0,
+    "claim_profiles": [
+      {
+        "claim_id": "receipts_1",
+        "total_duration_ms": 0,
+        "verifier_ms": 0,
+        "contradiction_finder_ms": 0,
+        "numeric_calibrator_ms": 0,
+        "aggregator_ms": 0,
+        "contrast_ms": 0
+      },
+      {
+        "claim_id": "receipts_2",
+        "total_duration_ms": 0,
+        "verifier_ms": 0,
+        "contradiction_finder_ms": 0,
+        "numeric_calibrator_ms": 0,
+        "aggregator_ms": 0,
+        "contrast_ms": 0
+      },
+      {
+        "claim_id": "receipts_3",
+        "total_duration_ms": 0,
+        "verifier_ms": 0,
+        "contradiction_finder_ms": 0,
+        "numeric_calibrator_ms": 0,
+        "aggregator_ms": 0,
+        "contrast_ms": 0
+      }
+    ]
+  }
 }

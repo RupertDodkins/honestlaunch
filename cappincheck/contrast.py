@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import asyncio
+from dataclasses import dataclass
+from time import perf_counter
 
 from pydantic import BaseModel, Field
 
@@ -10,6 +12,12 @@ from .schemas import ClaimAudit, ContrastSource, Document, EvidenceContrast, Ref
 
 class ContrastSet(BaseModel):
     contrasts: list[EvidenceContrast] = Field(default_factory=list)
+
+
+@dataclass
+class ContrastExecutionProfile:
+    total_duration_ms: int
+    by_claim_id: dict[str, int]
 
 
 def top_contrast_candidates(audits: list[ClaimAudit], limit: int) -> list[ClaimAudit]:
@@ -23,39 +31,53 @@ async def apply_contrast(
     mock: bool,
     reference_urls: list[str],
     contrast_top: int,
-) -> list[ClaimAudit]:
+) -> tuple[list[ClaimAudit], ContrastExecutionProfile]:
+    started_at = perf_counter()
     if contrast_top < 1:
-        return audits
+        return audits, ContrastExecutionProfile(total_duration_ms=0, by_claim_id={})
     candidates = top_contrast_candidates(audits, contrast_top)
     if mock:
-        contrasts = [_mock_contrast(audit) for audit in candidates]
+        contrasts = []
+        timing_by_claim_id: dict[str, int] = {}
+        for audit in candidates:
+            claim_started_at = perf_counter()
+            contrast = _mock_contrast(audit)
+            contrasts.append(contrast)
+            timing_by_claim_id[audit.claim.id] = _elapsed_ms(claim_started_at)
     else:
-        contrasts = await _live_contrasts(document, candidates, reference_urls)
-    by_claim_id = {contrast.claim_id: contrast for contrast in contrasts}
+        contrasts, timing_by_claim_id = await _live_contrasts(document, candidates, reference_urls)
+    contrast_by_claim_id = {contrast.claim_id: contrast for contrast in contrasts}
     for audit in audits:
-        contrast = by_claim_id.get(audit.claim.id)
+        contrast = contrast_by_claim_id.get(audit.claim.id)
         if contrast is None:
             continue
         audit.contrast = contrast
         _merge_contrast_verdict(audit, contrast)
-    return audits
+    return audits, ContrastExecutionProfile(
+        total_duration_ms=_elapsed_ms(started_at),
+        by_claim_id=timing_by_claim_id,
+    )
 
 
 async def _live_contrasts(
     document: Document,
     audits: list[ClaimAudit],
     reference_urls: list[str],
-) -> list[EvidenceContrast]:
+) -> tuple[list[EvidenceContrast], dict[str, int]]:
     if not reference_urls:
         raise ValueError("--contrast requires at least one --reference URL unless --mock is used.")
-    return list(
+    results = list(
         await asyncio.gather(
             *[_live_contrast(document, audit, reference_urls) for audit in audits],
         )
     )
+    return [contrast for contrast, _ in results], {contrast.claim_id: duration_ms for contrast, duration_ms in results}
 
 
-async def _live_contrast(document: Document, audit: ClaimAudit, reference_urls: list[str]) -> EvidenceContrast:
+async def _live_contrast(
+    document: Document, audit: ClaimAudit, reference_urls: list[str]
+) -> tuple[EvidenceContrast, int]:
+    started_at = perf_counter()
     client = GeminiClient()
     references = "\n".join(f"- {url}" for url in reference_urls)
     prompt = f"""
@@ -91,7 +113,8 @@ Reference URLs:
 Relevant document context:
 {document.text[:20000]}
 """
-    return await asyncio.to_thread(client.structured, prompt, EvidenceContrast)
+    contrast = await asyncio.to_thread(client.structured, prompt, EvidenceContrast)
+    return contrast, _elapsed_ms(started_at)
 
 
 def _merge_contrast_verdict(audit: ClaimAudit, contrast: EvidenceContrast) -> None:
@@ -183,3 +206,10 @@ def _mock_contrast(audit: ClaimAudit) -> EvidenceContrast:
         recommended_verdict=Verdict.NOT_CHECKABLE,
         confidence="low",
     )
+
+
+def _elapsed_ms(started_at: float) -> int:
+    elapsed_ms = (perf_counter() - started_at) * 1000
+    if elapsed_ms > 0:
+        return max(1, int(elapsed_ms + 0.999))
+    return 0

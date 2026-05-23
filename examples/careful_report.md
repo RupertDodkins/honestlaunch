@@ -6,9 +6,21 @@ Source: `examples/careful_document.md`
 
 - Mode: `deterministic_fallback`
 - Runtime: `local`
+- Pipeline wall: `2ms`
+- Load / Extract / Audit / Contrast: `1ms` / `1ms` / `1ms` / `0ms`
+- Claims extracted / audited: `3` / `3`
+- Specialist passes / unique sources: `9` / `0`
+
 - Model: `none`
 - Evidence Contrast: `disabled`
 - Provided reference URLs: `none`
+
+## Scorecard
+
+- Claims audited: `3`
+- Verdict counts: `supported=3` · `overstated=0` · `missing_context=0` · `contradicted=0` · `not_checkable=0`
+- Average stretch score: `12/100`
+- Provided reference URL count: `0`
 
 | Claim | Formal Verdict | Confidence | Stretch Score |
 | --- | --- | --- | ---: |
@@ -28,9 +40,14 @@ Source: `examples/careful_document.md`
 
 **Defensible rewrite:** CappinCheck improved from 84.1% to 87.3% on Benchmark X, a 3.2 percentage-point gain under the benchmark conditions.
 
+**Claim timing:**
+- Total / Verifier / Contradiction / Numeric / Aggregator / Contrast: 0ms / 0ms / 0ms / 0ms / 0ms / 0ms
+
 ### Agent Steps
 
 <details><summary>verifier: Found direct benchmark support for the narrower table values.</summary>
+
+**Duration:** 0ms
 
 **Supporting evidence:**
 - Baseline: 84.1%. CappinCheck: 87.3%. The document calls this a 3.2 percentage-point gain. (Careful document benchmark table). Relevance: The source wording matches the table and keeps the scope limited to Benchmark X.
@@ -39,9 +56,13 @@ Source: `examples/careful_document.md`
 
 <details><summary>contradiction-finder: No contradictions were found for the scoped claim.</summary>
 
+**Duration:** 0ms
+
 </details>
 
 <details><summary>numeric-calibrator: Computed the absolute and relative difference from the benchmark values.</summary>
+
+**Duration:** 0ms
 
 **Computed checks:**
 - Absolute gain: 87.3 - 84.1 = 3.2 percentage points.
@@ -52,6 +73,8 @@ Source: `examples/careful_document.md`
 
 <details><summary>claim-aggregator: Combined specialist outputs into final verdict `supported` with `high` confidence.</summary>
 
+**Duration:** 0ms
+
 **Supporting evidence:**
 - Baseline: 84.1%. CappinCheck: 87.3%. The document calls this a 3.2 percentage-point gain. (Careful document benchmark table). Relevance: The source wording matches the table and keeps the scope limited to Benchmark X.
 
@@ -67,7 +90,7 @@ Source: `examples/careful_document.md`
 - Relative gain: (3.2 / 84.1) * 100 = 3.8%.
 - The document uses percentage-point wording, so the numeric claim is properly scoped.
 
-**Supporting evidence found:**
+**Gemini-discovered supporting sources:**
 - Baseline: 84.1%. CappinCheck: 87.3%. The document calls this a 3.2 percentage-point gain. (Careful document benchmark table). Relevance: The source wording matches the table and keeps the scope limited to Benchmark X.
 
 
@@ -83,9 +106,14 @@ Source: `examples/careful_document.md`
 
 **Defensible rewrite:** The evaluation does not establish real-world deployment performance.
 
+**Claim timing:**
+- Total / Verifier / Contradiction / Numeric / Aggregator / Contrast: 0ms / 0ms / 0ms / 0ms / 0ms / 0ms
+
 ### Agent Steps
 
 <details><summary>verifier: Found direct benchmark support for the narrower table values.</summary>
+
+**Duration:** 0ms
 
 **Supporting evidence:**
 - Baseline: 84.1%. CappinCheck: 87.3%. The document calls this a 3.2 percentage-point gain. (Careful document benchmark table). Relevance: The source wording matches the table and keeps the scope limited to Benchmark X.
@@ -94,20 +122,26 @@ Source: `examples/careful_document.md`
 
 <details><summary>contradiction-finder: No contradictions were found for the scoped claim.</summary>
 
+**Duration:** 0ms
+
 </details>
 
 <details><summary>numeric-calibrator: No numeric calibration was applicable.</summary>
 
+**Duration:** 0ms
+
 </details>
 
 <details><summary>claim-aggregator: Combined specialist outputs into final verdict `supported` with `high` confidence.</summary>
+
+**Duration:** 0ms
 
 **Supporting evidence:**
 - Baseline: 84.1%. CappinCheck: 87.3%. The document calls this a 3.2 percentage-point gain. (Careful document benchmark table). Relevance: The source wording matches the table and keeps the scope limited to Benchmark X.
 
 </details>
 
-**Supporting evidence found:**
+**Gemini-discovered supporting sources:**
 - Baseline: 84.1%. CappinCheck: 87.3%. The document calls this a 3.2 percentage-point gain. (Careful document benchmark table). Relevance: The source wording matches the table and keeps the scope limited to Benchmark X.
 
 
@@ -123,9 +157,14 @@ Source: `examples/careful_document.md`
 
 **Defensible rewrite:** The result is limited to the curated Benchmark X dataset.
 
+**Claim timing:**
+- Total / Verifier / Contradiction / Numeric / Aggregator / Contrast: 0ms / 0ms / 0ms / 0ms / 0ms / 0ms
+
 ### Agent Steps
 
 <details><summary>verifier: Found direct benchmark support for the narrower table values.</summary>
+
+**Duration:** 0ms
 
 **Supporting evidence:**
 - Baseline: 84.1%. CappinCheck: 87.3%. The document calls this a 3.2 percentage-point gain. (Careful document benchmark table). Relevance: The source wording matches the table and keeps the scope limited to Benchmark X.
@@ -134,19 +173,25 @@ Source: `examples/careful_document.md`
 
 <details><summary>contradiction-finder: No contradictions were found for the scoped claim.</summary>
 
+**Duration:** 0ms
+
 </details>
 
 <details><summary>numeric-calibrator: No numeric calibration was applicable.</summary>
 
+**Duration:** 0ms
+
 </details>
 
 <details><summary>claim-aggregator: Combined specialist outputs into final verdict `supported` with `high` confidence.</summary>
+
+**Duration:** 0ms
 
 **Supporting evidence:**
 - Baseline: 84.1%. CappinCheck: 87.3%. The document calls this a 3.2 percentage-point gain. (Careful document benchmark table). Relevance: The source wording matches the table and keeps the scope limited to Benchmark X.
 
 </details>
 
-**Supporting evidence found:**
+**Gemini-discovered supporting sources:**
 - Baseline: 84.1%. CappinCheck: 87.3%. The document calls this a 3.2 percentage-point gain. (Careful document benchmark table). Relevance: The source wording matches the table and keeps the scope limited to Benchmark X.
 

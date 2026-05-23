@@ -6,9 +6,21 @@ Source: `examples/demo_document.md`
 
 - Mode: `deterministic_fallback`
 - Runtime: `local`
+- Pipeline wall: `3ms`
+- Load / Extract / Audit / Contrast: `2ms` / `1ms` / `2ms` / `0ms`
+- Claims extracted / audited: `3` / `3`
+- Specialist passes / unique sources: `9` / `0`
+
 - Model: `none`
 - Evidence Contrast: `disabled`
 - Provided reference URLs: `none`
+
+## Scorecard
+
+- Claims audited: `3`
+- Verdict counts: `supported=0` · `overstated=1` · `missing_context=2` · `contradicted=0` · `not_checkable=0`
+- Average stretch score: `72/100`
+- Provided reference URL count: `0`
 
 | Claim | Formal Verdict | Confidence | Stretch Score |
 | --- | --- | --- | ---: |
@@ -28,9 +40,14 @@ Source: `examples/demo_document.md`
 
 **Defensible rewrite:** Our method improves performance from 84.1% to 87.3% on Benchmark X, a 3.2-point absolute gain and 3.8% relative improvement.
 
+**Claim timing:**
+- Total / Verifier / Contradiction / Numeric / Aggregator / Contrast: 0ms / 0ms / 0ms / 0ms / 0ms / 0ms
+
 ### Agent Steps
 
 <details><summary>verifier: Found direct benchmark support for the narrower table values.</summary>
+
+**Duration:** 0ms
 
 **Supporting evidence:**
 - Baseline: 84.1%. CappinCheck: 87.3%. (Demo document benchmark table). Relevance: The table supports a 3.2-point absolute gain, not a 30% relative improvement.
@@ -39,12 +56,16 @@ Source: `examples/demo_document.md`
 
 <details><summary>contradiction-finder: Found scope limitations, missing deployment evidence, or wording that narrows the claim.</summary>
 
+**Duration:** 0ms
+
 **Missing context:**
 - No real-world deployment task is reported in the demo document.
 
 </details>
 
 <details><summary>numeric-calibrator: Computed the absolute and relative difference from the benchmark values.</summary>
+
+**Duration:** 0ms
 
 **Computed checks:**
 - Absolute gain: 87.3 - 84.1 = 3.2 points.
@@ -54,6 +75,8 @@ Source: `examples/demo_document.md`
 
 <details><summary>claim-aggregator: Combined specialist outputs into final verdict `overstated` with `high` confidence.</summary>
 
+**Duration:** 0ms
+
 **Supporting evidence:**
 - Baseline: 84.1%. CappinCheck: 87.3%. (Demo document benchmark table). Relevance: The table supports a 3.2-point absolute gain, not a 30% relative improvement.
 
@@ -70,7 +93,7 @@ Source: `examples/demo_document.md`
 - Absolute gain: 87.3 - 84.1 = 3.2 points.
 - Relative gain: (3.2 / 84.1) * 100 = 3.8%.
 
-**Supporting evidence found:**
+**Gemini-discovered supporting sources:**
 - Baseline: 84.1%. CappinCheck: 87.3%. (Demo document benchmark table). Relevance: The table supports a 3.2-point absolute gain, not a 30% relative improvement.
 
 **Missing context:**
@@ -89,13 +112,20 @@ Source: `examples/demo_document.md`
 
 **Defensible rewrite:** The document provides preliminary evidence for a narrower version of this claim.
 
+**Claim timing:**
+- Total / Verifier / Contradiction / Numeric / Aggregator / Contrast: 0ms / 0ms / 0ms / 0ms / 0ms / 0ms
+
 ### Agent Steps
 
 <details><summary>verifier: No direct supporting evidence was available in the deterministic fixture.</summary>
 
+**Duration:** 0ms
+
 </details>
 
 <details><summary>contradiction-finder: Found scope limitations, missing deployment evidence, or wording that narrows the claim.</summary>
+
+**Duration:** 0ms
 
 **Missing context:**
 - Additional external grounding would be needed for a production verdict.
@@ -104,9 +134,13 @@ Source: `examples/demo_document.md`
 
 <details><summary>numeric-calibrator: No numeric calibration was applicable.</summary>
 
+**Duration:** 0ms
+
 </details>
 
 <details><summary>claim-aggregator: Combined specialist outputs into final verdict `missing_context` with `medium` confidence.</summary>
+
+**Duration:** 0ms
 
 **Missing context:**
 - Additional external grounding would be needed for a production verdict.
@@ -129,13 +163,20 @@ Source: `examples/demo_document.md`
 
 **Defensible rewrite:** The document provides preliminary evidence for a narrower version of this claim.
 
+**Claim timing:**
+- Total / Verifier / Contradiction / Numeric / Aggregator / Contrast: 0ms / 0ms / 0ms / 0ms / 0ms / 0ms
+
 ### Agent Steps
 
 <details><summary>verifier: No direct supporting evidence was available in the deterministic fixture.</summary>
 
+**Duration:** 0ms
+
 </details>
 
 <details><summary>contradiction-finder: Found scope limitations, missing deployment evidence, or wording that narrows the claim.</summary>
+
+**Duration:** 0ms
 
 **Missing context:**
 - Additional external grounding would be needed for a production verdict.
@@ -144,9 +185,13 @@ Source: `examples/demo_document.md`
 
 <details><summary>numeric-calibrator: No numeric calibration was applicable.</summary>
 
+**Duration:** 0ms
+
 </details>
 
 <details><summary>claim-aggregator: Combined specialist outputs into final verdict `missing_context` with `medium` confidence.</summary>
+
+**Duration:** 0ms
 
 **Missing context:**
 - Additional external grounding would be needed for a production verdict.
