@@ -5,13 +5,12 @@ Source: `examples/demo_document.md`
 ## Provenance
 
 - Mode: `deterministic_fallback`
-- Runtime: `local`
-- Pipeline wall: `2ms`
+- Model: `none`
+- Pipeline wall: `1ms`
 - Load / Extract / Audit / Contrast: `1ms` / `1ms` / `1ms` / `0ms`
 - Claims extracted / audited: `3` / `3`
 - Specialist passes / unique sources: `9` / `0`
 
-- Model: `none`
 - Evidence Contrast: `disabled`
 - Provided reference URLs: `none`
 

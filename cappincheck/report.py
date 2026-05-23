@@ -22,7 +22,6 @@ def write_markdown(report: AuditReport, path: Path) -> None:
         "## Provenance",
         "",
         f"- Mode: `{report.mode}`",
-        f"- Runtime: `{report.runtime}`",
         f"- Model: `{report.model or 'none'}`",
         f"- Evidence Contrast: `{'enabled' if report.contrast_enabled else 'disabled'}`",
         f"- Provided reference URLs: {', '.join(f'`{url}`' for url in report.reference_urls) if report.reference_urls else '`none`'}",
@@ -80,7 +79,7 @@ def write_html(report: AuditReport, path: Path) -> None:
     header_summary = f"{len(report.audits)} audited claims"
     if report.run_profile:
         header_summary += f" · {_format_duration_ms(report.run_profile.total_duration_ms)} pipeline"
-    header_summary += f" · {html.escape(report.mode)} · {html.escape(report.runtime)}"
+    header_summary += f" · {html.escape(report.mode)}"
     markup = f"""<!doctype html>
 <html lang="en">
 <head>
@@ -501,7 +500,7 @@ def write_html(report: AuditReport, path: Path) -> None:
       ].join('');
       document.getElementById('telemetry-grid').innerHTML = [
         statCard('Model', report.model || 'none', report.contrast_enabled ? 'contrast enabled' : 'contrast disabled'),
-        statCard('Runtime Path', `${{report.mode}} · ${{report.runtime}}`),
+        statCard('Execution Mode', report.mode),
         statCard('Pipeline Wall', fmtMs(run.total_duration_ms || 0), `audit ${{fmtMs(run.audit_claims_ms || 0)}} · contrast ${{fmtMs(run.contrast_duration_ms || 0)}}`),
         statCard('Specialist Passes', String(run.agent_passes || 0), `${{run.claims_audited || (report.audits || []).length}} claims`),
         statCard('Unique Sources', String(run.unique_source_count || 0), 'support + caveat + contrast urls'),
@@ -558,7 +557,7 @@ def write_html(report: AuditReport, path: Path) -> None:
       document.getElementById('claim-detail').innerHTML = `
         <div class="panel">
           <h3>Report Provenance</h3>
-          <p class="wrap"><strong>Mode:</strong> ${{esc(report.mode)}} · <strong>Runtime:</strong> ${{esc(report.runtime)}} · <strong>Model:</strong> ${{esc(report.model || 'none')}}</p>
+          <p class="wrap"><strong>Mode:</strong> ${{esc(report.mode)}} · <strong>Model:</strong> ${{esc(report.model || 'none')}}</p>
           <p class="wrap"><strong>Evidence Contrast:</strong> ${{report.contrast_enabled ? 'enabled' : 'disabled'}}</p>
           <p class="wrap"><strong>Provided reference URLs:</strong> ${{(report.reference_urls || []).length ? (report.reference_urls || []).map(esc).join(', ') : 'none'}}</p>
           ${{runProfile}}

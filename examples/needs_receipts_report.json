@@ -274,7 +274,7 @@
   "contrast_enabled": false,
   "reference_urls": [],
   "run_profile": {
-    "total_duration_ms": 1,
+    "total_duration_ms": 2,
     "load_document_ms": 1,
     "extract_claims_ms": 1,
     "audit_claims_ms": 1,

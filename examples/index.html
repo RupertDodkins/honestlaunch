@@ -110,7 +110,7 @@
   <header>
     <div>
       <h1>CappinCheck Demo Gallery</h1>
-      <p>Pre-generated static reports. Use the live-grounded report if vetted; use the deterministic fallback if network or API access is uncertain.</p>
+      <p>Pre-generated static reports showing different claim-audit outcomes on public AI model documents.</p>
     </div>
     <p><code>Document -> Claims -> Audit Report</code></p>
   </header>
@@ -140,28 +140,10 @@
         summary: 'Live Gemini run on a local source proxy for the xAI Grok 3 launch page, because the official xAI page is Cloudflare-blocked to the CLI fetcher. Official xAI, leaderboard, LiveCodeBench, and Stanford transparency URLs are preserved as references.'
       },
       {
-        label: 'Evidence Contrast Fallback',
-        badge: 'overstated',
-        href: 'contrast_demo.html',
-        summary: 'Deterministic offline report. Shows the core mechanism: a risky claim, evidence contrast, sources checked, agent steps, and a defensible rewrite.'
-      },
-      {
         label: 'Careful Scientific Claim',
         badge: 'supported',
         href: 'careful_report.html',
         summary: 'Shows the non-cynical state: a scoped document with correct percentage-point wording and explicit limitations remains supported.'
-      },
-      {
-        label: 'Not Checkable',
-        badge: 'not checkable',
-        href: 'needs_receipts_report.html',
-        summary: 'Shows the unauditable state: claims may be true, but the document provides no user study, safety validation, or prior-work comparison.'
-      },
-      {
-        label: 'Standard Audit Fallback',
-        badge: 'context',
-        href: 'overstated_report.html',
-        summary: 'Same deterministic source document without Evidence Contrast enabled. Useful for explaining what the contrast extension adds.'
       }
     ];
     let selected = 0;
@@ -184,8 +166,7 @@
       summary.innerHTML = `
         <strong>${item.label}</strong>
         <p>${item.summary}</p>
-        <p>Real command: <code>cappincheck audit https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-5/ --contrast --reference https://deepmind.google/models/model-cards/gemini-3-5-flash --contrast-top 2 --limit 4 --out examples/gemini_35_flash_report.md --json examples/gemini_35_flash_report.json --html examples/gemini_35_flash_report.html</code></p>
-        <p>Fallback command: <code>cappincheck audit examples/demo_document.md --mock --contrast --contrast-top 2 --out examples/contrast_demo.md --json examples/contrast_demo.json --html examples/contrast_demo.html</code></p>
+        ${item.command ? `<p>Command: <code>${item.command}</code></p>` : ''}
       `;
       frame.src = item.href;
     }

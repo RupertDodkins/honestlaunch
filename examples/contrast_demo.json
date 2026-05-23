@@ -342,10 +342,10 @@
   "contrast_enabled": true,
   "reference_urls": [],
   "run_profile": {
-    "total_duration_ms": 4,
-    "load_document_ms": 2,
+    "total_duration_ms": 1,
+    "load_document_ms": 1,
     "extract_claims_ms": 1,
-    "audit_claims_ms": 2,
+    "audit_claims_ms": 1,
     "contrast_duration_ms": 1,
     "claims_extracted": 3,
     "claims_audited": 3,

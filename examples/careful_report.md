@@ -5,13 +5,12 @@ Source: `examples/careful_document.md`
 ## Provenance
 
 - Mode: `deterministic_fallback`
-- Runtime: `local`
+- Model: `none`
 - Pipeline wall: `2ms`
 - Load / Extract / Audit / Contrast: `1ms` / `1ms` / `1ms` / `0ms`
 - Claims extracted / audited: `3` / `3`
 - Specialist passes / unique sources: `9` / `0`
 
-- Model: `none`
 - Evidence Contrast: `disabled`
 - Provided reference URLs: `none`
 
