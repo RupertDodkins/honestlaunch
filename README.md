@@ -87,6 +87,11 @@ Defensible rewrite: ...
 
 This is documented in `DEMO_EXTENSION_PLAN.md`. Evidence Contrast Mode is the intended answer to "show me exactly where the claim differs from existing docs."
 
+Planned report layout:
+
+- `Evidence Contrast`: the demo-facing side-by-side card: claim wording, best source wording, delta, verdict movement, and defensible rewrite.
+- `Evidence Stack`: the raw support, contradiction/narrowing evidence, and missing-context trails underneath for inspection.
+
 ## Limitations
 
 CappinCheck does not prove that a paper is true or false. It identifies claims whose wording may outrun the available evidence. It should be used as a triage and review aid, not as an authority.

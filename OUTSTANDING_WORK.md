@@ -35,7 +35,7 @@ open examples/demo_report.html
 - Done: static dashboard filters, source links, and claim-strength UI added.
 - Done: README/RUNTIME docs updated to describe local default and managed beta caveat.
 - Done: report now surfaces supporting evidence and contradictions/narrowing evidence explicitly.
-- Planned next: Evidence Contrast Mode, which turns evidence lists into side-by-side claim-vs-source cards. See `DEMO_EXTENSION_PLAN.md`.
+- Planned next: Evidence Contrast Mode, which turns evidence lists into side-by-side claim-vs-source cards. The intended layout is `Evidence Contrast` first for demo legibility, then the raw `Evidence Stack` underneath for inspection. See `DEMO_EXTENSION_PLAN.md`.
 - Remaining optional: choose a stronger real public source and pre-generate a stable report when network/API latency permits.
   - Managed Agents are documented as a future adapter boundary in `RUNTIME.md`; they are not the current runtime.
 

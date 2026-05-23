@@ -120,6 +120,11 @@ The contrast card answers:
 - Is the source narrower, broader, contradictory, or not checkable?
 - What is the safest defensible rewrite?
 
+Final report layout should have two layers:
+
+1. `Evidence Contrast`: the demo-facing side-by-side card that explains the claim/source delta in one glance.
+2. `Evidence Stack`: the raw support, contradiction/narrowing evidence, and missing context underneath for auditability.
+
 Example card shape:
 
 ```text
@@ -212,16 +217,22 @@ Return JSON only.
 
 ### Rendering Requirements
 
-In Markdown and HTML, each contrasted claim should show:
+In Markdown and HTML, each contrasted claim should show an `Evidence Contrast` section before the raw evidence lists:
 
 - Claim
+- Best source says
+- Delta type and explanation
+- Existing verdict -> contrast verdict
+- Defensible rewrite
+- Small vibe label
+
+The raw `Evidence Stack` should remain underneath and show:
+
 - Search queries
 - Source URLs/titles
-- "Best source says"
-- Delta explanation
-- Suggested rewrite
-- Existing verdict -> contrast verdict
-- Small vibe label
+- Supporting evidence found
+- Contradictions / narrowing evidence
+- Missing context
 
 The report must remain static. No hosted app.
 
