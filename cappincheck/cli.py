@@ -27,16 +27,25 @@ def audit(
     json_out: Path | None = typer.Option(None, "--json", help="Optional JSON report path."),
     html_out: Path | None = typer.Option(None, "--html", help="Optional static HTML dashboard path."),
     limit: int = typer.Option(5, "--limit", min=1, max=12, help="Number of claims to audit."),
+    runtime: str = typer.Option("local", "--runtime", help="Runtime adapter: local or managed."),
     mock: bool = typer.Option(False, "--mock", help="Run deterministic no-key demo mode."),
 ) -> None:
     """Audit risky factual claims in a dense document."""
     document = load_document(source)
     typer.echo(f"Loaded: {document.title}")
     typer.echo("Extracting risky claims...")
-    claims = extract_claims(document, mock=mock, limit=max(limit, 8))
+    try:
+        claims = extract_claims(document, mock=mock, limit=max(limit, 8))
+    except Exception as exc:
+        _fail_with_context("claim extraction", exc)
     typer.echo(f"Extracted {len(claims)} risky claims.")
     typer.echo(f"Auditing top {min(limit, len(claims))} claims...")
-    audits = asyncio.run(audit_claims(document, claims, mock=mock, limit=limit))
+    if runtime not in {"local", "managed"}:
+        raise typer.BadParameter("--runtime must be local or managed")
+    try:
+        audits = asyncio.run(audit_claims(document, claims, mock=mock, limit=limit, runtime=runtime))
+    except Exception as exc:
+        _fail_with_context("claim audit", exc)
     report = AuditReport(document=document, claims=claims, audits=audits)
 
     write_markdown(report, out)
@@ -47,6 +56,17 @@ def audit(
     if html_out:
         write_html(report, html_out)
         typer.echo(f"Wrote HTML dashboard: {html_out}")
+
+
+def _fail_with_context(stage: str, exc: Exception) -> None:
+    typer.secho(f"Failed during {stage}: {exc}", fg=typer.colors.RED, err=True)
+    typer.echo(
+        "Fallback: cappincheck audit examples/demo_document.md --mock "
+        "--out examples/demo_report.md --json examples/demo_report.json "
+        "--html examples/demo_report.html",
+        err=True,
+    )
+    raise typer.Exit(1)
 
 
 if __name__ == "__main__":

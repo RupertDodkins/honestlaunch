@@ -7,121 +7,121 @@
   "claims": [
     {
       "id": "claim_1",
-      "claim": "We introduce CappinCheck, an agentic workflow that improves performance by 30% over prior work on real-world tasks.",
+      "claim": "improves performance by 30% over prior work",
       "claim_type": "numeric",
       "source_location": "Abstract",
-      "why_risky": "The results section only shows an improvement from 84.1% to 87.3% on Benchmark X, which is a 3.2% absolute or 3.8% relative improvement. There is no evidence supporting a 30% improvement.",
-      "audit_question": "What is the mathematical basis for the 30% improvement claim, and does it refer to a metric or baseline not presented in the text?"
+      "why_risky": "The results section shows an accuracy increase from 84.1% to 87.3%, which is only a 3.2% absolute improvement or roughly a 20% error reduction, making the 30% improvement claim mathematically unsupported by the provided data.",
+      "audit_question": "What specific metric and prior work baseline were used to calculate the 30% performance improvement, and where is this data presented in the paper?"
     },
     {
       "id": "claim_2",
-      "claim": "The system robustly generalizes across domains",
+      "claim": "on real-world tasks",
       "claim_type": "generalization",
       "source_location": "Abstract",
-      "why_risky": "The authors state in the discussion that they did not evaluate clinical documents, legal documents, or private enterprise workflows, and only tested on Benchmark X.",
-      "audit_question": "Which specific domains was the system tested on to prove robust generalization, and what were the performance metrics in each domain?"
+      "why_risky": "The discussion explicitly notes that they did not evaluate prospective real-world deployment, clinical documents, legal documents, or private enterprise workflows, which undermines the claim of testing on real-world tasks.",
+      "audit_question": "What characteristics of Benchmark X qualify it as representative of 'real-world tasks' given the exclusion of real-world deployments, clinical, legal, and private enterprise workflows?"
     },
     {
       "id": "claim_3",
-      "claim": "is the first agentic workflow for scientific claim auditing.",
-      "claim_type": "novelty",
+      "claim": "The system robustly generalizes across domains",
+      "claim_type": "generalization",
       "source_location": "Abstract",
-      "why_risky": "The discussion section explicitly states that the authors did not run an external literature search for prior scientific fact-checking or claim-audit systems, undermining the claim of being the first.",
-      "audit_question": "Does a comprehensive literature search of prior scientific claim-auditing and fact-checking systems confirm that CappinCheck is indeed the first agentic workflow of its kind?"
+      "why_risky": "The evaluation was restricted to curated technical claims from public documents, without testing across key domains like clinical or legal, meaning there is no empirical evidence to support robust cross-domain generalization.",
+      "audit_question": "Which distinct domains was CappinCheck evaluated against, and what were the performance metrics demonstrating robustness across these domains?"
     },
     {
       "id": "claim_4",
-      "claim": "CappinCheck achieves 87.3% on the same benchmark.",
-      "claim_type": "benchmark",
-      "source_location": "Results",
-      "why_risky": "Benchmark X details are not provided, and the evaluation lacks statistical significance testing, error bars, or details on potential data leakage.",
-      "audit_question": "What are the confidence intervals, statistical significance, and split details for CappinCheck's 87.3% accuracy on Benchmark X?"
+      "claim": "is the first agentic workflow for scientific claim auditing.",
+      "claim_type": "novelty",
+      "source_location": "Abstract",
+      "why_risky": "The authors state in the discussion that they did not conduct an external literature search for prior scientific fact-checking or claim-audit systems, making the absolute novelty claim of being the 'first' unsupported.",
+      "audit_question": "What systematic literature search or patent search was performed to verify that no other agentic workflows for scientific claim auditing exist in prior literature?"
     },
     {
       "id": "claim_5",
-      "claim": "The baseline system achieves 84.1% on the benchmark.",
-      "claim_type": "benchmark",
-      "source_location": "Results",
-      "why_risky": "The baseline claim-review pipeline is not defined, making it impossible to determine if it represents a state-of-the-art comparison or a weak baseline.",
-      "audit_question": "What is the exact architecture, model size, and hyperparameter configuration of the baseline system used for comparison?"
-    },
-    {
-      "id": "claim_6",
       "claim": "We compare CappinCheck against a baseline claim-review pipeline on Benchmark X.",
       "claim_type": "benchmark",
       "source_location": "Results",
-      "why_risky": "No references or details are provided for Benchmark X, preventing replication and raising questions about whether the benchmark is a standard, un-biased test.",
-      "audit_question": "Is Benchmark X a standard, peer-reviewed benchmark, and where are its dataset and source code hosted for replication?"
+      "why_risky": "There is no information on whether Benchmark X is a standard, validated benchmark or if the baseline pipeline was optimized fairly, which could lead to an artificial performance advantage.",
+      "audit_question": "Is Benchmark X a standard peer-reviewed benchmark, and how was the baseline claim-review pipeline constructed and optimized to ensure a fair comparison?"
+    },
+    {
+      "id": "claim_6",
+      "claim": "The baseline system achieves 84.1% on the benchmark.",
+      "claim_type": "numeric",
+      "source_location": "Results",
+      "why_risky": "The accuracy figure is presented as a single static point estimate without standard deviation, confidence intervals, or details on the number of evaluation runs.",
+      "audit_question": "What are the confidence intervals and statistical variance for the baseline system's 84.1% accuracy score across multiple runs?"
     },
     {
       "id": "claim_7",
-      "claim": "The benchmark contains curated technical claims from public documents.",
-      "claim_type": "other",
-      "source_location": "Discussion",
-      "why_risky": "Curated public documents might introduce selection bias, and without clear curation criteria, the dataset may not be representative of actual scientific claim auditing.",
-      "audit_question": "What were the explicit curation guidelines, annotator agreement metrics, and source document types used to construct Benchmark X?"
+      "claim": "CappinCheck achieves 87.3% on the same benchmark.",
+      "claim_type": "numeric",
+      "source_location": "Results",
+      "why_risky": "The reported accuracy of 87.3% lacks statistical significance testing, meaning the 3.2% marginal difference over the baseline could be due to random variation.",
+      "audit_question": "Was a statistical significance test performed to confirm that the 87.3% score is significantly better than the 84.1% baseline, and what was the resulting p-value?"
     },
     {
       "id": "claim_8",
-      "claim": "improves performance... on real-world tasks.",
-      "claim_type": "deployment",
-      "source_location": "Abstract",
-      "why_risky": "The discussion notes that they did not evaluate prospective real-world deployment, indicating the tasks evaluated may be purely offline or synthetic.",
-      "audit_question": "What constitutes a 'real-world task' in this evaluation, and how does the offline benchmark performance correlate with actual real-world deployment success?"
+      "claim": "The benchmark contains curated technical claims from public documents.",
+      "claim_type": "other",
+      "source_location": "Discussion",
+      "why_risky": "Curated benchmarks of public documents are highly prone to selection bias and data leakage if the model was trained on public internet data containing those exact claims.",
+      "audit_question": "What curation criteria and methodologies were used to construct Benchmark X, and how did you verify that the evaluation data did not leak into the models' training or fine-tuning datasets?"
     }
   ],
   "audits": [
     {
       "claim": {
         "id": "claim_1",
-        "claim": "We introduce CappinCheck, an agentic workflow that improves performance by 30% over prior work on real-world tasks.",
+        "claim": "improves performance by 30% over prior work",
         "claim_type": "numeric",
         "source_location": "Abstract",
-        "why_risky": "The results section only shows an improvement from 84.1% to 87.3% on Benchmark X, which is a 3.2% absolute or 3.8% relative improvement. There is no evidence supporting a 30% improvement.",
-        "audit_question": "What is the mathematical basis for the 30% improvement claim, and does it refer to a metric or baseline not presented in the text?"
+        "why_risky": "The results section shows an accuracy increase from 84.1% to 87.3%, which is only a 3.2% absolute improvement or roughly a 20% error reduction, making the 30% improvement claim mathematically unsupported by the provided data.",
+        "audit_question": "What specific metric and prior work baseline were used to calculate the 30% performance improvement, and where is this data presented in the paper?"
       },
       "verdict": "contradicted",
       "vibe": "cap",
       "confidence": "high",
-      "cap_score": 95,
-      "why": "The claim of a 30% performance improvement is mathematically contradicted by the paper's results, which show only a 3.2% absolute (3.8% relative) improvement on Benchmark X (87.3% vs 84.1%). Furthermore, the assertion of evaluating on 'real-world tasks' and improving over 'prior work' is directly contradicted by the authors' admissions that they did not evaluate prospective real-world deployments and did not conduct an external literature search for prior work.",
-      "weaker_supported_rewrite": "We introduce CappinCheck, an agentic workflow that improves performance by 3.2% absolute (3.8% relative) over a baseline claim-review pipeline on Benchmark X.",
+      "cap_score": 90,
+      "why": "The claim of a 30% performance improvement over prior work is mathematically contradicted by the paper's own empirical results. The actual data presented on Benchmark X shows CappinCheck achieving 87.3% accuracy compared to a baseline of 84.1%, which translates to a 3.2 percentage point absolute increase, a 3.8% relative accuracy improvement, or a 20.1% relative error rate reduction. None of these calculations yield 30%. Furthermore, the authors state they did not conduct an external literature search, meaning the claim of beating 'prior work' lacks foundational evidence.",
+      "weaker_supported_rewrite": "improves relative performance accuracy by 3.8% (or reduces the error rate by 20.1%) on Benchmark X compared to a baseline claim-review pipeline",
       "supporting_evidence": [],
       "counter_evidence": [
         {
           "source_title": "Demo Paper: CappinCheck for Agentic Claim Audits",
-          "url": "examples/demo_document.md",
-          "date": null,
-          "snippet": "We compare CappinCheck against a baseline claim-review pipeline on Benchmark X. The baseline system achieves 84.1% on the benchmark. CappinCheck achieves 87.3% on the same benchmark.",
-          "relevance": "Provides the actual performance comparison, showing a 3.2% absolute or 3.8% relative improvement, which directly contradicts the claimed 30%."
-        },
-        {
-          "source_title": "Demo Paper: CappinCheck for Agentic Claim Audits - Discussion",
           "url": null,
           "date": null,
-          "snippet": "The benchmark contains curated technical claims from public documents. We did not evaluate prospective real-world deployment, clinical documents, legal documents, or private enterprise workflows.",
-          "relevance": "Directly contradicts the claim that the system was tested on real-world tasks."
+          "snippet": "We compare CappinCheck against a baseline claim-review pipeline on Benchmark X. The baseline system achieves 84.1% on the benchmark. CappinCheck achieves 87.3% on the same benchmark. | System | Benchmark X accuracy | | --- | ---: | | Baseline | 84.1% | | CappinCheck | 87.3% |",
+          "relevance": "Provides the actual benchmark results which directly contradict the claimed 30% improvement, showing only a 3.2 percentage point absolute improvement (3.8% relative accuracy improvement, or 20.1% error reduction)."
         },
         {
-          "source_title": "Demo Paper: CappinCheck for Agentic Claim Audits - Discussion",
+          "source_title": "Demo Paper: CappinCheck for Agentic Claim Audits",
           "url": null,
           "date": null,
           "snippet": "We did not run an external literature search for prior scientific fact-checking or claim-audit systems.",
-          "relevance": "Undermines the claim of improving over prior work as no literature search was performed to verify prior art."
+          "relevance": "Reveals that the comparison baseline may not represent actual state-of-the-art scientific claim-auditing systems, undermining the 'prior work' claim scope."
         }
       ],
       "missing_context": [
-        "The mathematical basis for the 30% improvement claim is completely absent from the text.",
-        "No evaluation or metrics for real-world tasks other than Benchmark X are presented.",
-        "The text lacks any explanation of what prior work was compared against, other than a single baseline pipeline."
+        "The specific baseline, task, or metric that shows a 30% improvement over prior work is completely missing from the paper.",
+        "The paper does not provide the formula, metric, or justification used to calculate the 30% performance improvement figure.",
+        "The exact specifications, architecture, and source of the 'baseline claim-review pipeline' are not documented.",
+        "The paper lacks any other performance evaluations or external comparisons besides the Benchmark X comparison."
       ],
       "numeric_findings": [
-        "Baseline accuracy on Benchmark X: 84.1%",
-        "CappinCheck accuracy on Benchmark X: 87.3%",
-        "Absolute accuracy improvement: 3.2 percentage points",
-        "Relative accuracy improvement: ~3.8%",
-        "Relative error rate reduction: ~20.1%",
-        "Claimed performance improvement: 30%"
+        "Claimed performance improvement: 30%",
+        "Baseline Benchmark X accuracy: 84.1%",
+        "CappinCheck Benchmark X accuracy: 87.3%",
+        "Absolute difference: 3.2 percentage points (87.3% - 84.1%)",
+        "Relative accuracy improvement: 3.8% (3.2 / 84.1)",
+        "Baseline error rate: 15.9%",
+        "CappinCheck error rate: 12.7%",
+        "Relative error rate reduction: 20.1% (3.2 / 15.9)",
+        "Detected benchmark rows: Baseline = 84.1%, CappinCheck = 87.3%.",
+        "Absolute gain: 87.3 - 84.1 = 3.2 percentage points.",
+        "Relative gain: (3.2 / 84.1) * 100 = 3.8%.",
+        "Claimed improvement is 30.0%; computed relative improvement is 3.8% (difference 26.2 points)."
       ]
     }
   ]

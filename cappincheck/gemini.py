@@ -7,10 +7,23 @@ from typing import TypeVar
 
 from google import genai
 from google.genai import types
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 
 T = TypeVar("T", bound=BaseModel)
+
+
+class StructuredResponseError(RuntimeError):
+    def __init__(self, *, model: str, schema_name: str, raw_output: str, cause: Exception) -> None:
+        preview = raw_output[:1000] if raw_output else "<empty response>"
+        super().__init__(
+            f"Gemini returned invalid JSON for schema {schema_name} using model {model}.\n"
+            f"Cause: {cause}\n"
+            f"Raw output preview:\n{preview}\n\n"
+            "Try the deterministic fallback:\n"
+            "  cappincheck audit examples/demo_document.md --mock --out examples/demo_report.md "
+            "--json examples/demo_report.json --html examples/demo_report.html"
+        )
 
 
 class GeminiClient:
@@ -42,9 +55,65 @@ class GeminiClient:
             config=config,
         )
         if hasattr(response, "parsed") and response.parsed is not None:
-            return response.parsed
+            return _attach_grounding(response.parsed, response)
         text = response.text or "{}"
-        return schema.model_validate(json.loads(text))
+        try:
+            parsed = schema.model_validate(json.loads(text))
+        except (json.JSONDecodeError, ValidationError) as exc:
+            parsed = self._repair_structured(text, schema, exc)
+        return _attach_grounding(parsed, response)
+
+    def structured_interaction(
+        self,
+        *,
+        input_text: str,
+        system_instruction: str,
+        schema: type[T],
+        tools: bool = True,
+    ) -> T:
+        response = self.client.interactions.create(
+            input=input_text,
+            model=self.model,
+            system_instruction=system_instruction,
+            tools=_interaction_tools() if tools else None,
+            timeout=int(os.getenv("CAPPINCHECK_TIMEOUT_SECONDS", "90")),
+        )
+        text = _interaction_text(response)
+        try:
+            return schema.model_validate(json.loads(text))
+        except (json.JSONDecodeError, ValidationError) as exc:
+            return self._repair_structured(text, schema, exc)
+
+    def _repair_structured(self, raw_output: str, schema: type[T], cause: Exception) -> T:
+        repair_prompt = f"""
+Repair the following model output so it is valid JSON matching the {schema.__name__} schema.
+Return only the repaired JSON. Do not add markdown.
+
+RAW OUTPUT:
+{raw_output[:8000]}
+"""
+        try:
+            repaired = self.client.models.generate_content(
+                model=self.model,
+                contents=repair_prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=schema,
+                    http_options=types.HttpOptions(
+                        timeout=int(os.getenv("CAPPINCHECK_TIMEOUT_SECONDS", "90")) * 1000
+                    ),
+                ),
+            )
+            if hasattr(repaired, "parsed") and repaired.parsed is not None:
+                return repaired.parsed
+            return schema.model_validate(json.loads(repaired.text or "{}"))
+        except Exception as repair_exc:
+            raise StructuredResponseError(
+                model=self.model,
+                schema_name=schema.__name__,
+                raw_output=raw_output,
+                cause=repair_exc or cause,
+            ) from repair_exc
 
 
 def _load_dotenv() -> None:
@@ -59,3 +128,64 @@ def _load_dotenv() -> None:
         key = key.strip()
         value = value.strip().strip('"').strip("'")
         os.environ.setdefault(key, value)
+
+
+def _attach_grounding(parsed: T, response: object) -> T:
+    """Best-effort metadata capture; skill prompts still own claim-specific citations."""
+    try:
+        from .schemas import AgentAudit, EvidenceItem
+    except Exception:
+        return parsed
+
+    if not isinstance(parsed, AgentAudit):
+        return parsed
+
+    for item in _grounding_items(response):
+        if item.url and not any(existing.url == item.url for existing in parsed.supporting_evidence):
+            parsed.supporting_evidence.append(item)
+    return parsed
+
+
+def _grounding_items(response: object) -> list[object]:
+    from .schemas import EvidenceItem
+
+    items: list[EvidenceItem] = []
+    for candidate in getattr(response, "candidates", []) or []:
+        metadata = getattr(candidate, "grounding_metadata", None) or getattr(candidate, "groundingMetadata", None)
+        chunks = getattr(metadata, "grounding_chunks", None) or getattr(metadata, "groundingChunks", None) or []
+        for chunk in chunks:
+            web = getattr(chunk, "web", None)
+            if not web:
+                continue
+            uri = getattr(web, "uri", None)
+            title = getattr(web, "title", None) or "Grounded source"
+            if uri:
+                items.append(
+                    EvidenceItem(
+                        source_title=title,
+                        url=uri,
+                        snippet="Source returned by Gemini grounding metadata.",
+                        relevance="Grounding source used during specialist audit.",
+                    )
+                )
+    return items
+
+
+def _interaction_tools() -> list[dict[str, object]]:
+    return [
+        {"type": "google_search", "search_types": ["web_search"]},
+        {"type": "url_context"},
+        {"type": "code_execution"},
+    ]
+
+
+def _interaction_text(response: object) -> str:
+    chunks: list[str] = []
+    for step in getattr(response, "steps", []) or []:
+        if getattr(step, "type", None) != "model_output":
+            continue
+        for content in getattr(step, "content", []) or []:
+            text = getattr(content, "text", None)
+            if text:
+                chunks.append(text)
+    return "\n".join(chunks).strip()

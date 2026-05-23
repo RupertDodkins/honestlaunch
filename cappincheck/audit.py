@@ -4,6 +4,7 @@ import asyncio
 from pydantic import BaseModel, Field
 
 from .gemini import GeminiClient
+from .numeric import calibrate_numeric_claim
 from .schemas import AgentAudit, ClaimAudit, Document, EvidenceItem, RiskyClaim, Verdict
 from .skills import load_skill
 
@@ -22,35 +23,35 @@ async def audit_claims(
     *,
     mock: bool,
     limit: int = 5,
+    runtime: str = "local",
 ) -> list[ClaimAudit]:
+    if runtime not in {"local", "managed"}:
+        raise ValueError("runtime must be local or managed")
     selected = claims[:limit]
     if mock:
         return [_mock_audit(claim) for claim in selected]
 
-    per_claim = await asyncio.gather(*[_audit_one(document, claim) for claim in selected])
+    per_claim = await asyncio.gather(*[_audit_one(document, claim, runtime=runtime) for claim in selected])
     return list(per_claim)
 
 
-async def _audit_one(document: Document, claim: RiskyClaim) -> ClaimAudit:
+async def _audit_one(document: Document, claim: RiskyClaim, *, runtime: str) -> ClaimAudit:
     print(f"Auditing {claim.id}: {claim.claim[:90]}")
     agent_results = await asyncio.gather(
-        _run_skill("verifier", document, claim),
-        _run_skill("contradiction-finder", document, claim),
-        _run_skill("numeric-calibrator", document, claim),
+        _run_skill("verifier", document, claim, runtime=runtime),
+        _run_skill("contradiction-finder", document, claim, runtime=runtime),
+        _run_skill("numeric-calibrator", document, claim, runtime=runtime),
     )
     print(f"Aggregating {claim.id}")
-    return await _aggregate(document, claim, list(agent_results))
+    aggregated = await _aggregate(document, claim, list(agent_results), runtime=runtime)
+    return _merge_numeric_calibration(document, aggregated)
 
 
-async def _run_skill(skill_name: str, document: Document, claim: RiskyClaim) -> AgentAudit:
+async def _run_skill(skill_name: str, document: Document, claim: RiskyClaim, *, runtime: str) -> AgentAudit:
     print(f"  Running {skill_name} for {claim.id}")
     skill = load_skill(skill_name)
     client = GeminiClient()
     prompt = f"""
-{skill}
-
-Return only JSON matching the AgentAudit schema.
-
 Document title: {document.title}
 Document source: {document.source}
 
@@ -62,10 +63,28 @@ Audit question: {claim.audit_question}
 Relevant document text:
 {document.text[:50000]}
 """
-    return await asyncio.to_thread(client.structured, prompt, AgentAudit)
+    if runtime == "managed":
+        return await asyncio.to_thread(
+            client.structured_interaction,
+            input_text=prompt,
+            system_instruction=f"{skill}\n\nReturn only JSON matching the AgentAudit schema.",
+            schema=AgentAudit,
+            tools=True,
+        )
+    return await asyncio.to_thread(
+        client.structured,
+        f"{skill}\n\nReturn only JSON matching the AgentAudit schema.\n\n{prompt}",
+        AgentAudit,
+    )
 
 
-async def _aggregate(document: Document, claim: RiskyClaim, audits: list[AgentAudit]) -> ClaimAudit:
+async def _aggregate(
+    document: Document,
+    claim: RiskyClaim,
+    audits: list[AgentAudit],
+    *,
+    runtime: str,
+) -> ClaimAudit:
     skill = load_skill("claim-aggregator")
     client = GeminiClient()
     audit_json = "\n".join(audit.model_dump_json(indent=2) for audit in audits)
@@ -83,6 +102,14 @@ Claim:
 Specialist agent results:
 {audit_json}
 """
+    if runtime == "managed":
+        return await asyncio.to_thread(
+            client.structured_interaction,
+            input_text=prompt,
+            system_instruction=f"{skill}\n\nReturn only JSON matching the ClaimAudit schema.",
+            schema=ClaimAudit,
+            tools=False,
+        )
     return await asyncio.to_thread(client.structured, prompt, ClaimAudit)
 
 
@@ -137,3 +164,16 @@ def _mock_audit(claim: RiskyClaim) -> ClaimAudit:
         missing_context=["Additional external grounding would be needed for a production verdict."],
         numeric_findings=[],
     )
+
+
+def _merge_numeric_calibration(document: Document, audit: ClaimAudit) -> ClaimAudit:
+    calibration = calibrate_numeric_claim(document.text, audit.claim)
+    if calibration is None:
+        return audit
+    existing = set(audit.numeric_findings)
+    for finding in calibration.findings:
+        if finding not in existing:
+            audit.numeric_findings.append(finding)
+    if calibration.suggested_rewrite and audit.verdict == Verdict.OVERSTATED:
+        audit.weaker_supported_rewrite = calibration.suggested_rewrite
+    return audit

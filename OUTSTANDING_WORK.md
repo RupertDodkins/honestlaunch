@@ -23,6 +23,19 @@ open examples/demo_report.html
   - Local async Gemini runner that loads the skill files.
   - Mock mode with deterministic numeric-stretch demo.
   - Real Gemini path requests Google Search, URL Context, and Code Execution tools.
+  - Experimental managed runtime is available with `--runtime managed` via Google GenAI Interactions API.
+
+## Completion Snapshot
+
+- Done: live Gemini path verified on `examples/demo_document.md`.
+- Done: malformed JSON repair path and CLI failure context added.
+- Done: best-effort grounding metadata capture added for standard Gemini responses.
+- Done: deterministic numeric calibration helper added and verified.
+- Done: `--runtime managed` experimental Interactions path added and verified on one demo claim.
+- Done: static dashboard filters, source links, and claim-strength UI added.
+- Done: README/RUNTIME docs updated to describe local default and managed beta caveat.
+- Remaining optional: choose a stronger real public source and pre-generate a stable report when network/API latency permits.
+  - Managed Agents are documented as a future adapter boundary in `RUNTIME.md`; they are not the current runtime.
 
 ## Non-Negotiables
 
@@ -31,6 +44,7 @@ open examples/demo_report.html
 - Do not add user accounts, auth, database, or a hosted backend.
 - Prefer a reliable CLI + static report over a fragile app.
 - Every step below must include a local verification command and a short note of the result.
+- Keep README public-demo language accurate: local async Gemini runtime now, Managed Agents adapter later.
 
 ## Step 1: Verify Real Gemini Path
 
@@ -151,11 +165,12 @@ Tasks:
   - local runner is the fallback
   - where the Managed Agents adapter should plug in
   - exact current blocker
+  - README must not claim Managed Agents are currently executing audits.
 
 Verification criteria:
 
 - `cappincheck audit ... --runtime local` works.
-- If implemented, `cappincheck audit ... --runtime managed` works on the demo document.
+- `cappincheck audit ... --runtime managed` works on the demo document.
 - If not implemented, `RUNTIME.md` is specific enough that another agent can add the adapter without rediscovering the architecture.
 - README does not overclaim Managed Agents execution if only local runtime is available.
 
@@ -183,6 +198,7 @@ Verification criteria:
 - README points to both:
   - deterministic mock fixture
   - real public example
+  - current placeholder: `examples/real_public_example.md`
 
 ## Step 7: Dashboard Polish
 
@@ -219,7 +235,7 @@ Tasks:
 Suggested commands:
 
 ```bash
-rg -n "AIza|GEMINI_API_KEY=|OPENAI_API_KEY=|secret|password|token" .
+rg -n "AIza[0-9A-Za-z_-]+|gho_[0-9A-Za-z_]+" . --glob '!/.env' --glob '!/.venv/**' --glob '!/.git/**'
 git status --short
 ```
 

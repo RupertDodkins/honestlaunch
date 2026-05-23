@@ -6,9 +6,9 @@ CappinCheck reads a paper, model report, technical blog post, or other dense exp
 
 It is not a paper summarizer. The output is a claim ledger: original wording, formal verdict, evidence, counter-evidence, cap score, and the strongest defensible rewrite.
 
-## Why Gemini 3.5 Flash
+## Why Low-Latency Gemini
 
-Before Gemini 3.5 Flash and Managed Agents, running multiple grounded subagents in parallel sandboxes, each browsing the web, executing code, and grading a single claim, would have cost dollars and minutes per audit. Today it costs cents and seconds, which is what makes a live claim ledger possible.
+Before low-latency Gemini models, running multiple grounded specialist passes over the same document would have cost dollars and minutes per audit. Today it can be fast enough for a live claim ledger.
 
 This repo is structured around agent skills:
 
@@ -17,7 +17,7 @@ This repo is structured around agent skills:
 - `skills/numeric-calibrator/SKILL.md`: checks percentages, deltas, units, and table math.
 - `skills/claim-aggregator/SKILL.md`: turns evidence into verdicts and rewrites.
 
-The initial implementation includes a local async runner that loads those same skills. It can be swapped for Managed Agents / Interactions API without changing the public artifact.
+The supported default implementation is a local async Gemini runner that loads those same `SKILL.md` files. An experimental `--runtime managed` path uses Google GenAI Interactions; see `RUNTIME.md` for the runtime boundary and caveats.
 
 ## Quickstart
 
@@ -35,12 +35,30 @@ cappincheck audit examples/demo_document.md --mock --out examples/demo_report.md
 open examples/demo_report.html
 ```
 
+The deterministic fixture is `examples/demo_document.md`; use `--mock` for public demos when API access is unavailable or live grounding is flaky.
+
 Run with Gemini:
 
 ```bash
 export GEMINI_API_KEY=...
 cappincheck audit examples/demo_document.md --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
 ```
+
+Run the experimental managed runtime:
+
+```bash
+cappincheck audit examples/demo_document.md --runtime managed --limit 1 --out examples/managed_report.md --json examples/managed_report.json --html examples/managed_report.html
+```
+
+For a real/public source placeholder that avoids copying copyrighted text into the repo, see `examples/real_public_example.md`.
+
+## Demo Script
+
+1. Run the deterministic mock command above.
+2. Open `examples/demo_report.html`.
+3. Point out the claim ledger: verdict, cap score, evidence, missing context, and rewrite.
+4. Highlight the numeric calibration row: the source says `84.1%` to `87.3%`, so the defensible improvement is `3.2` points / `3.8%` relative, not `30%`.
+5. If `GEMINI_API_KEY` is available, rerun without `--mock` and compare the live grounded report to the deterministic fallback.
 
 ## Output
 
@@ -55,6 +73,8 @@ Each audited claim includes:
 - Counter-evidence and missing context
 - Strongest defensible rewrite
 
-## Safety and Scope
+## Limitations
 
 CappinCheck does not prove that a paper is true or false. It identifies claims whose wording may outrun the available evidence. It should be used as a triage and review aid, not as an authority.
+
+The default runtime is local async Gemini execution over repo-local skill files. The experimental managed runtime depends on beta Interactions API availability and JSON normalization from managed interaction output. Live output depends on model availability, tool support, and grounding quality. The `--mock` path is intentionally deterministic so public demos can run without secrets or network access.
