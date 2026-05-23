@@ -76,17 +76,25 @@ def write_html(report: AuditReport, path: Path) -> None:
     }}
     h1 {{ margin: 0; font-size: 24px; letter-spacing: 0; }}
     main {{
-      display: grid;
-      grid-template-columns: 360px minmax(0, 1fr) 380px;
       min-height: calc(100vh - 74px);
     }}
-    aside, section {{ padding: 18px; border-right: 1px solid var(--line); }}
+    .claim-strip {{
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: var(--bg);
+    }}
+    .report-grid {{
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 380px;
+      min-height: calc(100vh - 250px);
+    }}
+    section {{ padding: 18px; border-right: 1px solid var(--line); }}
     section:last-child {{ border-right: 0; }}
     .filters {{
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(180px, 260px);
       gap: 10px;
-      margin: 14px 0;
+      margin: 0 0 12px;
     }}
     label {{
       display: grid;
@@ -110,22 +118,14 @@ def write_html(report: AuditReport, path: Path) -> None:
       border: 1px solid var(--line);
       border-radius: 8px;
       padding: 12px;
-      margin-bottom: 10px;
       cursor: pointer;
       overflow-wrap: anywhere;
     }}
     .claim-row.active {{ border-color: var(--ink); box-shadow: 0 0 0 2px rgba(31,35,40,.08); }}
-    .extracted-row {{
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 8px;
-      overflow-wrap: anywhere;
-    }}
-    .extracted-row .claim-text {{
-      font-weight: 700;
-      margin: 4px 0;
+    #claim-list {{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
     }}
     .claim-meta {{
       display: flex;
@@ -283,8 +283,8 @@ def write_html(report: AuditReport, path: Path) -> None:
       font-weight: 800;
     }}
     @media (max-width: 980px) {{
-      main {{ grid-template-columns: 1fr; }}
-      aside, section {{ border-right: 0; border-bottom: 1px solid var(--line); }}
+      .report-grid {{ grid-template-columns: 1fr; }}
+      section {{ border-right: 0; border-bottom: 1px solid var(--line); }}
       .strength-grid {{ grid-template-columns: 1fr; }}
     }}
   </style>
@@ -298,15 +298,10 @@ def write_html(report: AuditReport, path: Path) -> None:
     <div class="muted">{len(report.audits)} audited claims · {html.escape(report.mode)} · {html.escape(report.runtime)}</div>
   </header>
   <main>
-    <aside>
-      <details class="extraction-panel" open>
-        <summary>1. Claim Extraction</summary>
-        <p class="muted">Gemini identifies risky factual claims before any verification runs.</p>
-        <div id="extracted-claims"></div>
-      </details>
+    <div class="claim-strip">
       <div class="title-row">
-        <h2>2. Claim Ledger</h2>
-        <span class="hint" tabindex="0" data-tip="Each row is an audited claim. Click one to inspect verdict, evidence, contrast, and agent steps.">?</span>
+        <h2>Claim Ledger</h2>
+        <span class="hint" tabindex="0" data-tip="Gemini extracts risky factual claims, then CappinCheck audits the selected claims. Click a card to inspect verdict, evidence, contrast, and agent steps.">?</span>
       </div>
       <div class="filters single">
         <label>Verdict
@@ -316,21 +311,23 @@ def write_html(report: AuditReport, path: Path) -> None:
       </div>
       <p class="muted" id="filter-summary"></p>
       <div id="claim-list"></div>
-    </aside>
-    <section>
-      <div class="title-row">
-        <h2>Selected Claim</h2>
-        <span class="hint" tabindex="0" data-tip="This panel shows the selected claim, CappinCheck verdict, and strongest defensible rewrite.">?</span>
-      </div>
-      <div id="claim-detail"></div>
-    </section>
-    <section>
-      <div class="title-row">
-        <h2>Sources Checked</h2>
-        <span class="hint" tabindex="0" data-tip="Sources checked includes contrast references, supporting evidence, narrowing evidence, and missing context.">?</span>
-      </div>
-      <div id="evidence"></div>
-    </section>
+    </div>
+    <div class="report-grid">
+      <section>
+        <div class="title-row">
+          <h2>Selected Claim</h2>
+          <span class="hint" tabindex="0" data-tip="This panel shows the selected claim, CappinCheck verdict, and strongest defensible rewrite.">?</span>
+        </div>
+        <div id="claim-detail"></div>
+      </section>
+      <section>
+        <div class="title-row">
+          <h2>Sources Checked</h2>
+          <span class="hint" tabindex="0" data-tip="Sources checked includes contrast references, supporting evidence, narrowing evidence, and missing context.">?</span>
+        </div>
+        <div id="evidence"></div>
+      </section>
+    </div>
   </main>
   <script>
     const report = {data};
@@ -359,7 +356,6 @@ def write_html(report: AuditReport, path: Path) -> None:
       .filter(audit => filters.verdict === 'all' || audit.verdict === filters.verdict);
     function setupFilters() {{
       fillSelect('verdict-filter', 'All verdicts', [...new Set(report.audits.map(audit => audit.verdict))]);
-      renderExtractedClaims();
     }}
     function fillSelect(id, allLabel, values) {{
       document.getElementById(id).innerHTML = [
@@ -377,10 +373,11 @@ def write_html(report: AuditReport, path: Path) -> None:
       document.getElementById('claim-list').innerHTML = audits.map((audit, i) => `
         <button class="claim-row ${{audit.__index === selected ? 'active' : ''}}" onclick="selected=${{audit.__index}}; render();">
           <div class="claim-meta">
-            <span class="muted">${{esc(audit.verdict)}} · ${{esc(audit.claim.claim_type)}}</span>
+            <span class="muted">${{esc(audit.verdict)}} · ${{esc(audit.claim.claim_type)}} · score ${{audit.stretch_score}}/100</span>
           </div>
           <div class="wrap">${{esc(audit.claim.claim)}}</div>
           <div class="meter ${{cls(audit.verdict)}}" title="Stretch score ${{audit.stretch_score}} / 100"><div style="width: ${{audit.stretch_score}}%"></div></div>
+          <p class="muted wrap">${{esc(audit.claim.why_risky || '')}}</p>
         </button>
       `).join('');
       if (!audits.length) {{
@@ -426,39 +423,6 @@ def write_html(report: AuditReport, path: Path) -> None:
         <div class="panel"><h3>Contradictions / Narrowing Evidence</h3>${{items(audit.counter_evidence)}}</div>
         <div class="panel"><h3>Missing Context</h3>${{list(audit.missing_context)}}</div>
       `;
-    }}
-    function renderExtractedClaims() {{
-      const auditedById = new Map((report.audits || []).map((audit, index) => [audit.claim.id, {{ audit, index }}]));
-      document.getElementById('extracted-claims').innerHTML = (report.claims || []).map((claim, index) => {{
-        const audited = auditedById.get(claim.id);
-        const riskScore = claimRiskScore(claim, audited?.audit);
-        const status = audited ? `audited as ${{esc(audited.audit.verdict)}}` : 'extracted only';
-        return `
-          <div class="extracted-row">
-            <div class="claim-meta">
-              <span class="muted">#${{index + 1}} · ${{esc(claim.claim_type)}} · risk ${{riskScore}}/100</span>
-            </div>
-            <div class="wrap claim-text">${{esc(claim.claim)}}</div>
-            <div class="meter ${{audited ? cls(audited.audit.verdict) : ''}}" title="Extraction risk score ${{riskScore}} / 100"><div style="width: ${{riskScore}}%"></div></div>
-            <p class="muted wrap">${{status}} · ${{esc(claim.why_risky || '')}}</p>
-          </div>
-        `;
-      }}).join('');
-    }}
-    function claimRiskScore(claim, audit) {{
-      if (audit) return audit.stretch_score;
-      const base = {{
-        numeric: 82,
-        novelty: 78,
-        safety: 76,
-        generalization: 72,
-        causal: 70,
-        benchmark: 68,
-        deployment: 62,
-        citation_stretch: 72,
-        other: 50
-      }}[claim.claim_type] ?? 50;
-      return Math.max(0, Math.min(100, base));
     }}
     function strengthCard(label, value, verdict, display, tip) {{
       return `
