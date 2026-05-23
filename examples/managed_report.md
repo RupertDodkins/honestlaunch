@@ -4,25 +4,24 @@ Source: `examples/demo_document.md`
 
 | Claim | Vibe | Formal Verdict | Cap Score | Confidence |
 | --- | --- | --- | ---: | --- |
-| We introduce CappinCheck, an agentic workflow that improves performance by 30% over prior work on real-world tasks. | cap | contradicted | 90 | high |
+| improves performance by 30% over prior work | cap | overstated | 87 | high |
 
-## claim_01: cap / contradicted
+## claim_1: cap / overstated
 
-**Original:** We introduce CappinCheck, an agentic workflow that improves performance by 30% over prior work on real-world tasks.
+**Original:** improves performance by 30% over prior work
 
-**Cap Score:** 90/100
+**Cap Score:** 87/100
 
-**Why:** The claim of a 30% performance improvement over prior work on real-world tasks is contradicted by the evaluation. The paper reports only a 3.2% absolute (3.8% relative) accuracy improvement over a single local baseline on Benchmark X, with no evaluation of real-world tasks or comparison to prior established literature.
+**Why:** The claim of a 30% performance improvement is mathematically irreconcilable with the actual results presented in the paper. The baseline system achieves 84.1% accuracy and CappinCheck achieves 87.3% accuracy on Benchmark X. This represents a 3.2 percentage point absolute increase, a ~3.8% relative accuracy improvement, or a ~20.1% relative reduction in the error rate. No standard mathematical formulation supports the 30% figure.
 
-**Defensible rewrite:** We introduce CappinCheck, an agentic workflow that achieves a 3.2% absolute accuracy improvement (increasing performance from 84.1% to 87.3%) over a local baseline pipeline on Benchmark X.
+**Defensible rewrite:** CappinCheck improves from 84.1% to 87.3% versus Baseline, a 3.2-point absolute gain and 3.8% relative improvement.
 
 **Numeric findings:**
-- Baseline accuracy: 84.1%
+- Baseline system accuracy: 84.1%
 - CappinCheck accuracy: 87.3%
-- Actual absolute improvement: 3.2%
-- Actual relative accuracy improvement: 3.8%
-- Relative reduction in error rate: 20.13% (from 15.9% to 12.7%)
-- Claimed performance improvement: 30%
+- Absolute accuracy improvement: 3.2 percentage points (87.3% - 84.1%)
+- Relative accuracy improvement: ~3.8% ((87.3 - 84.1) / 84.1)
+- Relative error rate reduction: ~20.1% ((15.9 - 12.7) / 15.9)
 - Detected benchmark rows: Baseline = 84.1%, CappinCheck = 87.3%.
 - Absolute gain: 87.3 - 84.1 = 3.2 percentage points.
 - Relative gain: (3.2 / 84.1) * 100 = 3.8%.
@@ -30,10 +29,7 @@ Source: `examples/demo_document.md`
 
 **Counter-evidence:**
 - We compare CappinCheck against a baseline claim-review pipeline on Benchmark X. The baseline system achieves 84.1% on the benchmark. CappinCheck achieves 87.3% on the same benchmark. (Demo Paper: CappinCheck for Agentic Claim Audits)
-- We did not evaluate prospective real-world deployment, clinical documents, legal documents, or private enterprise workflows. (Demo Paper: CappinCheck for Agentic Claim Audits)
-- We did not run an external literature search for prior scientific fact-checking or claim-audit systems. (Demo Paper: CappinCheck for Agentic Claim Audits)
 
 **Missing context:**
-- The evaluation was restricted entirely to public technical claims curated within a static dataset (Benchmark X) with no prospective, clinical, legal, or live real-world deployment.
-- The baseline pipeline used for comparison is undefined, making it impossible to assess if it represents a strong modern competitor.
+- There is no mathematical explanation, alternative metric definition, or prior baseline in the text that justifies how the 30% improvement figure was calculated.
 

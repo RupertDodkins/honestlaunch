@@ -69,7 +69,7 @@ Relevant document text:
             input_text=prompt,
             system_instruction=f"{skill}\n\nReturn only JSON matching the AgentAudit schema.",
             schema=AgentAudit,
-            tools=True,
+            tools=skill_name != "numeric-calibrator",
         )
     return await asyncio.to_thread(
         client.structured,

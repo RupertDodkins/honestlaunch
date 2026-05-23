@@ -71,18 +71,38 @@ class GeminiClient:
         schema: type[T],
         tools: bool = True,
     ) -> T:
-        response = self.client.interactions.create(
+        try:
+            response = self._create_interaction(
+                input_text=input_text,
+                system_instruction=system_instruction,
+                tools=tools,
+            )
+        except Exception as exc:
+            if not tools or "too many tool calls" not in str(exc).lower():
+                raise
+            response = self._create_interaction(
+                input_text=(
+                    "The previous managed interaction used too many tool calls. "
+                    "Retry with at most one web/search/url tool call, then return JSON from available evidence.\n\n"
+                    f"{input_text}"
+                ),
+                system_instruction=system_instruction,
+                tools=False,
+            )
+        text = _interaction_text(response)
+        try:
+            return schema.model_validate(json.loads(text))
+        except (json.JSONDecodeError, ValidationError) as exc:
+            return self._repair_structured(text, schema, exc)
+
+    def _create_interaction(self, *, input_text: str, system_instruction: str, tools: bool) -> object:
+        return self.client.interactions.create(
             input=input_text,
             model=self.model,
             system_instruction=system_instruction,
             tools=_interaction_tools() if tools else None,
             timeout=int(os.getenv("CAPPINCHECK_TIMEOUT_SECONDS", "90")),
         )
-        text = _interaction_text(response)
-        try:
-            return schema.model_validate(json.loads(text))
-        except (json.JSONDecodeError, ValidationError) as exc:
-            return self._repair_structured(text, schema, exc)
 
     def _repair_structured(self, raw_output: str, schema: type[T], cause: Exception) -> T:
         repair_prompt = f"""
