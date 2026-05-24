@@ -6,6 +6,12 @@ CappinCheck reads an AI model report, paper, technical blog post, or other dense
 
 It is not a paper summarizer. The output is a claim ledger: original wording, formal verdict, evidence contrast against references, collapsible agent steps, supporting evidence found, contradictions or narrowing evidence, missing context, computed checks when relevant, and the strongest defensible rewrite.
 
+## Hackathon Submission
+
+CappinCheck was built as a submission to the [Google I/O Hackathon](https://cerebralvalley.ai/e/google-io-hackathon), hosted by Cerebral Valley with the Google DeepMind team.
+
+The project was shaped around the event prompt for Gemini 3.5 Flash: build something new for the agentic era that benefits from fast, low-cost multi-step reasoning. Rather than shipping another chat interface or RAG wrapper, CappinCheck uses parallel Gemini specialist agents to audit dense public AI model reports and launch posts, compare claims against references, and rewrite overstated claims into wording that is still strong but actually defensible.
+
 ## Why Low-Latency Gemini
 
 Before low-latency Gemini models, running multiple grounded specialist passes over the same document would have cost dollars and minutes per audit. Today it can be fast enough for a live claim ledger.
