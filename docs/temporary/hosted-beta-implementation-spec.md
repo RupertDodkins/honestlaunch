@@ -66,12 +66,12 @@ Recommendation:
 
 Backend audit pipeline: `Yes`
 
-- CLI entry: `cappincheck/cli.py`
-- document fetch and normalization: `cappincheck/ingest.py`
-- source snapshot extraction: `cappincheck/source_snapshot.py`
-- claim extraction and audit: `cappincheck/claims.py`, `cappincheck/audit.py`
-- audited launch-page enrichment: `cappincheck/anchor_map.py`, `cappincheck/citations.py`
-- static HTML output: `cappincheck/report.py`
+- CLI entry: `honestlaunch/cli.py`
+- document fetch and normalization: `honestlaunch/ingest.py`
+- source snapshot extraction: `honestlaunch/source_snapshot.py`
+- claim extraction and audit: `honestlaunch/claims.py`, `honestlaunch/audit.py`
+- audited launch-page enrichment: `honestlaunch/anchor_map.py`, `honestlaunch/citations.py`
+- static HTML output: `honestlaunch/report.py`
 
 Hosted job orchestration: `No`
 
@@ -209,7 +209,7 @@ Cloud Storage objects:
 
 Add one shared pipeline module so CLI and web use the same logic:
 
-- new `cappincheck/pipeline.py`
+- new `honestlaunch/pipeline.py`
 
 Suggested interface:
 
@@ -231,7 +231,7 @@ def run_audit_pipeline(
 
 The hosted worker should also call this module.
 
-Do not shell out to `python -m cappincheck.cli` from the web app.
+Do not shell out to `python -m honestlaunch.cli` from the web app.
 
 ## Backend API
 
@@ -525,7 +525,7 @@ Suggested first presets:
 
 Mechanism:
 
-- new `cappincheck/reference_presets.py`
+- new `honestlaunch/reference_presets.py`
 
 Suggested interface:
 
@@ -613,7 +613,7 @@ Monetization path later, if needed:
 
 ### Phase 1: Shared Pipeline Refactor
 
-- add `cappincheck/pipeline.py`
+- add `honestlaunch/pipeline.py`
 - move non-CLI orchestration out of `cli.py`
 - verify CLI still works
 

@@ -21,7 +21,7 @@ class StructuredResponseError(RuntimeError):
             f"Cause: {cause}\n"
             f"Raw output preview:\n{preview}\n\n"
             "Try the deterministic fallback:\n"
-            "  cappincheck audit examples/demo_document.md --mock --out examples/demo_report.md "
+            "  honestlaunch audit examples/demo_document.md --mock --out examples/demo_report.md "
             "--json examples/demo_report.json --html examples/demo_report.html"
         )
 
@@ -36,7 +36,7 @@ class GeminiClient:
         self.model = model or os.getenv("CLAIMLENS_MODEL", "gemini-3.5-flash")
 
     def structured(self, prompt: str, schema: type[T], *, tools: bool = True) -> T:
-        timeout_seconds = int(os.getenv("CAPPINCHECK_TIMEOUT_SECONDS", "90"))
+        timeout_seconds = int(os.getenv("HONESTLAUNCH_TIMEOUT_SECONDS", "90"))
         config = types.GenerateContentConfig(
             http_options=types.HttpOptions(timeout=timeout_seconds * 1000),
             response_mime_type="application/json",
@@ -101,7 +101,7 @@ class GeminiClient:
             model=self.model,
             system_instruction=system_instruction,
             tools=_interaction_tools() if tools else None,
-            timeout=int(os.getenv("CAPPINCHECK_TIMEOUT_SECONDS", "90")),
+            timeout=int(os.getenv("HONESTLAUNCH_TIMEOUT_SECONDS", "90")),
         )
 
     def _repair_structured(self, raw_output: str, schema: type[T], cause: Exception) -> T:
@@ -120,7 +120,7 @@ RAW OUTPUT:
                     response_mime_type="application/json",
                     response_schema=schema,
                     http_options=types.HttpOptions(
-                        timeout=int(os.getenv("CAPPINCHECK_TIMEOUT_SECONDS", "90")) * 1000
+                        timeout=int(os.getenv("HONESTLAUNCH_TIMEOUT_SECONDS", "90")) * 1000
                     ),
                 ),
             )

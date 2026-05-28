@@ -4,13 +4,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from cappincheck.anchor_map import enrich_report_for_launch_page
-from cappincheck.archive_quality import publication_gate, report_metrics
-from cappincheck.archive_registry import publication_info_for_report
-from cappincheck.canonical_hardening import GEMINI_REFERENCE_URLS, harden_report
-from cappincheck.citations import build_tooltip_citations, canonical_source_title
-from cappincheck.report import write_html
-from cappincheck.schemas import (
+from honestlaunch.anchor_map import enrich_report_for_launch_page
+from honestlaunch.archive_quality import publication_gate, report_metrics
+from honestlaunch.archive_registry import publication_info_for_report
+from honestlaunch.canonical_hardening import GEMINI_REFERENCE_URLS, harden_report
+from honestlaunch.citations import build_tooltip_citations, canonical_source_title
+from honestlaunch.report import write_html
+from honestlaunch.schemas import (
     AuditReport,
     ClaimAudit,
     ClaimType,
@@ -23,7 +23,7 @@ from cappincheck.schemas import (
     PublicationInfo,
     Verdict,
 )
-from cappincheck.source_snapshot import build_snapshot_from_html, build_snapshot_from_text
+from honestlaunch.source_snapshot import build_snapshot_from_html, build_snapshot_from_text
 
 
 class AuditedLaunchPageTests(unittest.TestCase):

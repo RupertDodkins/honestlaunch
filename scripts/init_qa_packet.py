@@ -5,7 +5,7 @@ from pathlib import Path
 
 import typer
 
-from cappincheck.research_qa import build_qa_packet
+from honestlaunch.research_qa import build_qa_packet
 
 
 app = typer.Typer(help="Initialize a deep-research QA packet for one archive launch.")

@@ -139,7 +139,7 @@ def audit(
 def _fail_with_context(stage: str, exc: Exception) -> None:
     typer.secho(f"Failed during {stage}: {exc}", fg=typer.colors.RED, err=True)
     typer.echo(
-        "Fallback: cappincheck audit examples/demo_document.md --mock "
+        "Fallback: honestlaunch audit examples/demo_document.md --mock "
         "--out examples/demo_report.md --json examples/demo_report.json "
         "--html examples/demo_report.html",
         err=True,

@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from cappincheck.archive_quality import archive_scorecard, improvement_recommendations, write_scorecard_markdown
+from honestlaunch.archive_quality import archive_scorecard, improvement_recommendations, write_scorecard_markdown
 
 
 ROOT = Path(__file__).resolve().parents[1]

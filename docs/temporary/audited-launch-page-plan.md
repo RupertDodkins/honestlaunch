@@ -38,10 +38,10 @@ Product contract for v1:
 
 Relevant files:
 
-- `cappincheck/ingest.py`
-- `cappincheck/report.py`
-- `cappincheck/schemas.py`
-- `cappincheck/cli.py`
+- `honestlaunch/ingest.py`
+- `honestlaunch/report.py`
+- `honestlaunch/schemas.py`
+- `honestlaunch/cli.py`
 - `examples/index.html`
 - `README.md`
 
@@ -83,22 +83,22 @@ Do not keep expanding `report.py` as one file. Use it as the public orchestratio
 
 Target module split:
 
-- `cappincheck/report.py`
+- `honestlaunch/report.py`
   - keep `write_markdown`, `write_json`, and top-level `write_html`
   - delegate HTML generation to sub-renderers
-- `cappincheck/ingest.py`
+- `honestlaunch/ingest.py`
   - preserve source text and produce a sanitized source snapshot
-- `cappincheck/schemas.py`
+- `honestlaunch/schemas.py`
   - add snapshot, anchor, and tooltip citation models
-- `cappincheck/source_snapshot.py`
+- `honestlaunch/source_snapshot.py`
   - sanitize and normalize fetched HTML into a stable article snapshot
-- `cappincheck/anchor_map.py`
+- `honestlaunch/anchor_map.py`
   - map audited claims onto exact source spans
-- `cappincheck/citations.py`
+- `honestlaunch/citations.py`
   - normalize explicit reference URLs into canonical source titles for UI
-- `cappincheck/report_dashboard.py`
+- `honestlaunch/report_dashboard.py`
   - current claim-ledger HTML surface
-- `cappincheck/report_launch_page.py`
+- `honestlaunch/report_launch_page.py`
   - audited launch-page renderer with inline replacements and tooltips
 
 This split is not required all at once, but it should be the direction of travel.
@@ -173,9 +173,9 @@ Objective:
 
 Files:
 
-- `cappincheck/ingest.py`
-- `cappincheck/schemas.py`
-- new `cappincheck/source_snapshot.py`
+- `honestlaunch/ingest.py`
+- `honestlaunch/schemas.py`
+- new `honestlaunch/source_snapshot.py`
 
 Scope:
 
@@ -199,15 +199,15 @@ Verification criteria:
   - stable title
   - article-like ordered blocks
   - preserved headings, paragraphs, and lists
-- `python -m compileall cappincheck` passes
+- `python -m compileall honestlaunch` passes
 - Existing `--mock` report generation still works
 
 Suggested verification:
 
 ```bash
 source .venv/bin/activate
-python -m compileall cappincheck
-cappincheck audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
+python -m compileall honestlaunch
+honestlaunch audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
 ```
 
 Can be done concurrently:
@@ -227,9 +227,9 @@ Objective:
 
 Files:
 
-- `cappincheck/schemas.py`
-- new `cappincheck/anchor_map.py`
-- possibly `cappincheck/audit.py` if anchors are computed during audit finalization
+- `honestlaunch/schemas.py`
+- new `honestlaunch/anchor_map.py`
+- possibly `honestlaunch/audit.py` if anchors are computed during audit finalization
 
 Scope:
 
@@ -253,7 +253,7 @@ Suggested verification:
 
 ```bash
 source .venv/bin/activate
-cappincheck audit examples/demo_document.md --mock --json examples/demo_report.json --html examples/demo_report.html
+honestlaunch audit examples/demo_document.md --mock --json examples/demo_report.json --html examples/demo_report.html
 ```
 
 Manual checks:
@@ -276,9 +276,9 @@ Objective:
 
 Files:
 
-- new `cappincheck/citations.py`
-- `cappincheck/report_launch_page.py`
-- possibly `cappincheck/contrast.py`
+- new `honestlaunch/citations.py`
+- `honestlaunch/report_launch_page.py`
+- possibly `honestlaunch/contrast.py`
 
 Scope:
 
@@ -318,8 +318,8 @@ Objective:
 
 Files:
 
-- new `cappincheck/report_launch_page.py`
-- `cappincheck/report.py`
+- new `honestlaunch/report_launch_page.py`
+- `honestlaunch/report.py`
 
 Scope:
 
@@ -348,7 +348,7 @@ Suggested verification:
 
 ```bash
 source .venv/bin/activate
-cappincheck audit <gemini-url-or-local-snapshot> --contrast --reference <canonical-ref-url> --out examples/gemini_35_flash_report.md --json examples/gemini_35_flash_report.json --html examples/gemini_35_flash_report.html
+honestlaunch audit <gemini-url-or-local-snapshot> --contrast --reference <canonical-ref-url> --out examples/gemini_35_flash_report.md --json examples/gemini_35_flash_report.json --html examples/gemini_35_flash_report.html
 ```
 
 Can be done concurrently:
@@ -368,7 +368,7 @@ Objective:
 
 Files:
 
-- `cappincheck/report_launch_page.py`
+- `honestlaunch/report_launch_page.py`
 - optional shared UI helpers if extracted from `report.py`
 
 Scope:
@@ -411,8 +411,8 @@ Objective:
 
 Files:
 
-- `cappincheck/report.py`
-- `cappincheck/report_dashboard.py` if split
+- `honestlaunch/report.py`
+- `honestlaunch/report_dashboard.py` if split
 - `README.md`
 - `examples/index.html`
 
@@ -558,15 +558,15 @@ Compile and mock regression:
 
 ```bash
 source .venv/bin/activate
-python -m compileall cappincheck
-cappincheck audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
+python -m compileall honestlaunch
+honestlaunch audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
 ```
 
 Real Gemini page:
 
 ```bash
 source .venv/bin/activate
-cappincheck audit https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-5/ \
+honestlaunch audit https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-5/ \
   --contrast \
   --reference https://deepmind.google/models/model-cards/gemini-3-5-flash \
   --contrast-top 2 \

@@ -13,7 +13,7 @@ The current public-facing direction is a reviewed static archive of audited laun
 Browse the archive locally:
 
 ```bash
-cd /Users/rupert/engineering/cappincheck
+cd /Users/rupert/engineering/honestlaunch
 python3 -m http.server 8765
 ```
 
@@ -62,7 +62,7 @@ The supported default implementation is a local async Gemini runner that loads t
 ## Quickstart
 
 ```bash
-cd /Users/rupert/engineering/cappincheck
+cd /Users/rupert/engineering/honestlaunch
 python -m venv .venv
 source .venv/bin/activate
 pip install -e .
@@ -71,7 +71,7 @@ pip install -e .
 Run the no-key demo:
 
 ```bash
-cappincheck audit examples/demo_document.md --mock --profile --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
+honestlaunch audit examples/demo_document.md --mock --profile --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
 open examples/demo_report.html
 ```
 
@@ -82,7 +82,7 @@ The deterministic fixture is `examples/demo_document.md`; use `--mock` for publi
 Run the no-key Evidence Contrast demo:
 
 ```bash
-cappincheck audit examples/demo_document.md --mock --contrast --contrast-top 2 --profile --out examples/contrast_demo.md --json examples/contrast_demo.json --html examples/contrast_demo.html
+honestlaunch audit examples/demo_document.md --mock --contrast --contrast-top 2 --profile --out examples/contrast_demo.md --json examples/contrast_demo.json --html examples/contrast_demo.html
 open examples/contrast_demo.html
 ```
 
@@ -90,13 +90,13 @@ Run with Gemini:
 
 ```bash
 export GEMINI_API_KEY=...
-cappincheck audit examples/demo_document.md --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
+honestlaunch audit examples/demo_document.md --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
 ```
 
 Run Evidence Contrast against explicit reference URLs:
 
 ```bash
-cappincheck audit examples/demo_document.md \
+honestlaunch audit examples/demo_document.md \
   --contrast \
   --reference https://ai.google.dev/gemini-api/docs/models \
   --profile \

@@ -2,7 +2,7 @@
 
 This is the coding-agent handoff for implementing Evidence Contrast Mode with concurrent work where safe.
 
-Goal: add an optional `--contrast` mode to `cappincheck audit` that compares selected claims against explicit reference URLs and renders a clear `Evidence Contrast` card plus `Sources Checked` details. V1 should not auto-discover references.
+Goal: add an optional `--contrast` mode to `honestlaunch audit` that compares selected claims against explicit reference URLs and renders a clear `Evidence Contrast` card plus `Sources Checked` details. V1 should not auto-discover references.
 
 ## Product Contract
 
@@ -18,7 +18,7 @@ Reader-facing source of truth:
 V1 input model:
 
 ```bash
-cappincheck audit TARGET \
+honestlaunch audit TARGET \
   --contrast \
   --reference REF_URL \
   --reference REF_URL \
@@ -31,7 +31,7 @@ cappincheck audit TARGET \
 V1 mock/demo model:
 
 ```bash
-cappincheck audit examples/demo_document.md \
+honestlaunch audit examples/demo_document.md \
   --mock \
   --contrast \
   --contrast-top 2 \
@@ -68,7 +68,7 @@ Parallel lanes after Gate 2:
 
 Merge point:
 
-- Lanes A/B/C merge when `cappincheck audit ... --mock --contrast ...` writes JSON/Markdown/HTML and the HTML visibly shows `Evidence Contrast` plus `Sources Checked`.
+- Lanes A/B/C merge when `honestlaunch audit ... --mock --contrast ...` writes JSON/Markdown/HTML and the HTML visibly shows `Evidence Contrast` plus `Sources Checked`.
 
 ## Work Unit 0: Baseline Verification
 
@@ -85,8 +85,8 @@ Commands:
 
 ```bash
 source .venv/bin/activate
-python -m compileall cappincheck
-cappincheck audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
+python -m compileall honestlaunch
+honestlaunch audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
 python scripts/verify_numeric.py
 ```
 
@@ -102,7 +102,7 @@ Can run concurrently with Work Unit 4 after file ownership is agreed.
 
 Files likely touched:
 
-- `cappincheck/schemas.py`
+- `honestlaunch/schemas.py`
 
 Tasks:
 
@@ -153,7 +153,7 @@ Enums should match `DEMO_EXTENSION_PLAN.md`:
 
 Success criteria:
 
-- `python -m compileall cappincheck` exits `0`.
+- `python -m compileall honestlaunch` exits `0`.
 - Existing `examples/demo_report.json` can still be generated.
 - JSON output for non-contrast audits either omits contrast or has `null` contrast.
 
@@ -163,8 +163,8 @@ Depends on Work Unit 1.
 
 Files likely touched:
 
-- `cappincheck/cli.py`
-- `cappincheck/audit.py`
+- `honestlaunch/cli.py`
+- `honestlaunch/audit.py`
 
 Tasks:
 
@@ -185,7 +185,7 @@ Behavior:
 Success criteria:
 
 ```bash
-cappincheck audit examples/demo_document.md --mock --contrast --contrast-top 2 --out examples/contrast_demo.md --json examples/contrast_demo.json --html examples/contrast_demo.html
+honestlaunch audit examples/demo_document.md --mock --contrast --contrast-top 2 --out examples/contrast_demo.md --json examples/contrast_demo.json --html examples/contrast_demo.html
 ```
 
 - Command exits `0`.
@@ -198,7 +198,7 @@ Can run after Work Unit 1; can proceed in parallel with Work Unit 4.
 
 Files likely touched:
 
-- `cappincheck/audit.py` or new `cappincheck/contrast.py`
+- `honestlaunch/audit.py` or new `honestlaunch/contrast.py`
 - `examples/evidence_contrast_demo.md` optional
 - generated `examples/contrast_demo.*`
 
@@ -229,7 +229,7 @@ Can begin after Work Unit 1 with stub/mock contrast data.
 
 Files likely touched:
 
-- `cappincheck/report.py`
+- `honestlaunch/report.py`
 - generated `examples/contrast_demo.html`
 - generated `examples/contrast_demo.md`
 
@@ -294,9 +294,9 @@ Depends on Work Units 1 and 2. Can run in parallel with Work Unit 4 if schemas a
 
 Files likely touched:
 
-- new `cappincheck/contrast.py`
-- `cappincheck/audit.py`
-- `cappincheck/gemini.py` only if a helper is needed
+- new `honestlaunch/contrast.py`
+- `honestlaunch/audit.py`
+- `honestlaunch/gemini.py` only if a helper is needed
 
 Tasks:
 
@@ -317,7 +317,7 @@ Prompt constraints:
 Success criteria:
 
 ```bash
-CAPPINCHECK_TIMEOUT_SECONDS=90 cappincheck audit examples/demo_document.md \
+HONESTLAUNCH_TIMEOUT_SECONDS=90 honestlaunch audit examples/demo_document.md \
   --contrast \
   --reference https://example.com/reference \
   --contrast-top 1 \
@@ -337,8 +337,8 @@ Depends on Work Units 1, 3 or 5.
 
 Files likely touched:
 
-- `cappincheck/audit.py`
-- `cappincheck/report.py`
+- `honestlaunch/audit.py`
+- `honestlaunch/report.py`
 
 Tasks:
 
@@ -448,8 +448,8 @@ Commands:
 
 ```bash
 source .venv/bin/activate
-python -m compileall cappincheck
-cappincheck audit examples/demo_document.md --mock --contrast --contrast-top 2 --out examples/contrast_demo.md --json examples/contrast_demo.json --html examples/contrast_demo.html
+python -m compileall honestlaunch
+honestlaunch audit examples/demo_document.md --mock --contrast --contrast-top 2 --out examples/contrast_demo.md --json examples/contrast_demo.json --html examples/contrast_demo.html
 python scripts/verify_numeric.py
 python scripts/verify_contrast.py examples/contrast_demo.json
 open examples/contrast_demo.html
@@ -521,9 +521,9 @@ Before final commit/push:
 ```bash
 git status --short
 source .venv/bin/activate
-python -m compileall cappincheck
-cappincheck audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
-cappincheck audit examples/demo_document.md --mock --contrast --contrast-top 2 --out examples/contrast_demo.md --json examples/contrast_demo.json --html examples/contrast_demo.html
+python -m compileall honestlaunch
+honestlaunch audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
+honestlaunch audit examples/demo_document.md --mock --contrast --contrast-top 2 --out examples/contrast_demo.md --json examples/contrast_demo.json --html examples/contrast_demo.html
 python scripts/verify_numeric.py
 python scripts/verify_contrast.py examples/contrast_demo.json
 rg -n "AIza[0-9A-Za-z_-]+|gho_[0-9A-Za-z_]+" . --glob '!/.env' --glob '!/.venv/**' --glob '!/.git/**'

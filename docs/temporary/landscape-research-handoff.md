@@ -10,7 +10,7 @@ We are exploring a product that audits AI model launch disclosures for **support
 
 Current internal prototype:
 
-- repo: `/Users/rupert/engineering/cappincheck`
+- repo: `/Users/rupert/engineering/honestlaunch`
 - current artifact direction:
   - audited launch-page regeneration
   - claim ledger with verdicts, evidence, and rewrites
@@ -21,9 +21,9 @@ Current internal prototype:
 
 Relevant internal context docs:
 
-- [docs/temporary/audited-launch-page-plan.md](/Users/rupert/engineering/cappincheck/docs/temporary/audited-launch-page-plan.md:1)
-- [docs/temporary/hosted-beta-implementation-spec.md](/Users/rupert/engineering/cappincheck/docs/temporary/hosted-beta-implementation-spec.md:1)
-- [docs/temporary/disclosure-benchmark-plan.md](/Users/rupert/engineering/cappincheck/docs/temporary/disclosure-benchmark-plan.md:1)
+- [docs/temporary/audited-launch-page-plan.md](/Users/rupert/engineering/honestlaunch/docs/temporary/audited-launch-page-plan.md:1)
+- [docs/temporary/hosted-beta-implementation-spec.md](/Users/rupert/engineering/honestlaunch/docs/temporary/hosted-beta-implementation-spec.md:1)
+- [docs/temporary/disclosure-benchmark-plan.md](/Users/rupert/engineering/honestlaunch/docs/temporary/disclosure-benchmark-plan.md:1)
 
 ## What We Need To Learn
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cappincheck.archive_quality import refresh_archive_metadata
+from honestlaunch.archive_quality import refresh_archive_metadata
 
 
 ROOT = Path(__file__).resolve().parents[1]

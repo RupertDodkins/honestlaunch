@@ -8,9 +8,9 @@ Current demo guidance: do not rely on `--runtime managed` live on stage. A one-c
 
 ## Current Runtime
 
-- `cappincheck audit ... --mock` uses deterministic fixture output for demos and tests.
-- `cappincheck audit ... --runtime local` uses the local async Gemini client.
-- `cappincheck audit ... --runtime managed` uses the experimental Interactions API and normalizes model-output JSON back into the same report schemas.
+- `honestlaunch audit ... --mock` uses deterministic fixture output for demos and tests.
+- `honestlaunch audit ... --runtime local` uses the local async Gemini client.
+- `honestlaunch audit ... --runtime managed` uses the experimental Interactions API and normalizes model-output JSON back into the same report schemas.
 - `skills/*/SKILL.md` define the verifier, contradiction finder, numeric calibrator, and aggregator roles.
 - Report generation is local and static; there is no hosted backend, account system, or database.
 

@@ -57,7 +57,7 @@ This makes it easier to detect where models converge or diverge.
 ### Step 1: Initialize a QA packet
 
 ```bash
-cd /Users/rupert/engineering/cappincheck
+cd /Users/rupert/engineering/honestlaunch
 source .venv/bin/activate
 python scripts/init_qa_packet.py gemini-35-flash
 ```
@@ -168,7 +168,7 @@ The packet is initialized by:
 
 Backed by:
 
-- `cappincheck/research_qa.py`
+- `honestlaunch/research_qa.py`
 
 The packet is intentionally minimal.
 

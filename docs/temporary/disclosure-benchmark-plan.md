@@ -1,6 +1,6 @@
 # Disclosure Benchmark Plan
 
-Status: proposed work plan for turning `cappincheck` from a one-off hackathon audit tool into a recurring disclosure-quality benchmark and artifact archive.
+Status: proposed work plan for turning `honestlaunch` from a one-off hackathon audit tool into a recurring disclosure-quality benchmark and artifact archive.
 
 ## Sequencing Update
 
@@ -227,13 +227,13 @@ Objective:
 Deliverables:
 
 - benchmark schema doc
-- updates to `cappincheck/schemas.py`
+- updates to `honestlaunch/schemas.py`
 - launch-level score packet shape
 
 Files likely involved:
 
-- `cappincheck/schemas.py`
-- new `cappincheck/benchmark_schema.py`
+- `honestlaunch/schemas.py`
+- new `honestlaunch/benchmark_schema.py`
 - `docs/temporary/disclosure-benchmark-plan.md`
 
 Verification:
@@ -267,7 +267,7 @@ Suggested scope for v1 registry:
 Files likely involved:
 
 - new `data/launch_registry.yaml`
-- new `cappincheck/reference_presets.py`
+- new `honestlaunch/reference_presets.py`
 
 Verification:
 
@@ -292,9 +292,9 @@ Deliverables:
 
 Files likely involved:
 
-- `cappincheck/ingest.py`
-- `cappincheck/source_snapshot.py`
-- new `cappincheck/evidence_packet.py`
+- `honestlaunch/ingest.py`
+- `honestlaunch/source_snapshot.py`
+- new `honestlaunch/evidence_packet.py`
 - new `artifacts/launches/<slug>/`
 
 Stored packet contents:
@@ -341,8 +341,8 @@ Deliverables:
 
 Files likely involved:
 
-- `cappincheck/schemas.py`
-- `cappincheck/claims.py`
+- `honestlaunch/schemas.py`
+- `honestlaunch/claims.py`
 - new `docs/methodology_claim_selection.md`
 
 Verification:
@@ -366,7 +366,7 @@ Checks to add:
 Files likely involved:
 
 - current numeric helpers
-- new `cappincheck/deterministic_checks.py`
+- new `honestlaunch/deterministic_checks.py`
 
 Verification:
 
@@ -391,9 +391,9 @@ Deliverables:
 
 Files likely involved:
 
-- `cappincheck/contrast.py`
-- `cappincheck/citations.py`
-- `cappincheck/anchor_map.py`
+- `honestlaunch/contrast.py`
+- `honestlaunch/citations.py`
+- `honestlaunch/anchor_map.py`
 
 Verification:
 
@@ -445,7 +445,7 @@ Deliverables:
 
 Files likely involved:
 
-- new `cappincheck/benchmark_aggregate.py`
+- new `honestlaunch/benchmark_aggregate.py`
 - new `data/benchmark/`
 
 Verification:

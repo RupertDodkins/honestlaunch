@@ -152,7 +152,7 @@ Current state:
 Current commands:
 
 ```bash
-cd /Users/rupert/engineering/cappincheck
+cd /Users/rupert/engineering/honestlaunch
 source .venv/bin/activate
 python scripts/rebuild_archive.py
 python scripts/evaluate_archive.py

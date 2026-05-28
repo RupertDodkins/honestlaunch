@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cappincheck.anchor_map import enrich_report_for_launch_page
-from cappincheck.archive_quality import hydrate_report_document, load_report, refresh_archive_metadata
-from cappincheck.archive_registry import archive_entries, publication_info_for_report
-from cappincheck.report import write_html, write_json
+from honestlaunch.anchor_map import enrich_report_for_launch_page
+from honestlaunch.archive_quality import hydrate_report_document, load_report, refresh_archive_metadata
+from honestlaunch.archive_registry import archive_entries, publication_info_for_report
+from honestlaunch.report import write_html, write_json
 
 
 ROOT = Path(__file__).resolve().parents[1]

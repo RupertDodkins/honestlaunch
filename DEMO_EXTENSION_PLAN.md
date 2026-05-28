@@ -81,7 +81,7 @@ Evidence Contrast Mode is the explicit "claim vs existing docs" feature. It shou
 Add optional flags to the existing audit command. V1 should use explicit reference URLs:
 
 ```bash
-cappincheck audit examples/evidence_contrast_demo.md \
+honestlaunch audit examples/evidence_contrast_demo.md \
   --mock \
   --contrast \
   --reference https://example.com/reference-1 \
@@ -95,7 +95,7 @@ cappincheck audit examples/evidence_contrast_demo.md \
 Live path:
 
 ```bash
-cappincheck audit <public-url-or-file> \
+honestlaunch audit <public-url-or-file> \
   --contrast \
   --reference https://example.com/model-card \
   --reference https://example.com/paper-or-benchmark \
@@ -110,7 +110,7 @@ Do not add a `--live` flag. Non-mock mode is already live.
 V2 can add automatic source discovery:
 
 ```bash
-cappincheck audit <public-url-or-file> --contrast --discover-references
+honestlaunch audit <public-url-or-file> --contrast --discover-references
 ```
 
 Do not build `--discover-references` until explicit `--reference` mode is complete and demo-stable.
@@ -241,8 +241,8 @@ Before changes:
 
 ```bash
 source .venv/bin/activate
-python -m compileall cappincheck
-cappincheck audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
+python -m compileall honestlaunch
+honestlaunch audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
 python scripts/verify_numeric.py
 ```
 
@@ -259,7 +259,7 @@ Tasks:
 Verification:
 
 ```bash
-cappincheck audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
+honestlaunch audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
 open examples/demo_report.html
 ```
 
@@ -277,7 +277,7 @@ Tasks:
 Verification:
 
 ```bash
-cappincheck audit examples/demo_document.md --mock --contrast --contrast-top 2 --out examples/contrast_demo.md --json examples/contrast_demo.json --html examples/contrast_demo.html
+honestlaunch audit examples/demo_document.md --mock --contrast --contrast-top 2 --out examples/contrast_demo.md --json examples/contrast_demo.json --html examples/contrast_demo.html
 ```
 
 Done when JSON includes contrast results and HTML renders contrast cards.
@@ -293,7 +293,7 @@ Tasks:
 Verification:
 
 ```bash
-CAPPINCHECK_TIMEOUT_SECONDS=90 cappincheck audit examples/demo_document.md --contrast --reference https://example.com/reference --contrast-top 1 --out examples/contrast_live.md --json examples/contrast_live.json --html examples/contrast_live.html
+HONESTLAUNCH_TIMEOUT_SECONDS=90 honestlaunch audit examples/demo_document.md --contrast --reference https://example.com/reference --contrast-top 1 --out examples/contrast_live.md --json examples/contrast_live.json --html examples/contrast_live.html
 ```
 
 Done when the command exits `0` and the report includes at least one live contrast card.
@@ -324,7 +324,7 @@ Prepare three paths:
 Verification:
 
 ```bash
-cappincheck audit examples/demo_document.md --mock --contrast --contrast-top 2 --out examples/contrast_demo.md --json examples/contrast_demo.json --html examples/contrast_demo.html
+honestlaunch audit examples/demo_document.md --mock --contrast --contrast-top 2 --out examples/contrast_demo.md --json examples/contrast_demo.json --html examples/contrast_demo.html
 open examples/contrast_demo.html
 ```
 

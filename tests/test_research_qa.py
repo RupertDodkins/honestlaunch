@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from cappincheck.research_qa import build_qa_packet, find_archive_entry_by_slug
+from honestlaunch.research_qa import build_qa_packet, find_archive_entry_by_slug
 
 
 class ResearchQATests(unittest.TestCase):

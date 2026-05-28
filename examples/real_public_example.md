@@ -20,7 +20,7 @@ Command:
 
 ```bash
 source .venv/bin/activate
-CAPPINCHECK_TIMEOUT_SECONDS=90 cappincheck audit \
+HONESTLAUNCH_TIMEOUT_SECONDS=90 honestlaunch audit \
   https://blog.google/innovation-and-ai/models-and-research/gemini-models/gemini-3-5/ \
   --contrast \
   --reference https://deepmind.google/models/model-cards/gemini-3-5-flash \

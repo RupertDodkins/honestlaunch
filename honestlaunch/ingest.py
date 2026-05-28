@@ -43,7 +43,7 @@ def _read_pdf_path(path: Path) -> str:
 
 
 def _read_pdf_bytes(content: bytes) -> str:
-    tmp = Path("/tmp/cappincheck-input.pdf")
+    tmp = Path("/tmp/honestlaunch-input.pdf")
     tmp.write_bytes(content)
     return _read_pdf_path(tmp)
 

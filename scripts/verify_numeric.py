@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from cappincheck.claims import _mock_claims
-from cappincheck.numeric import calibrate_numeric_claim
+from honestlaunch.claims import _mock_claims
+from honestlaunch.numeric import calibrate_numeric_claim
 
 
 def main() -> None:

@@ -6,13 +6,13 @@ Goal: execute the remaining work sequentially, self-verify each step, and keep t
 
 ## Current State
 
-- Repo: `/Users/rupert/engineering/cappincheck`
+- Repo: `/Users/rupert/engineering/honestlaunch`
 - Initial commit: `993fdc2 Create initial hackathon scaffold`
 - Working command:
 
 ```bash
 source .venv/bin/activate
-cappincheck audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
+honestlaunch audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
 open examples/demo_report.html
 ```
 
@@ -65,7 +65,7 @@ Suggested commands:
 ```bash
 source .venv/bin/activate
 export GEMINI_API_KEY=...
-cappincheck audit examples/demo_document.md --out examples/live_report.md --json examples/live_report.json --html examples/live_report.html --limit 3
+honestlaunch audit examples/demo_document.md --out examples/live_report.md --json examples/live_report.json --html examples/live_report.html --limit 3
 ```
 
 Verification criteria:
@@ -105,8 +105,8 @@ Suggested verification:
 
 ```bash
 source .venv/bin/activate
-python -m compileall cappincheck
-cappincheck audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
+python -m compileall honestlaunch
+honestlaunch audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
 ```
 
 ## Step 3: Improve Grounded Citation Capture
@@ -171,8 +171,8 @@ Tasks:
 
 Verification criteria:
 
-- `cappincheck audit ... --runtime local` works.
-- `cappincheck audit ... --runtime managed` works on the demo document.
+- `honestlaunch audit ... --runtime local` works.
+- `honestlaunch audit ... --runtime managed` works on the demo document.
 - If not implemented, `RUNTIME.md` is specific enough that another agent can add the adapter without rediscovering the architecture.
 - README does not overclaim Managed Agents execution if only local runtime is available.
 
@@ -263,7 +263,7 @@ Tasks:
 Demo command:
 
 ```bash
-cappincheck audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
+honestlaunch audit examples/demo_document.md --mock --out examples/demo_report.md --json examples/demo_report.json --html examples/demo_report.html
 open examples/demo_report.html
 ```
 

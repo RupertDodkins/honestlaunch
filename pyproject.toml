@@ -1,5 +1,5 @@
 [project]
-name = "cappincheck"
+name = "honestlaunch"
 version = "0.1.0"
 description = "Grounded adversarial claim audit for dense expert documents."
 readme = "README.md"
@@ -15,8 +15,7 @@ dependencies = [
 ]
 
 [project.scripts]
-cappincheck = "cappincheck.cli:app"
-honestlaunch = "cappincheck.cli:app"
+honestlaunch = "honestlaunch.cli:app"
 
 [build-system]
 requires = ["hatchling"]
