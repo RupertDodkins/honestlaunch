@@ -1,0 +1,2815 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Anthropic Claude Opus 4.8 · Honest Launches</title>
+  <style>
+    :root {
+      --ink: #1f2328;
+      --muted: #667085;
+      --line: #d0d7de;
+      --bg: #f6f8fa;
+      --panel: #ffffff;
+      --overstated: #b42318;
+      --missing: #b54708;
+      --supported: #067647;
+      --receipts: #344054;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: baseline;
+    }
+    .eyebrow {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    h1 { margin: 0; font-size: 24px; letter-spacing: 0; }
+    main {
+      min-height: calc(100vh - 74px);
+    }
+    [hidden] { display: none !important; }
+    .notice-strip {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
+    }
+    .notice-copy {
+      max-width: 920px;
+    }
+    .notice-copy p {
+      margin: 6px 0 0;
+      color: var(--ink);
+    }
+    .notice-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .notice-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel);
+      padding: 9px 12px;
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+      color: var(--ink);
+    }
+    .notice-link.primary {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: #ffffff;
+    }
+    .view-switcher {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 14px 18px 0;
+      background: var(--bg);
+    }
+    .view-toggle {
+      appearance: none;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .view-toggle.active {
+      background: var(--ink);
+      color: #ffffff;
+      border-color: var(--ink);
+    }
+    .launch-shell {
+      padding: 18px;
+      background: var(--bg);
+    }
+    .launch-article {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 22px;
+      line-height: 1.7;
+      box-shadow: 0 8px 24px rgba(31,35,40,.06);
+    }
+    .launch-block {
+      margin: 0 0 18px;
+      overflow-wrap: anywhere;
+    }
+    .launch-block:last-child {
+      margin-bottom: 0;
+    }
+    .launch-block.list-item {
+      padding-left: 18px;
+      position: relative;
+    }
+    .launch-block.list-item::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--muted);
+    }
+    .launch-block.preformatted {
+      white-space: pre-wrap;
+      background: #0d1117;
+      color: #f0f6fc;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+    .launch-kicker {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .launch-note {
+      margin: 0 0 14px;
+      color: var(--muted);
+    }
+    .launch-meta {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .launch-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .launch-meta p {
+      margin: 0;
+    }
+    .audit-mark {
+      appearance: none;
+      border: 0;
+      border-bottom: 2px dotted rgba(181, 71, 8, 0.9);
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      line-height: inherit;
+      cursor: pointer;
+      text-align: left;
+    }
+    .audit-mark:hover,
+    .audit-mark:focus-visible {
+      background: rgba(181, 71, 8, 0.08);
+      outline: none;
+      border-bottom-style: solid;
+    }
+    .audit-tooltip {
+      position: fixed;
+      z-index: 1000;
+      max-width: min(360px, calc(100vw - 32px));
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--ink);
+      padding: 12px 14px;
+      box-shadow: 0 18px 42px rgba(31,35,40,.18);
+    }
+    .audit-tooltip p {
+      margin: 0 0 10px;
+      color: inherit;
+    }
+    .audit-tooltip p:last-child {
+      margin-bottom: 0;
+    }
+    .audit-tooltip .tooltip-label {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .audit-tooltip .tooltip-citations {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .audit-tooltip .tooltip-citation {
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+    }
+    .claim-strip {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      background: var(--bg);
+    }
+    .headline-strip {
+      padding: 18px;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.94), rgba(246,248,250,0.96));
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 10px;
+    }
+    .stat-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .stat-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+    .stat-note {
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--muted);
+      overflow-wrap: anywhere;
+    }
+    .report-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 380px;
+      min-height: calc(100vh - 250px);
+    }
+    section { padding: 18px; border-right: 1px solid var(--line); }
+    section:last-child { border-right: 0; }
+    .filters {
+      display: grid;
+      grid-template-columns: minmax(180px, 260px);
+      gap: 10px;
+      margin: 0 0 12px;
+    }
+    label {
+      display: grid;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      background: var(--panel);
+      color: var(--ink);
+    }
+    .claim-row {
+      width: 100%;
+      text-align: left;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      overflow-wrap: anywhere;
+    }
+    .claim-row.active { border-color: var(--ink); box-shadow: 0 0 0 2px rgba(31,35,40,.08); }
+    #claim-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+    }
+    .claim-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 999px;
+      margin-right: 6px;
+      color: white;
+      background: var(--receipts);
+    }
+    .hint {
+      display: inline-grid;
+      place-items: center;
+      width: 18px;
+      height: 18px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: help;
+      position: relative;
+      background: var(--panel);
+      vertical-align: middle;
+    }
+    .hint:focus {
+      outline: 2px solid var(--ink);
+      outline-offset: 2px;
+    }
+    .hint::after {
+      content: attr(data-tip);
+      display: none;
+      position: absolute;
+      z-index: 10;
+      top: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(280px, 72vw);
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--ink);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.35;
+      box-shadow: 0 8px 24px rgba(31,35,40,.18);
+    }
+    .hint:hover::after,
+    .hint:focus::after {
+      display: block;
+    }
+    .muted { color: var(--muted); }
+    .wrap {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 14px;
+      overflow-wrap: anywhere;
+    }
+    .score {
+      height: 10px;
+      background: #eaecf0;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .score > div { height: 100%; background: var(--overstated); }
+    .strength-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .strength-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: var(--bg);
+    }
+    .strength-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .meter {
+      height: 8px;
+      background: var(--line);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .meter > div { height: 100%; background: var(--receipts); }
+    .meter.overstated > div, .meter.contradicted > div { background: var(--overstated); }
+    .meter.missing-context > div { background: var(--missing); }
+    .meter.supported > div { background: var(--supported); }
+    a {
+      color: var(--receipts);
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+    .source-item {
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .source-item:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+    h2, h3 { margin: 0 0 10px; letter-spacing: 0; }
+    .title-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    pre {
+      white-space: pre-wrap;
+      background: #0d1117;
+      color: #f0f6fc;
+      padding: 12px;
+      border-radius: 8px;
+      max-height: 260px;
+      overflow: auto;
+    }
+    details {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--bg);
+      padding: 10px 12px;
+      margin-top: 10px;
+    }
+    details:first-of-type {
+      margin-top: 0;
+    }
+    summary {
+      cursor: pointer;
+      font-weight: 800;
+    }
+    @media (max-width: 980px) {
+      .report-grid { grid-template-columns: 1fr; }
+      section { border-right: 0; border-bottom: 1px solid var(--line); }
+      .strength-grid { grid-template-columns: 1fr; }
+      .notice-strip {
+        display: block;
+      }
+      .notice-links {
+        margin-top: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header id="artifact-header">
+    <div>
+      <div class="eyebrow">Honest Launches audit artifact</div>
+      <h1>Anthropic Claude Opus 4.8</h1>
+      <div class="muted">Anthropic Claude Opus 4.8</div>
+    </div>
+    <div class="muted">6 audited claims · curated_manual</div>
+  </header>
+  <main>
+    <div class="view-switcher">
+      <button class="view-toggle active" id="launch-toggle" onclick="setView('launch')">Audited Launch Page</button>
+      <button class="view-toggle" id="ledger-toggle" onclick="setView('ledger')">Audit Ledger</button>
+    </div>
+    <div id="launch-view" class="launch-shell">
+      <div id="launch-summary"></div>
+      <article class="launch-article">
+        <div id="launch-article"></div>
+      </article>
+    </div>
+    <div id="ledger-view" hidden>
+      <div class="notice-strip">
+        <div class="notice-copy" id="publication-notice"></div>
+        <div class="notice-links" id="publication-links"></div>
+      </div>
+      <div class="headline-strip">
+        <div class="title-row">
+          <h2>Run Summary</h2>
+          <span class="hint" tabindex="0" data-tip="This strip summarizes the audit punchline: how many claims were audited, how severe they were, and what runtime/profile telemetry was recorded for the run.">?</span>
+        </div>
+        <div class="summary-grid" id="scorecard-grid"></div>
+        <div class="telemetry-grid" id="telemetry-grid"></div>
+      </div>
+      <div class="claim-strip">
+        <div class="title-row">
+          <h2>Audit Ledger</h2>
+          <span class="hint" tabindex="0" data-tip="Gemini extracts risky factual claims, then Honest Launches audits the selected claims. Click a card to inspect verdict, evidence, contrast, and agent steps.">?</span>
+        </div>
+        <div class="filters single">
+          <label>Verdict
+            <span class="hint" tabindex="0" data-tip="Formal verdict definitions: supported = evidence supports the claim as written; overstated = directionally supported but too broad/strong/certain; missing_context = may be true but key scope/baseline/method/source context is absent; contradicted = evidence conflicts with the claim; not_checkable = insufficient evidence to verify or falsify.">?</span>
+            <select id="verdict-filter" onchange="filters.verdict=this.value; syncSelection(); render();"></select>
+          </label>
+        </div>
+        <p class="muted" id="filter-summary"></p>
+        <div id="claim-list"></div>
+      </div>
+      <div class="report-grid">
+        <section>
+          <div class="title-row">
+            <h2>Selected Claim</h2>
+            <span class="hint" tabindex="0" data-tip="This panel shows the selected claim, the Honest Launches verdict, and the strongest defensible rewrite.">?</span>
+          </div>
+          <div id="claim-detail"></div>
+        </section>
+        <section>
+          <div class="title-row">
+            <h2>Source Provenance</h2>
+            <span class="hint" tabindex="0" data-tip="Separates explicit references you provided from claim-level contrast references and Gemini-discovered supporting or caveat/counter sources.">?</span>
+          </div>
+          <div id="evidence"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <div id="audit-tooltip" class="audit-tooltip" hidden></div>
+  <script>
+    const report = {
+  "document": {
+    "title": "Anthropic Claude Opus 4.8",
+    "source": "https://www.anthropic.com/news/claude-opus-4-8",
+    "text": "Introducing Claude Opus 4.8\n\nWe\u2019re upgrading Claude Opus to a new version: Claude Opus 4.8. It builds on Opus 4.7 with improvements across benchmarks, and is a more effective collaborator. It\u2019s available today for the same price.\n\nOpus 4.8 launches alongside several new features. Users on claude.ai now have control over the amount of effort Claude puts into a task. Claude Code has a new \u201cdynamic workflows\u201d feature that allows it to tackle very large-scale problems. And fast mode for Opus 4.8\u2014where the model can work at 2.5\u00d7 the speed\u2014is now three times cheaper than it was for previous models.\n\nOpus 4.8\u2019s capabilities\n\nThe table below shows how Opus 4.8 compares to its predecessor and to other models on tests of coding, agentic skills, reasoning, and practical knowledge work tasks. More details and a much wider range of capability evaluations are provided in the Claude Opus 4.8 System Card.\n\nCollaborating with Opus 4.8\n\nEarly testers have found Claude Opus 4.8 to be more reliable and sharper in its judgement when it\u2019s performing agentic tasks. Below are quotes from many of these testers about their experience collaborating with Opus 4.8:\n\nClaude Opus 4.8 has noticeably better judgment. In Claude Code, it asks the right questions, catches its own mistakes, pushes back when a plan isn\u2019t sound, and builds up confidence around complex, multi-service explorations before making big changes. It\u2019s a great model to build with.Tom Pritchard Staff Engineer\n\nOn our Super-Agent benchmark, Claude Opus 4.8 is the only model to complete every case end-to-end, beating prior Opus models and GPT-5.5 at parity on cost. For agent products in translation, deep research, slide-building, and analysis, it delivers powerful reliability.Kay Zhu Co-Founder and CTO\n\nOn CursorBench, Claude Opus 4.8 exceeds prior Opus models across every effort level. Tool calling is meaningfully more efficient, using fewer steps for the same intelligence, and it carries end-to-end tasks through. Michael Truell Co-Founder and CEO\n\nClaude Opus 4.8 delivers the highest score recorded on our Legal Agent Benchmark, and is the first model to break 10% overall on the all-pass standard. For substantive legal work, that\u2019s the kind of accuracy lift that translates directly into how much real attorney work our customers can hand off with confidence.Niko Grupen Head of Applied Research\n\nClaude Opus 4.8 feels like a major quality-of-life update over Opus 4.7: faster, easier to collaborate with, and better at carrying context and style direction across a long session. Opus 4.8 is the model I kept trusting for work where voice, taste, and technical execution all have to happen side-by-side.Katie Parrott Staff Writer\n\nClaude Opus 4.8 is the strongest computer-use and browser-agent model we\u2019ve tested, scoring 84% on Online-Mind2Web, which is a meaningful jump over both Opus 4.7 and GPT-5.5. It stays reflective and on-task in the way our customers\u2019 agent workloads need to be reliable end-to-end.Miguel Gonzalez Tech Lead\n\nClaude Opus 4.8 uses tools cleanly and follows instructions with the consistency our autonomous engineering workloads need to keep running unattended. It improves on Opus 4.6 and fixes the comment-verbosity and tool-calling issues we saw with Opus 4.7. This release from Anthropic translates directly into faster capability gains for engineers building on Devin.Scott Wu CEO\n\nOn our long-running evals, Claude Opus 4.8\u2019s analysis was consistently higher quality than prior Opus models. It finished faster and produced richer, more information dense outputs. Overall, a noticeably better signal to noise ratio. The biggest differentiator was Opus 4.8\u2019s tendency to proactively flag issues with the inputs and outputs of an analysis, something other models routinely missed and left to the users to catch.Michael Ran Sr. Investment Associate\n\nAcross CoCounsel Legal, Claude Opus 4.8 delivered meaningful improvements in consistency and reasoning quality compared to prior Opus models. For the high-stakes professional workflows our customers depend on, that reliability matters. As we build fiduciary-grade AI systems for legal and tax professionals, advances like these help raise the standard for trusted AI performance in real-world workflows.Joel Hron Chief Technology Officer\n\nClaude Opus 4.8 sets a new bar for enterprise AI. In Genie, Databricks\u2019 AI agent for data and knowledge work, the new Opus model unlocks a step change in agentic reasoning, tackling deeper, multistep questions faster than any prior Opus. Its multimodal strength also lets Genie reason directly over PDFs, diagrams, and other unstructured content at 61% cheaper token cost than Opus 4.7.Hanlin Tang CTO, Neural Networks\n\nFor financial-document workflows in Hebbia\u2019s orchestrator, Claude Opus 4.8 delivers the same strong quality as Opus 4.7 with noticeably better citation precision and more token efficiency on retrieval, which works incredibly well for the kinds of dense filings our customers run every day.Aabhas Sharma CTO\n\nOne of the most prominent improvements in Opus 4.8 is its honesty. We train all our models to be honest\u2014for instance, to avoid making claims that they can\u2019t support. But a general problem with AI models is that they sometimes jump to conclusions, confidently claiming to have made progress in their work despite the evidence being thin. Early testers report that Opus 4.8 is more likely to flag uncertainties about its work and less likely to make unsupported claims. This is borne out in our evaluations, which show that Opus 4.8 is around four times less likely than its predecessor to allow flaws in code it has written to pass unremarked.\n\nAs always, we ran a detailed alignment assessment on the model before release. In terms of positive traits, our Alignment team concluded that Opus 4.8 \u201creaches new highs on our measures of prosocial traits like supporting user autonomy and acting in the user\u2019s best interest.\u201d The assessment also showed Opus 4.8 to have rates of misaligned behavior (such as deception or cooperation with misuse) that are substantially lower than Opus 4.7, and similar to our best-aligned model, Claude Mythos Preview. The full alignment assessment, accompanied by a suite of pre-deployment safety tests, is reported in the Claude Opus 4.8 System Card.\n\nAlso launching today\n\nIn addition to Claude Opus 4.8, we\u2019re making the following updates:\n\nDynamic workflows. This new feature, available in research preview, allows Claude to take on even bigger tasks in Claude Code. Claude can plan the work and then run hundreds of parallel subagents in a single session (and with Opus 4.8, the agents can run for even longer). It then verifies its outputs before reporting back to the user. For example, Claude Code with Opus 4.8 can now carry out codebase-scale migrations across hundreds of thousands of lines of code from kickoff to merge, with the existing test suite as its bar. You can read more about dynamic workflows\u2014available in Claude Code for Enterprise, Team, and Max plans\u2014in this post.\n\nEffort control in claude.ai and Cowork. A new control alongside the model selector lets users choose how much effort Claude puts into a response. On higher effort settings, Claude will think more frequently and more deeply to give better responses. On lower effort settings, Claude will respond faster and use up a user\u2019s rate limits more slowly. Users now have this choice\u2014the effort control is available on all plans.\n\nThe Messages API now accepts system entries inside the messages array. Developers can update Claude\u2019s instructions mid-task without breaking the prompt cache or routing the update through a user turn. This can be used in a given harness to update permissions, token budgets, or environment context as an agent runs.\n\nA note on effort\n\nOpus 4.8 defaults to high effort, which we judge to be the best overall balance of quality and user experience. On coding tasks, this effort level spends a similar number of tokens as Opus 4.7\u2019s default, but with better performance. Users can choose \u201cextra\u201d (\u201cxhigh\u201d in Claude Code) or \u201cmax,\u201d and the model will spend more tokens to get better results; we recommend using \u201cextra\u201d for difficult tasks and long-running asynchronous workflows. We have increased rate limits in Claude Code to accommodate the higher token usage of higher effort levels; users can select whichever makes sense for their particular project.\n\nWhat\u2019s next?\n\nUsers will find Opus 4.8 to be a modest but tangible improvement on its predecessor. There\u2019s still more to be done: we\u2019re working on developing and releasing models that provide many of the same capabilities as Opus at a lower cost.\n\nNot only that, but we plan to release a new class of model with even higher intelligence than Opus. As part of Project Glasswing, a small number of organizations are currently using Claude Mythos Preview for cybersecurity work. Models of this capability level require stronger cyber safeguards before they can be generally released. We\u2019re making swift progress on developing these safeguards and expect to be able to bring Mythos-class models to all our customers in the coming weeks.\n\nAvailability\n\nClaude Opus 4.8 is available everywhere today. Pricing for regular usage is unchanged from Opus 4.7: $5 per million input tokens and $25 per million output tokens. Pricing for fast mode is $10 per million input tokens and $50 per million output tokens. Developers can use claude-opus-4-8 via the Claude API.",
+    "snapshot": {
+      "title": "Introducing Claude Opus 4.8 \\ Anthropic",
+      "source_url": "https://www.anthropic.com/news/claude-opus-4-8",
+      "source_kind": "html",
+      "blocks": [
+        {
+          "block_id": "block-0",
+          "kind": "h1",
+          "text": "Introducing Claude Opus 4.8",
+          "source_order": 0
+        },
+        {
+          "block_id": "block-1",
+          "kind": "p",
+          "text": "We\u2019re upgrading Claude Opus to a new version: Claude Opus 4.8. It builds on Opus 4.7 with improvements across benchmarks, and is a more effective collaborator. It\u2019s available today for the same price.",
+          "section_heading": "Introducing Claude Opus 4.8",
+          "source_order": 1
+        },
+        {
+          "block_id": "block-2",
+          "kind": "p",
+          "text": "Opus 4.8 launches alongside several new features. Users on claude.ai now have control over the amount of effort Claude puts into a task. Claude Code has a new \u201cdynamic workflows\u201d feature that allows it to tackle very large-scale problems. And fast mode for Opus 4.8\u2014where the model can work at 2.5\u00d7 the speed\u2014is now three times cheaper than it was for previous models.",
+          "section_heading": "Introducing Claude Opus 4.8",
+          "source_order": 2
+        },
+        {
+          "block_id": "block-3",
+          "kind": "h2",
+          "text": "Opus 4.8\u2019s capabilities",
+          "section_heading": "Introducing Claude Opus 4.8",
+          "source_order": 3
+        },
+        {
+          "block_id": "block-4",
+          "kind": "p",
+          "text": "The table below shows how Opus 4.8 compares to its predecessor and to other models on tests of coding, agentic skills, reasoning, and practical knowledge work tasks. More details and a much wider range of capability evaluations are provided in the Claude Opus 4.8 System Card.",
+          "section_heading": "Opus 4.8\u2019s capabilities",
+          "source_order": 4
+        },
+        {
+          "block_id": "block-5",
+          "kind": "h2",
+          "text": "Collaborating with Opus 4.8",
+          "section_heading": "Opus 4.8\u2019s capabilities",
+          "source_order": 5
+        },
+        {
+          "block_id": "block-6",
+          "kind": "p",
+          "text": "Early testers have found Claude Opus 4.8 to be more reliable and sharper in its judgement when it\u2019s performing agentic tasks. Below are quotes from many of these testers about their experience collaborating with Opus 4.8:",
+          "section_heading": "Collaborating with Opus 4.8",
+          "source_order": 6
+        },
+        {
+          "block_id": "block-7",
+          "kind": "blockquote",
+          "text": "Claude Opus 4.8 has noticeably better judgment. In Claude Code, it asks the right questions, catches its own mistakes, pushes back when a plan isn\u2019t sound, and builds up confidence around complex, multi-service explorations before making big changes. It\u2019s a great model to build with.Tom Pritchard Staff Engineer",
+          "section_heading": "Collaborating with Opus 4.8",
+          "source_order": 7
+        },
+        {
+          "block_id": "block-8",
+          "kind": "blockquote",
+          "text": "On our Super-Agent benchmark, Claude Opus 4.8 is the only model to complete every case end-to-end, beating prior Opus models and GPT-5.5 at parity on cost. For agent products in translation, deep research, slide-building, and analysis, it delivers powerful reliability.Kay Zhu Co-Founder and CTO",
+          "section_heading": "Collaborating with Opus 4.8",
+          "source_order": 8
+        },
+        {
+          "block_id": "block-9",
+          "kind": "blockquote",
+          "text": "On CursorBench, Claude Opus 4.8 exceeds prior Opus models across every effort level. Tool calling is meaningfully more efficient, using fewer steps for the same intelligence, and it carries end-to-end tasks through. Michael Truell Co-Founder and CEO",
+          "section_heading": "Collaborating with Opus 4.8",
+          "source_order": 9
+        },
+        {
+          "block_id": "block-10",
+          "kind": "blockquote",
+          "text": "Claude Opus 4.8 delivers the highest score recorded on our Legal Agent Benchmark, and is the first model to break 10% overall on the all-pass standard. For substantive legal work, that\u2019s the kind of accuracy lift that translates directly into how much real attorney work our customers can hand off with confidence.Niko Grupen Head of Applied Research",
+          "section_heading": "Collaborating with Opus 4.8",
+          "source_order": 10
+        },
+        {
+          "block_id": "block-11",
+          "kind": "blockquote",
+          "text": "Claude Opus 4.8 feels like a major quality-of-life update over Opus 4.7: faster, easier to collaborate with, and better at carrying context and style direction across a long session. Opus 4.8 is the model I kept trusting for work where voice, taste, and technical execution all have to happen side-by-side.Katie Parrott Staff Writer",
+          "section_heading": "Collaborating with Opus 4.8",
+          "source_order": 11
+        },
+        {
+          "block_id": "block-12",
+          "kind": "blockquote",
+          "text": "Claude Opus 4.8 is the strongest computer-use and browser-agent model we\u2019ve tested, scoring 84% on Online-Mind2Web, which is a meaningful jump over both Opus 4.7 and GPT-5.5. It stays reflective and on-task in the way our customers\u2019 agent workloads need to be reliable end-to-end.Miguel Gonzalez Tech Lead",
+          "section_heading": "Collaborating with Opus 4.8",
+          "source_order": 12
+        },
+        {
+          "block_id": "block-13",
+          "kind": "blockquote",
+          "text": "Claude Opus 4.8 uses tools cleanly and follows instructions with the consistency our autonomous engineering workloads need to keep running unattended. It improves on Opus 4.6 and fixes the comment-verbosity and tool-calling issues we saw with Opus 4.7. This release from Anthropic translates directly into faster capability gains for engineers building on Devin.Scott Wu CEO",
+          "section_heading": "Collaborating with Opus 4.8",
+          "source_order": 13
+        },
+        {
+          "block_id": "block-14",
+          "kind": "blockquote",
+          "text": "On our long-running evals, Claude Opus 4.8\u2019s analysis was consistently higher quality than prior Opus models. It finished faster and produced richer, more information dense outputs. Overall, a noticeably better signal to noise ratio. The biggest differentiator was Opus 4.8\u2019s tendency to proactively flag issues with the inputs and outputs of an analysis, something other models routinely missed and left to the users to catch.Michael Ran Sr. Investment Associate",
+          "section_heading": "Collaborating with Opus 4.8",
+          "source_order": 14
+        },
+        {
+          "block_id": "block-15",
+          "kind": "blockquote",
+          "text": "Across CoCounsel Legal, Claude Opus 4.8 delivered meaningful improvements in consistency and reasoning quality compared to prior Opus models. For the high-stakes professional workflows our customers depend on, that reliability matters. As we build fiduciary-grade AI systems for legal and tax professionals, advances like these help raise the standard for trusted AI performance in real-world workflows.Joel Hron Chief Technology Officer",
+          "section_heading": "Collaborating with Opus 4.8",
+          "source_order": 15
+        },
+        {
+          "block_id": "block-16",
+          "kind": "blockquote",
+          "text": "Claude Opus 4.8 sets a new bar for enterprise AI. In Genie, Databricks\u2019 AI agent for data and knowledge work, the new Opus model unlocks a step change in agentic reasoning, tackling deeper, multistep questions faster than any prior Opus. Its multimodal strength also lets Genie reason directly over PDFs, diagrams, and other unstructured content at 61% cheaper token cost than Opus 4.7.Hanlin Tang CTO, Neural Networks",
+          "section_heading": "Collaborating with Opus 4.8",
+          "source_order": 16
+        },
+        {
+          "block_id": "block-17",
+          "kind": "blockquote",
+          "text": "For financial-document workflows in Hebbia\u2019s orchestrator, Claude Opus 4.8 delivers the same strong quality as Opus 4.7 with noticeably better citation precision and more token efficiency on retrieval, which works incredibly well for the kinds of dense filings our customers run every day.Aabhas Sharma CTO",
+          "section_heading": "Collaborating with Opus 4.8",
+          "source_order": 17
+        },
+        {
+          "block_id": "block-18",
+          "kind": "p",
+          "text": "One of the most prominent improvements in Opus 4.8 is its honesty. We train all our models to be honest\u2014for instance, to avoid making claims that they can\u2019t support. But a general problem with AI models is that they sometimes jump to conclusions, confidently claiming to have made progress in their work despite the evidence being thin. Early testers report that Opus 4.8 is more likely to flag uncertainties about its work and less likely to make unsupported claims. This is borne out in our evaluations, which show that Opus 4.8 is around four times less likely than its predecessor to allow flaws in code it has written to pass unremarked.",
+          "section_heading": "Collaborating with Opus 4.8",
+          "source_order": 18
+        },
+        {
+          "block_id": "block-19",
+          "kind": "p",
+          "text": "As always, we ran a detailed alignment assessment on the model before release. In terms of positive traits, our Alignment team concluded that Opus 4.8 \u201creaches new highs on our measures of prosocial traits like supporting user autonomy and acting in the user\u2019s best interest.\u201d The assessment also showed Opus 4.8 to have rates of misaligned behavior (such as deception or cooperation with misuse) that are substantially lower than Opus 4.7, and similar to our best-aligned model, Claude Mythos Preview. The full alignment assessment, accompanied by a suite of pre-deployment safety tests, is reported in the Claude Opus 4.8 System Card.",
+          "section_heading": "Collaborating with Opus 4.8",
+          "source_order": 19
+        },
+        {
+          "block_id": "block-20",
+          "kind": "h2",
+          "text": "Also launching today",
+          "section_heading": "Collaborating with Opus 4.8",
+          "source_order": 20
+        },
+        {
+          "block_id": "block-21",
+          "kind": "p",
+          "text": "In addition to Claude Opus 4.8, we\u2019re making the following updates:",
+          "section_heading": "Also launching today",
+          "source_order": 21
+        },
+        {
+          "block_id": "block-22",
+          "kind": "li",
+          "text": "Dynamic workflows. This new feature, available in research preview, allows Claude to take on even bigger tasks in Claude Code. Claude can plan the work and then run hundreds of parallel subagents in a single session (and with Opus 4.8, the agents can run for even longer). It then verifies its outputs before reporting back to the user. For example, Claude Code with Opus 4.8 can now carry out codebase-scale migrations across hundreds of thousands of lines of code from kickoff to merge, with the existing test suite as its bar. You can read more about dynamic workflows\u2014available in Claude Code for Enterprise, Team, and Max plans\u2014in this post.",
+          "section_heading": "Also launching today",
+          "source_order": 22
+        },
+        {
+          "block_id": "block-23",
+          "kind": "li",
+          "text": "Effort control in claude.ai and Cowork. A new control alongside the model selector lets users choose how much effort Claude puts into a response. On higher effort settings, Claude will think more frequently and more deeply to give better responses. On lower effort settings, Claude will respond faster and use up a user\u2019s rate limits more slowly. Users now have this choice\u2014the effort control is available on all plans.",
+          "section_heading": "Also launching today",
+          "source_order": 23
+        },
+        {
+          "block_id": "block-24",
+          "kind": "li",
+          "text": "The Messages API now accepts system entries inside the messages array. Developers can update Claude\u2019s instructions mid-task without breaking the prompt cache or routing the update through a user turn. This can be used in a given harness to update permissions, token budgets, or environment context as an agent runs.",
+          "section_heading": "Also launching today",
+          "source_order": 24
+        },
+        {
+          "block_id": "block-25",
+          "kind": "h2",
+          "text": "A note on effort",
+          "section_heading": "Also launching today",
+          "source_order": 25
+        },
+        {
+          "block_id": "block-26",
+          "kind": "p",
+          "text": "Opus 4.8 defaults to high effort, which we judge to be the best overall balance of quality and user experience. On coding tasks, this effort level spends a similar number of tokens as Opus 4.7\u2019s default, but with better performance. Users can choose \u201cextra\u201d (\u201cxhigh\u201d in Claude Code) or \u201cmax,\u201d and the model will spend more tokens to get better results; we recommend using \u201cextra\u201d for difficult tasks and long-running asynchronous workflows. We have increased rate limits in Claude Code to accommodate the higher token usage of higher effort levels; users can select whichever makes sense for their particular project.",
+          "section_heading": "A note on effort",
+          "source_order": 26
+        },
+        {
+          "block_id": "block-27",
+          "kind": "h2",
+          "text": "What\u2019s next?",
+          "section_heading": "A note on effort",
+          "source_order": 27
+        },
+        {
+          "block_id": "block-28",
+          "kind": "p",
+          "text": "Users will find Opus 4.8 to be a modest but tangible improvement on its predecessor. There\u2019s still more to be done: we\u2019re working on developing and releasing models that provide many of the same capabilities as Opus at a lower cost.",
+          "section_heading": "What\u2019s next?",
+          "source_order": 28
+        },
+        {
+          "block_id": "block-29",
+          "kind": "p",
+          "text": "Not only that, but we plan to release a new class of model with even higher intelligence than Opus. As part of Project Glasswing, a small number of organizations are currently using Claude Mythos Preview for cybersecurity work. Models of this capability level require stronger cyber safeguards before they can be generally released. We\u2019re making swift progress on developing these safeguards and expect to be able to bring Mythos-class models to all our customers in the coming weeks.",
+          "section_heading": "What\u2019s next?",
+          "source_order": 29
+        },
+        {
+          "block_id": "block-30",
+          "kind": "h2",
+          "text": "Availability",
+          "section_heading": "What\u2019s next?",
+          "source_order": 30
+        },
+        {
+          "block_id": "block-31",
+          "kind": "p",
+          "text": "Claude Opus 4.8 is available everywhere today. Pricing for regular usage is unchanged from Opus 4.7: $5 per million input tokens and $25 per million output tokens. Pricing for fast mode is $10 per million input tokens and $50 per million output tokens. Developers can use claude-opus-4-8 via the Claude API.",
+          "section_heading": "Availability",
+          "source_order": 31
+        }
+      ]
+    }
+  },
+  "claims": [
+    {
+      "id": "claim_benchmark_collaboration",
+      "claim": "It builds on Opus 4.7 with improvements across benchmarks, and is a more effective collaborator.",
+      "claim_type": "generalization",
+      "source_location": "Introducing Claude Opus 4.8",
+      "why_risky": "This compresses benchmark gains and qualitative collaboration language into one broad headline claim.",
+      "audit_question": "Do the public benchmark materials and product docs support both the benchmark-improvement claim and the broader collaboration framing as written?"
+    },
+    {
+      "id": "claim_agentic_reliability",
+      "claim": "Early testers have found Claude Opus 4.8 to be more reliable and sharper in its judgement when it\u2019s performing agentic tasks.",
+      "claim_type": "deployment",
+      "source_location": "Collaborating with Opus 4.8",
+      "why_risky": "Reliability language is easy to overread when the public evidence is mostly testimonials and selective benchmark framing.",
+      "audit_question": "Do the launch and system card provide standardized reliability evidence for this agentic-task claim?"
+    },
+    {
+      "id": "claim_super_agent_quote",
+      "claim": "On our Super-Agent benchmark, Claude Opus 4.8 is the only model to complete every case end-to-end, beating prior Opus models and GPT-5.5 at parity on cost.",
+      "claim_type": "benchmark",
+      "source_location": "Collaborating with Opus 4.8",
+      "why_risky": "This is a strong comparative benchmark claim presented through a partner quote with limited public methodology.",
+      "audit_question": "Is there enough public methodology to independently verify the Super-Agent benchmark result and the parity-on-cost comparison?"
+    },
+    {
+      "id": "claim_honesty_flawed_code",
+      "claim": "This is borne out in our evaluations, which show that Opus 4.8 is around four times less likely than its predecessor to allow flaws in code it has written to pass unremarked.",
+      "claim_type": "safety",
+      "source_location": "Collaborating with Opus 4.8",
+      "why_risky": "The claim mixes a strong ratio with an internal evaluation framing about honesty and code-review behavior.",
+      "audit_question": "Do the public evaluation materials support the exact magnitude and scope of this honesty claim?"
+    },
+    {
+      "id": "claim_alignment_assessment",
+      "claim": "The assessment also showed Opus 4.8 to have rates of misaligned behavior (such as deception or cooperation with misuse) that are substantially lower than Opus 4.7, and similar to our best-aligned model, Claude Mythos Preview.",
+      "claim_type": "safety",
+      "source_location": "Collaborating with Opus 4.8",
+      "why_risky": "This is a strong alignment comparison claim, but it is also one the system card appears to address directly.",
+      "audit_question": "Does the public system card support the comparative alignment claim as written?"
+    },
+    {
+      "id": "claim_availability_pricing",
+      "claim": "Claude Opus 4.8 is available everywhere today. Pricing for regular usage is unchanged from Opus 4.7: $5 per million input tokens and $25 per million output tokens. Pricing for fast mode is $10 per million input tokens and $50 per million output tokens. Developers can use claude-opus-4-8 via the Claude API.",
+      "claim_type": "numeric",
+      "source_location": "Availability",
+      "why_risky": "Availability and pricing claims are precise and easy to overstate, so they should either match the docs or be narrowed.",
+      "audit_question": "Do Anthropic's launch and current docs support the availability, API identifier, and pricing claims as written?"
+    }
+  ],
+  "audits": [
+    {
+      "claim": {
+        "id": "claim_benchmark_collaboration",
+        "claim": "It builds on Opus 4.7 with improvements across benchmarks, and is a more effective collaborator.",
+        "claim_type": "generalization",
+        "source_location": "Introducing Claude Opus 4.8",
+        "why_risky": "This compresses benchmark gains and qualitative collaboration language into one broad headline claim.",
+        "audit_question": "Do the public benchmark materials and product docs support both the benchmark-improvement claim and the broader collaboration framing as written?"
+      },
+      "verdict": "missing_context",
+      "confidence": "high",
+      "stretch_score": 57,
+      "why": "The launch and system card support meaningful benchmark improvements, but \"more effective collaborator\" is a broader qualitative framing than the public materials measure directly.",
+      "weaker_supported_rewrite": "It builds on Opus 4.7 with stronger results on several published evaluations and a launch narrative centered on improved collaboration.",
+      "supporting_evidence": [
+        {
+          "source_title": "Introducing Claude Opus 4.8 - Anthropic",
+          "url": "https://www.anthropic.com/news/claude-opus-4-8",
+          "snippet": "Anthropic positions Opus 4.8 as an upgrade over Opus 4.7 with benchmark gains and collaboration improvements.",
+          "relevance": "Primary launch framing for the benchmark and collaboration claim."
+        },
+        {
+          "source_title": "Models overview - Claude API Docs",
+          "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+          "snippet": "Anthropic documents Opus 4.8 as its most capable model for complex reasoning, long-horizon agentic coding, and high-autonomy work.",
+          "relevance": "Shows how Anthropic positions the model in developer-facing docs."
+        }
+      ],
+      "counter_evidence": [
+        {
+          "source_title": "Introducing Claude Opus 4.8 - Anthropic",
+          "url": "https://www.anthropic.com/news/claude-opus-4-8",
+          "snippet": "Anthropic later describes Opus 4.8 as a modest but tangible improvement on its predecessor rather than a wholesale leap.",
+          "relevance": "Narrows the breadth of the opening headline."
+        }
+      ],
+      "missing_context": [
+        "The public materials do not define a single collaboration metric or a benchmark summary score that directly maps to \"more effective collaborator.\"",
+        "Benchmark gains are distributed across many tasks rather than expressed as a single across-the-board improvement."
+      ],
+      "numeric_findings": [],
+      "agent_outputs": [
+        {
+          "agent": "manual-curation",
+          "claim_id": "claim_benchmark_collaboration",
+          "summary": "Reviewed the launch headline against Anthropic's Opus 4.8 system card and developer model overview.",
+          "supporting_evidence": [
+            {
+              "source_title": "Models overview - Claude API Docs",
+              "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+              "snippet": "Anthropic's most capable model for complex reasoning and high-autonomy work.",
+              "relevance": "Developer-doc positioning."
+            }
+          ],
+          "counter_evidence": [
+            {
+              "source_title": "Introducing Claude Opus 4.8 - Anthropic",
+              "url": "https://www.anthropic.com/news/claude-opus-4-8",
+              "snippet": "Anthropic itself calls the upgrade modest but tangible later in the launch.",
+              "relevance": "Narrows the top-line framing."
+            }
+          ],
+          "missing_context": [
+            "The collaboration claim is qualitative rather than directly benchmarked."
+          ],
+          "numeric_findings": []
+        }
+      ],
+      "contrast": {
+        "claim_id": "claim_benchmark_collaboration",
+        "claim_text": "It builds on Opus 4.7 with improvements across benchmarks, and is a more effective collaborator.",
+        "reference_sources": [
+          {
+            "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+            "title": "Claude Opus 4.8 System Card - Anthropic",
+            "source_type": "vendor_doc",
+            "why_relevant": "Primary capability and safety evaluation reference.",
+            "authority_score": 90
+          },
+          {
+            "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+            "title": "Models overview - Claude API Docs",
+            "source_type": "official_doc",
+            "why_relevant": "Developer-facing model positioning and comparison table.",
+            "authority_score": 90
+          }
+        ],
+        "best_sources": [
+          {
+            "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+            "title": "Claude Opus 4.8 System Card - Anthropic",
+            "stance": "supports",
+            "evidence_summary": "The system card reports broad capability sections across coding, reasoning, multimodal, and professional tasks and describes Opus 4.8 as an improvement over Opus 4.7 on many measures.",
+            "key_qualification": "The public materials support benchmark gains, but not a single quantified collaborator score."
+          },
+          {
+            "url": "https://www.anthropic.com/news/claude-opus-4-8",
+            "title": "Introducing Claude Opus 4.8 - Anthropic",
+            "stance": "narrows",
+            "evidence_summary": "Later in the launch Anthropic calls Opus 4.8 a modest but tangible improvement on its predecessor.",
+            "key_qualification": "That wording is narrower than the opening claim."
+          }
+        ],
+        "delta_type": "missing_context",
+        "delta_explanation": "The public sources support benchmark gains, but the broader collaborator framing is qualitative and not directly measured.",
+        "suggested_rewrite": "It builds on Opus 4.7 with stronger results on several published evaluations and a launch narrative centered on improved collaboration.",
+        "recommended_verdict": "missing_context",
+        "confidence": "high"
+      },
+      "anchor": {
+        "claim_id": "claim_benchmark_collaboration",
+        "block_id": "block-1",
+        "matched_text": "It builds on Opus 4.7 with improvements across benchmarks, and is a more effective collaborator.",
+        "start_char": 63,
+        "end_char": 159,
+        "match_type": "exact_claim",
+        "match_confidence": 1.0
+      },
+      "tooltip_citations": [
+        {
+          "title": "Pricing - claude.com",
+          "url": "https://claude.com/pricing#api",
+          "snippet": "",
+          "why_relevant": "The public materials support benchmark gains, but not a single quantified collaborator score."
+        },
+        {
+          "title": "Claude Opus 4.8 System Card - anthropic.com",
+          "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+          "snippet": "The system card reports broad capability sections across coding, reasoning, multimodal, and professional tasks and describes Opus 4.8 as an improvement over Opus 4.7 on many measures.",
+          "why_relevant": "The public materials support benchmark gains, but not a single quantified collaborator score."
+        }
+      ]
+    },
+    {
+      "claim": {
+        "id": "claim_agentic_reliability",
+        "claim": "Early testers have found Claude Opus 4.8 to be more reliable and sharper in its judgement when it\u2019s performing agentic tasks.",
+        "claim_type": "deployment",
+        "source_location": "Collaborating with Opus 4.8",
+        "why_risky": "Reliability language is easy to overread when the public evidence is mostly testimonials and selective benchmark framing.",
+        "audit_question": "Do the launch and system card provide standardized reliability evidence for this agentic-task claim?"
+      },
+      "verdict": "missing_context",
+      "confidence": "high",
+      "stretch_score": 63,
+      "why": "The launch offers consistent positive tester quotes, but it does not publish a standardized operational reliability rate, intervention threshold, or failure distribution for agentic tasks.",
+      "weaker_supported_rewrite": "Early testers report that Claude Opus 4.8 feels more reliable and sharper in judgment on agentic tasks, though the launch does not publish standardized reliability rates or intervention thresholds.",
+      "supporting_evidence": [
+        {
+          "source_title": "Introducing Claude Opus 4.8 - Anthropic",
+          "url": "https://www.anthropic.com/news/claude-opus-4-8",
+          "snippet": "The launch introduces a section of tester quotes describing sharper judgment and reliability on agentic work.",
+          "relevance": "Primary source for the early-tester framing."
+        },
+        {
+          "source_title": "Claude Opus 4.8 System Card - Anthropic",
+          "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+          "snippet": "The system card reports improvements on many alignment and capability measures and notes improved honesty in agentic settings.",
+          "relevance": "Directionally supports better model behavior on long-horizon tasks."
+        }
+      ],
+      "counter_evidence": [
+        {
+          "source_title": "Introducing Claude Opus 4.8 - Anthropic",
+          "url": "https://www.anthropic.com/news/claude-opus-4-8",
+          "snippet": "The launch surfaces testimonials and benchmark snapshots, but not a single published reliability rate for production agentic workflows.",
+          "relevance": "Shows the evidence gap behind the reliability phrasing."
+        }
+      ],
+      "missing_context": [
+        "No standardized public success-rate threshold is attached to the claim.",
+        "The launch does not say how much human supervision or intervention the quoted workflows required."
+      ],
+      "numeric_findings": [],
+      "agent_outputs": [
+        {
+          "agent": "manual-curation",
+          "claim_id": "claim_agentic_reliability",
+          "summary": "Compared the early-tester reliability framing to the launch evidence and the Opus 4.8 system card.",
+          "supporting_evidence": [
+            {
+              "source_title": "Claude Opus 4.8 System Card - Anthropic",
+              "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+              "snippet": "The system card reports improved honesty in agentic settings and lower rates of some misaligned actions.",
+              "relevance": "Supports the direction of the claim."
+            }
+          ],
+          "counter_evidence": [],
+          "missing_context": [
+            "No public operational reliability rate or intervention policy is provided."
+          ],
+          "numeric_findings": []
+        }
+      ],
+      "contrast": {
+        "claim_id": "claim_agentic_reliability",
+        "claim_text": "Early testers have found Claude Opus 4.8 to be more reliable and sharper in its judgement when it\u2019s performing agentic tasks.",
+        "reference_sources": [
+          {
+            "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+            "title": "Claude Opus 4.8 System Card - Anthropic",
+            "source_type": "vendor_doc",
+            "why_relevant": "Primary evaluation reference for agentic behavior and alignment outcomes.",
+            "authority_score": 90
+          },
+          {
+            "url": "https://www.anthropic.com/news/claude-opus-4-8",
+            "title": "Introducing Claude Opus 4.8 - Anthropic",
+            "source_type": "vendor_doc",
+            "why_relevant": "Contains the testimonial-driven reliability framing.",
+            "authority_score": 90
+          }
+        ],
+        "best_sources": [
+          {
+            "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+            "title": "Claude Opus 4.8 System Card - Anthropic",
+            "stance": "narrows",
+            "evidence_summary": "The system card describes broad improvements in honesty and alignment behavior, but it does not present one standardized reliability rate for agentic tasks.",
+            "key_qualification": "The evidence is directional rather than a single operational benchmark for reliability."
+          }
+        ],
+        "delta_type": "missing_context",
+        "delta_explanation": "The launch uses strong reliability language, but the public materials do not publish a standardized agentic reliability metric or supervision policy.",
+        "suggested_rewrite": "Early testers report that Claude Opus 4.8 feels more reliable and sharper in judgment on agentic tasks, though the launch does not publish standardized reliability rates or intervention thresholds.",
+        "recommended_verdict": "missing_context",
+        "confidence": "high"
+      },
+      "anchor": {
+        "claim_id": "claim_agentic_reliability",
+        "block_id": "block-6",
+        "matched_text": "Early testers have found Claude Opus 4.8 to be more reliable and sharper in its judgement when it\u2019s performing agentic tasks.",
+        "start_char": 0,
+        "end_char": 125,
+        "match_type": "exact_claim",
+        "match_confidence": 1.0
+      },
+      "tooltip_citations": [
+        {
+          "title": "Overview - platform.claude.com",
+          "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+          "snippet": "",
+          "why_relevant": "The evidence is directional rather than a single operational benchmark for reliability."
+        },
+        {
+          "title": "Pricing - claude.com",
+          "url": "https://claude.com/pricing#api",
+          "snippet": "",
+          "why_relevant": "The evidence is directional rather than a single operational benchmark for reliability."
+        }
+      ]
+    },
+    {
+      "claim": {
+        "id": "claim_super_agent_quote",
+        "claim": "On our Super-Agent benchmark, Claude Opus 4.8 is the only model to complete every case end-to-end, beating prior Opus models and GPT-5.5 at parity on cost.",
+        "claim_type": "benchmark",
+        "source_location": "Collaborating with Opus 4.8",
+        "why_risky": "This is a strong comparative benchmark claim presented through a partner quote with limited public methodology.",
+        "audit_question": "Is there enough public methodology to independently verify the Super-Agent benchmark result and the parity-on-cost comparison?"
+      },
+      "verdict": "not_checkable",
+      "confidence": "medium",
+      "stretch_score": 74,
+      "why": "The launch quote is concrete, but the public materials reviewed here do not disclose enough methodology, scoring details, or cost accounting to independently verify the result.",
+      "weaker_supported_rewrite": "Anthropic quotes an early tester saying Opus 4.8 completed every case end-to-end on that internal Super-Agent benchmark and matched GPT-5.5 at comparable cost, but the public launch does not disclose enough methodology to independently verify the claim.",
+      "supporting_evidence": [
+        {
+          "source_title": "Introducing Claude Opus 4.8 - Anthropic",
+          "url": "https://www.anthropic.com/news/claude-opus-4-8",
+          "snippet": "The Super-Agent result appears as a customer quote inside the launch page.",
+          "relevance": "Primary source for the quoted benchmark claim."
+        }
+      ],
+      "counter_evidence": [
+        {
+          "source_title": "Claude Opus 4.8 System Card - Anthropic",
+          "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+          "snippet": "The public system card covers many benchmark families, but the launch quote does not come with a public methodology packet here for the quoted Super-Agent result.",
+          "relevance": "Why the claim is not independently checkable from the reviewed public packet."
+        }
+      ],
+      "missing_context": [
+        "The public launch does not disclose the full Super-Agent benchmark methodology or dataset.",
+        "The cost-comparison method behind the GPT-5.5 parity claim is not public in the reviewed materials."
+      ],
+      "numeric_findings": [],
+      "agent_outputs": [
+        {
+          "agent": "manual-curation",
+          "claim_id": "claim_super_agent_quote",
+          "summary": "Treated the partner benchmark quote as a separate audit target and checked whether the reviewed public materials make it independently verifiable.",
+          "supporting_evidence": [
+            {
+              "source_title": "Introducing Claude Opus 4.8 - Anthropic",
+              "url": "https://www.anthropic.com/news/claude-opus-4-8",
+              "snippet": "The claim appears verbatim in the launch as a customer benchmark statement.",
+              "relevance": "Shows the source of the benchmark quote."
+            }
+          ],
+          "counter_evidence": [
+            {
+              "source_title": "Claude Opus 4.8 System Card - Anthropic",
+              "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+              "snippet": "The reviewed public packet does not surface a matching public methodology for this exact quote.",
+              "relevance": "Explains the independent-verification gap."
+            }
+          ],
+          "missing_context": [],
+          "numeric_findings": []
+        }
+      ],
+      "contrast": {
+        "claim_id": "claim_super_agent_quote",
+        "claim_text": "On our Super-Agent benchmark, Claude Opus 4.8 is the only model to complete every case end-to-end, beating prior Opus models and GPT-5.5 at parity on cost.",
+        "reference_sources": [
+          {
+            "url": "https://www.anthropic.com/news/claude-opus-4-8",
+            "title": "Introducing Claude Opus 4.8 - Anthropic",
+            "source_type": "vendor_doc",
+            "why_relevant": "Contains the customer benchmark quote as published.",
+            "authority_score": 90
+          },
+          {
+            "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+            "title": "Claude Opus 4.8 System Card - Anthropic",
+            "source_type": "vendor_doc",
+            "why_relevant": "Public evaluation packet reviewed for verification.",
+            "authority_score": 90
+          },
+          {
+            "url": "https://claude.com/pricing#api",
+            "title": "Plans & Pricing - Claude by Anthropic",
+            "source_type": "official_doc",
+            "why_relevant": "Relevant to the cost-comparison part of the quote.",
+            "authority_score": 90
+          }
+        ],
+        "best_sources": [
+          {
+            "url": "https://www.anthropic.com/news/claude-opus-4-8",
+            "title": "Introducing Claude Opus 4.8 - Anthropic",
+            "stance": "supports",
+            "evidence_summary": "The claim is presented as an early tester quote, not as a benchmark result fully unpacked in the launch itself.",
+            "key_qualification": "The quote is real, but the methodology remains opaque."
+          },
+          {
+            "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+            "title": "Claude Opus 4.8 System Card - Anthropic",
+            "stance": "narrows",
+            "evidence_summary": "The public evaluation packet reviewed here does not provide enough methodological detail to independently validate the specific Super-Agent result and parity-on-cost comparison.",
+            "key_qualification": "Independent verification is limited by missing benchmark-method detail."
+          }
+        ],
+        "delta_type": "not_checkable",
+        "delta_explanation": "The quote may be directionally accurate, but the reviewed public materials do not expose enough benchmark and cost methodology to verify it independently.",
+        "suggested_rewrite": "Anthropic quotes an early tester saying Opus 4.8 completed every case end-to-end on that internal Super-Agent benchmark and matched GPT-5.5 at comparable cost, but the public launch does not disclose enough methodology to independently verify the claim.",
+        "recommended_verdict": "not_checkable",
+        "confidence": "medium"
+      },
+      "anchor": {
+        "claim_id": "claim_super_agent_quote",
+        "block_id": "block-8",
+        "matched_text": "On our Super-Agent benchmark, Claude Opus 4.8 is the only model to complete every case end-to-end, beating prior Opus models and GPT-5.5 at parity on cost.",
+        "start_char": 0,
+        "end_char": 155,
+        "match_type": "exact_claim",
+        "match_confidence": 1.0
+      },
+      "tooltip_citations": [
+        {
+          "title": "Pricing - claude.com",
+          "url": "https://claude.com/pricing#api",
+          "snippet": "",
+          "why_relevant": "The quote is real, but the methodology remains opaque."
+        },
+        {
+          "title": "Claude Opus 4.8 System Card - anthropic.com",
+          "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+          "snippet": "The public evaluation packet reviewed here does not provide enough methodological detail to independently validate the specific Super-Agent result and parity-on-cost comparison.",
+          "why_relevant": "Independent verification is limited by missing benchmark-method detail."
+        }
+      ]
+    },
+    {
+      "claim": {
+        "id": "claim_honesty_flawed_code",
+        "claim": "This is borne out in our evaluations, which show that Opus 4.8 is around four times less likely than its predecessor to allow flaws in code it has written to pass unremarked.",
+        "claim_type": "safety",
+        "source_location": "Collaborating with Opus 4.8",
+        "why_risky": "The claim mixes a strong ratio with an internal evaluation framing about honesty and code-review behavior.",
+        "audit_question": "Do the public evaluation materials support the exact magnitude and scope of this honesty claim?"
+      },
+      "verdict": "missing_context",
+      "confidence": "high",
+      "stretch_score": 49,
+      "why": "The reviewed public materials clearly support a strong directional improvement in honesty around reporting flawed code, but they surface that directional result more clearly than the exact four-times ratio.",
+      "weaker_supported_rewrite": "Anthropic\u2019s evaluations indicate that Opus 4.8 is materially less likely than prior Opus models to leave flawed code unflagged, though the public materials here emphasize the directional improvement more clearly than the exact ratio.",
+      "supporting_evidence": [
+        {
+          "source_title": "Introducing Claude Opus 4.8 - Anthropic",
+          "url": "https://www.anthropic.com/news/claude-opus-4-8",
+          "snippet": "The launch says Anthropic's evaluations show Opus 4.8 is around four times less likely than its predecessor to let flawed code pass unremarked.",
+          "relevance": "Primary source for the exact claim."
+        },
+        {
+          "source_title": "Claude Opus 4.8 System Card - Anthropic",
+          "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+          "snippet": "The system card says honesty in agentic settings is markedly improved and that Opus 4.8 has a much lower tendency than previous models to fail to report flawed code.",
+          "relevance": "Supports the direction of the honesty improvement."
+        }
+      ],
+      "counter_evidence": [
+        {
+          "source_title": "Claude Opus 4.8 System Card - Anthropic",
+          "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+          "snippet": "The same system card notes hints of evaluation awareness and treats them as trends worth watching.",
+          "relevance": "A relevant caveat on how these evaluation results should be read."
+        }
+      ],
+      "missing_context": [
+        "The public materials reviewed here make the direction of the improvement clearer than the exact four-times ratio.",
+        "The launch does not spell out the exact evaluation setup in the same paragraph as the headline honesty claim."
+      ],
+      "numeric_findings": [
+        "Launch claim uses a relative ratio (around 4x); the supporting system-card language reviewed here is stronger on direction than on the exact multiple."
+      ],
+      "agent_outputs": [
+        {
+          "agent": "manual-curation",
+          "claim_id": "claim_honesty_flawed_code",
+          "summary": "Compared the launch's exact honesty ratio to the system-card summary language about failing to report flawed code.",
+          "supporting_evidence": [
+            {
+              "source_title": "Claude Opus 4.8 System Card - Anthropic",
+              "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+              "snippet": "The system card describes markedly improved honesty in agentic settings and a much lower tendency to miss flawed code.",
+              "relevance": "Directional support for the claim."
+            }
+          ],
+          "counter_evidence": [
+            {
+              "source_title": "Claude Opus 4.8 System Card - Anthropic",
+              "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+              "snippet": "The card also flags evaluation-awareness trends worth monitoring.",
+              "relevance": "Why the exact ratio deserves caveat."
+            }
+          ],
+          "missing_context": [],
+          "numeric_findings": [
+            "Public supporting material reviewed here clearly supports the direction of the improvement; the exact ratio is less directly surfaced."
+          ]
+        }
+      ],
+      "contrast": {
+        "claim_id": "claim_honesty_flawed_code",
+        "claim_text": "This is borne out in our evaluations, which show that Opus 4.8 is around four times less likely than its predecessor to allow flaws in code it has written to pass unremarked.",
+        "reference_sources": [
+          {
+            "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+            "title": "Claude Opus 4.8 System Card - Anthropic",
+            "source_type": "vendor_doc",
+            "why_relevant": "Primary evidence packet for honesty and alignment evaluations.",
+            "authority_score": 90
+          },
+          {
+            "url": "https://www.anthropic.com/news/claude-opus-4-8",
+            "title": "Introducing Claude Opus 4.8 - Anthropic",
+            "source_type": "vendor_doc",
+            "why_relevant": "Contains the exact ratio language.",
+            "authority_score": 90
+          }
+        ],
+        "best_sources": [
+          {
+            "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+            "title": "Claude Opus 4.8 System Card - Anthropic",
+            "stance": "narrows",
+            "evidence_summary": "The system card says honesty in agentic settings is markedly improved and that Opus 4.8 is much less likely than prior models to fail to report flawed code.",
+            "key_qualification": "The direction is clear, but the exact ratio is less front-and-center in the reviewed supporting material."
+          },
+          {
+            "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+            "title": "Claude Opus 4.8 System Card - Anthropic",
+            "stance": "narrows",
+            "evidence_summary": "The same section notes hints of evaluation awareness that Anthropic considers worth watching.",
+            "key_qualification": "That caveat belongs alongside the headline honesty claim."
+          }
+        ],
+        "delta_type": "missing_context",
+        "delta_explanation": "The public evidence reviewed here strongly supports the direction of the honesty improvement, but the exact ratio and its evaluation context still need caveat.",
+        "suggested_rewrite": "Anthropic\u2019s evaluations indicate that Opus 4.8 is materially less likely than prior Opus models to leave flawed code unflagged, though the public materials here emphasize the directional improvement more clearly than the exact ratio.",
+        "recommended_verdict": "missing_context",
+        "confidence": "high"
+      },
+      "anchor": {
+        "claim_id": "claim_honesty_flawed_code",
+        "block_id": "block-18",
+        "matched_text": "This is borne out in our evaluations, which show that Opus 4.8 is around four times less likely than its predecessor to allow flaws in code it has written to pass unremarked.",
+        "start_char": 468,
+        "end_char": 642,
+        "match_type": "exact_claim",
+        "match_confidence": 1.0
+      },
+      "tooltip_citations": [
+        {
+          "title": "Pricing - claude.com",
+          "url": "https://claude.com/pricing#api",
+          "snippet": "",
+          "why_relevant": "The direction is clear, but the exact ratio is less front-and-center in the reviewed supporting material."
+        },
+        {
+          "title": "Claude Opus 4.8 System Card - anthropic.com",
+          "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+          "snippet": "The system card says honesty in agentic settings is markedly improved and that Opus 4.8 is much less likely than prior models to fail to report flawed code.",
+          "why_relevant": "The direction is clear, but the exact ratio is less front-and-center in the reviewed supporting material."
+        }
+      ]
+    },
+    {
+      "claim": {
+        "id": "claim_alignment_assessment",
+        "claim": "The assessment also showed Opus 4.8 to have rates of misaligned behavior (such as deception or cooperation with misuse) that are substantially lower than Opus 4.7, and similar to our best-aligned model, Claude Mythos Preview.",
+        "claim_type": "safety",
+        "source_location": "Collaborating with Opus 4.8",
+        "why_risky": "This is a strong alignment comparison claim, but it is also one the system card appears to address directly.",
+        "audit_question": "Does the public system card support the comparative alignment claim as written?"
+      },
+      "verdict": "supported",
+      "confidence": "high",
+      "stretch_score": 24,
+      "why": "The reviewed system-card summary directly says Opus 4.8 shows a large improvement over Opus 4.7 on susceptibility to misuse and misaligned actions and brings the model broadly in line with Mythos Preview on these measures.",
+      "weaker_supported_rewrite": "The system card says Opus 4.8 shows substantially lower rates of several misaligned behaviors than Opus 4.7 and is broadly in line with Claude Mythos Preview on Anthropic\u2019s primary behavioral evaluations.",
+      "supporting_evidence": [
+        {
+          "source_title": "Claude Opus 4.8 System Card - Anthropic",
+          "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+          "snippet": "The system card says Opus 4.8 reaches new highs on prosocial traits and shows a large improvement over Opus 4.7 on susceptibility to misuse and misaligned actions, broadly in line with Mythos Preview.",
+          "relevance": "Direct support for the launch's alignment comparison."
+        },
+        {
+          "source_title": "Introducing Claude Opus 4.8 - Anthropic",
+          "url": "https://www.anthropic.com/news/claude-opus-4-8",
+          "snippet": "The launch explicitly points readers to the Opus 4.8 system card for the full alignment assessment and safety tests.",
+          "relevance": "Connects the claim to the underlying evaluation packet."
+        }
+      ],
+      "counter_evidence": [],
+      "missing_context": [],
+      "numeric_findings": [],
+      "agent_outputs": [
+        {
+          "agent": "manual-curation",
+          "claim_id": "claim_alignment_assessment",
+          "summary": "Checked the launch's alignment comparison against the corresponding system-card summary language.",
+          "supporting_evidence": [
+            {
+              "source_title": "Claude Opus 4.8 System Card - Anthropic",
+              "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+              "snippet": "System-card summary language closely matches the launch comparison.",
+              "relevance": "Direct support."
+            }
+          ],
+          "counter_evidence": [],
+          "missing_context": [],
+          "numeric_findings": []
+        }
+      ],
+      "contrast": {
+        "claim_id": "claim_alignment_assessment",
+        "claim_text": "The assessment also showed Opus 4.8 to have rates of misaligned behavior (such as deception or cooperation with misuse) that are substantially lower than Opus 4.7, and similar to our best-aligned model, Claude Mythos Preview.",
+        "reference_sources": [
+          {
+            "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+            "title": "Claude Opus 4.8 System Card - Anthropic",
+            "source_type": "vendor_doc",
+            "why_relevant": "Primary alignment and safety evidence packet.",
+            "authority_score": 90
+          },
+          {
+            "url": "https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy",
+            "title": "Announcing our updated Responsible Scaling Policy - Anthropic",
+            "source_type": "vendor_doc",
+            "why_relevant": "Safety-governance context for Anthropic's release process.",
+            "authority_score": 90
+          }
+        ],
+        "best_sources": [
+          {
+            "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+            "title": "Claude Opus 4.8 System Card - Anthropic",
+            "stance": "supports",
+            "evidence_summary": "The system-card summary says Opus 4.8 shows a large improvement over Opus 4.7 on susceptibility to misuse and misaligned actions and is broadly in line with Mythos Preview.",
+            "key_qualification": "The launch claim is closely aligned to the reviewed supporting source."
+          }
+        ],
+        "delta_type": "same",
+        "delta_explanation": "The reviewed system-card summary materially supports the comparative alignment claim as written.",
+        "suggested_rewrite": "The system card says Opus 4.8 shows substantially lower rates of several misaligned behaviors than Opus 4.7 and is broadly in line with Claude Mythos Preview on Anthropic\u2019s primary behavioral evaluations.",
+        "recommended_verdict": "supported",
+        "confidence": "high"
+      },
+      "tooltip_citations": []
+    },
+    {
+      "claim": {
+        "id": "claim_availability_pricing",
+        "claim": "Claude Opus 4.8 is available everywhere today. Pricing for regular usage is unchanged from Opus 4.7: $5 per million input tokens and $25 per million output tokens. Pricing for fast mode is $10 per million input tokens and $50 per million output tokens. Developers can use claude-opus-4-8 via the Claude API.",
+        "claim_type": "numeric",
+        "source_location": "Availability",
+        "why_risky": "Availability and pricing claims are precise and easy to overstate, so they should either match the docs or be narrowed.",
+        "audit_question": "Do Anthropic's launch and current docs support the availability, API identifier, and pricing claims as written?"
+      },
+      "verdict": "supported",
+      "confidence": "high",
+      "stretch_score": 10,
+      "why": "The launch, models overview, and pricing materials reviewed here align on the API name and the regular/fast mode price structure for Opus 4.8.",
+      "weaker_supported_rewrite": "Claude Opus 4.8 is available through Anthropic\u2019s surfaces and cloud partners, with regular usage priced at $5 per million input tokens and $25 per million output tokens, and fast mode at $10 and $50 respectively.",
+      "supporting_evidence": [
+        {
+          "source_title": "Introducing Claude Opus 4.8 - Anthropic",
+          "url": "https://www.anthropic.com/news/claude-opus-4-8",
+          "snippet": "The availability section says Opus 4.8 is available everywhere today and gives the regular and fast-mode prices plus the Claude API model name.",
+          "relevance": "Primary source for the launch availability block."
+        },
+        {
+          "source_title": "Models overview - Claude API Docs",
+          "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+          "snippet": "Anthropic's models overview lists Claude Opus 4.8, the claude-opus-4-8 API alias, and the $5 input / $25 output pricing.",
+          "relevance": "Developer-doc confirmation of model name and base pricing."
+        },
+        {
+          "source_title": "Plans & Pricing - Claude by Anthropic",
+          "url": "https://claude.com/pricing#api",
+          "snippet": "Anthropic's pricing page describes Opus 4.8 pricing, fast mode at 2x standard pricing, and related prompt-caching / batch details.",
+          "relevance": "Supports the pricing structure beyond the launch post."
+        }
+      ],
+      "counter_evidence": [],
+      "missing_context": [],
+      "numeric_findings": [
+        "Regular usage: $5/M input and $25/M output. Fast mode: $10/M input and $50/M output. Claude API identifier: claude-opus-4-8."
+      ],
+      "agent_outputs": [
+        {
+          "agent": "manual-curation",
+          "claim_id": "claim_availability_pricing",
+          "summary": "Checked Anthropic's launch availability paragraph against the current model-overview and pricing docs.",
+          "supporting_evidence": [
+            {
+              "source_title": "Models overview - Claude API Docs",
+              "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+              "snippet": "Model overview lists Claude Opus 4.8 and the standard API pricing.",
+              "relevance": "Docs confirmation."
+            },
+            {
+              "source_title": "Plans & Pricing - Claude by Anthropic",
+              "url": "https://claude.com/pricing#api",
+              "snippet": "Pricing page describes fast mode at 2x standard pricing for Opus 4.8.",
+              "relevance": "Pricing confirmation."
+            }
+          ],
+          "counter_evidence": [],
+          "missing_context": [],
+          "numeric_findings": [
+            "The launch pricing block matches the reviewed docs for standard and fast mode pricing."
+          ]
+        }
+      ],
+      "contrast": {
+        "claim_id": "claim_availability_pricing",
+        "claim_text": "Claude Opus 4.8 is available everywhere today. Pricing for regular usage is unchanged from Opus 4.7: $5 per million input tokens and $25 per million output tokens. Pricing for fast mode is $10 per million input tokens and $50 per million output tokens. Developers can use claude-opus-4-8 via the Claude API.",
+        "reference_sources": [
+          {
+            "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+            "title": "Models overview - Claude API Docs",
+            "source_type": "official_doc",
+            "why_relevant": "Lists the model IDs, pricing, and context window for Claude Opus 4.8.",
+            "authority_score": 90
+          },
+          {
+            "url": "https://claude.com/pricing#api",
+            "title": "Plans & Pricing - Claude by Anthropic",
+            "source_type": "official_doc",
+            "why_relevant": "Current pricing page for standard and fast mode.",
+            "authority_score": 90
+          },
+          {
+            "url": "https://www.anthropic.com/news/claude-opus-4-8",
+            "title": "Introducing Claude Opus 4.8 - Anthropic",
+            "source_type": "vendor_doc",
+            "why_relevant": "Launch availability paragraph and model identifier.",
+            "authority_score": 90
+          }
+        ],
+        "best_sources": [
+          {
+            "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+            "title": "Models overview - Claude API Docs",
+            "stance": "supports",
+            "evidence_summary": "The models overview lists Claude Opus 4.8 with the claude-opus-4-8 API alias and a $5 input / $25 output pricing row.",
+            "key_qualification": "Direct support for the standard pricing and API identifier."
+          },
+          {
+            "url": "https://claude.com/pricing#api",
+            "title": "Plans & Pricing - Claude by Anthropic",
+            "stance": "supports",
+            "evidence_summary": "Anthropic\u2019s pricing page describes fast mode for Opus 4.8 at 2x standard pricing.",
+            "key_qualification": "Supports the fast-mode prices stated in the launch."
+          }
+        ],
+        "delta_type": "same",
+        "delta_explanation": "The reviewed docs support the availability, API identifier, and price structure described in the launch.",
+        "suggested_rewrite": "Claude Opus 4.8 is available through Anthropic\u2019s surfaces and cloud partners, with regular usage priced at $5 per million input tokens and $25 per million output tokens, and fast mode at $10 and $50 respectively.",
+        "recommended_verdict": "supported",
+        "confidence": "high"
+      },
+      "tooltip_citations": []
+    }
+  ],
+  "runtime": "manual",
+  "mode": "curated_manual",
+  "contrast_enabled": true,
+  "reference_urls": [
+    "https://www.anthropic.com/claude-opus-4-8-system-card",
+    "https://www.anthropic.com/news/claude-opus-4-8",
+    "https://platform.claude.com/docs/en/about-claude/models/overview",
+    "https://claude.com/pricing#api",
+    "https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy"
+  ],
+  "launch_page": {
+    "source_title": "Introducing Claude Opus 4.8 \\ Anthropic",
+    "source_url": "https://www.anthropic.com/news/claude-opus-4-8",
+    "blocks": [
+      {
+        "block_id": "block-0",
+        "kind": "h1",
+        "text": "Introducing Claude Opus 4.8",
+        "source_order": 0
+      },
+      {
+        "block_id": "block-1",
+        "kind": "p",
+        "text": "We\u2019re upgrading Claude Opus to a new version: Claude Opus 4.8. It builds on Opus 4.7 with improvements across benchmarks, and is a more effective collaborator. It\u2019s available today for the same price.",
+        "section_heading": "Introducing Claude Opus 4.8",
+        "source_order": 1
+      },
+      {
+        "block_id": "block-2",
+        "kind": "p",
+        "text": "Opus 4.8 launches alongside several new features. Users on claude.ai now have control over the amount of effort Claude puts into a task. Claude Code has a new \u201cdynamic workflows\u201d feature that allows it to tackle very large-scale problems. And fast mode for Opus 4.8\u2014where the model can work at 2.5\u00d7 the speed\u2014is now three times cheaper than it was for previous models.",
+        "section_heading": "Introducing Claude Opus 4.8",
+        "source_order": 2
+      },
+      {
+        "block_id": "block-3",
+        "kind": "h2",
+        "text": "Opus 4.8\u2019s capabilities",
+        "section_heading": "Introducing Claude Opus 4.8",
+        "source_order": 3
+      },
+      {
+        "block_id": "block-4",
+        "kind": "p",
+        "text": "The table below shows how Opus 4.8 compares to its predecessor and to other models on tests of coding, agentic skills, reasoning, and practical knowledge work tasks. More details and a much wider range of capability evaluations are provided in the Claude Opus 4.8 System Card.",
+        "section_heading": "Opus 4.8\u2019s capabilities",
+        "source_order": 4
+      },
+      {
+        "block_id": "block-5",
+        "kind": "h2",
+        "text": "Collaborating with Opus 4.8",
+        "section_heading": "Opus 4.8\u2019s capabilities",
+        "source_order": 5
+      },
+      {
+        "block_id": "block-6",
+        "kind": "p",
+        "text": "Early testers have found Claude Opus 4.8 to be more reliable and sharper in its judgement when it\u2019s performing agentic tasks. Below are quotes from many of these testers about their experience collaborating with Opus 4.8:",
+        "section_heading": "Collaborating with Opus 4.8",
+        "source_order": 6
+      },
+      {
+        "block_id": "block-7",
+        "kind": "blockquote",
+        "text": "Claude Opus 4.8 has noticeably better judgment. In Claude Code, it asks the right questions, catches its own mistakes, pushes back when a plan isn\u2019t sound, and builds up confidence around complex, multi-service explorations before making big changes. It\u2019s a great model to build with.Tom Pritchard Staff Engineer",
+        "section_heading": "Collaborating with Opus 4.8",
+        "source_order": 7
+      },
+      {
+        "block_id": "block-8",
+        "kind": "blockquote",
+        "text": "On our Super-Agent benchmark, Claude Opus 4.8 is the only model to complete every case end-to-end, beating prior Opus models and GPT-5.5 at parity on cost. For agent products in translation, deep research, slide-building, and analysis, it delivers powerful reliability.Kay Zhu Co-Founder and CTO",
+        "section_heading": "Collaborating with Opus 4.8",
+        "source_order": 8
+      },
+      {
+        "block_id": "block-9",
+        "kind": "blockquote",
+        "text": "On CursorBench, Claude Opus 4.8 exceeds prior Opus models across every effort level. Tool calling is meaningfully more efficient, using fewer steps for the same intelligence, and it carries end-to-end tasks through. Michael Truell Co-Founder and CEO",
+        "section_heading": "Collaborating with Opus 4.8",
+        "source_order": 9
+      },
+      {
+        "block_id": "block-10",
+        "kind": "blockquote",
+        "text": "Claude Opus 4.8 delivers the highest score recorded on our Legal Agent Benchmark, and is the first model to break 10% overall on the all-pass standard. For substantive legal work, that\u2019s the kind of accuracy lift that translates directly into how much real attorney work our customers can hand off with confidence.Niko Grupen Head of Applied Research",
+        "section_heading": "Collaborating with Opus 4.8",
+        "source_order": 10
+      },
+      {
+        "block_id": "block-11",
+        "kind": "blockquote",
+        "text": "Claude Opus 4.8 feels like a major quality-of-life update over Opus 4.7: faster, easier to collaborate with, and better at carrying context and style direction across a long session. Opus 4.8 is the model I kept trusting for work where voice, taste, and technical execution all have to happen side-by-side.Katie Parrott Staff Writer",
+        "section_heading": "Collaborating with Opus 4.8",
+        "source_order": 11
+      },
+      {
+        "block_id": "block-12",
+        "kind": "blockquote",
+        "text": "Claude Opus 4.8 is the strongest computer-use and browser-agent model we\u2019ve tested, scoring 84% on Online-Mind2Web, which is a meaningful jump over both Opus 4.7 and GPT-5.5. It stays reflective and on-task in the way our customers\u2019 agent workloads need to be reliable end-to-end.Miguel Gonzalez Tech Lead",
+        "section_heading": "Collaborating with Opus 4.8",
+        "source_order": 12
+      },
+      {
+        "block_id": "block-13",
+        "kind": "blockquote",
+        "text": "Claude Opus 4.8 uses tools cleanly and follows instructions with the consistency our autonomous engineering workloads need to keep running unattended. It improves on Opus 4.6 and fixes the comment-verbosity and tool-calling issues we saw with Opus 4.7. This release from Anthropic translates directly into faster capability gains for engineers building on Devin.Scott Wu CEO",
+        "section_heading": "Collaborating with Opus 4.8",
+        "source_order": 13
+      },
+      {
+        "block_id": "block-14",
+        "kind": "blockquote",
+        "text": "On our long-running evals, Claude Opus 4.8\u2019s analysis was consistently higher quality than prior Opus models. It finished faster and produced richer, more information dense outputs. Overall, a noticeably better signal to noise ratio. The biggest differentiator was Opus 4.8\u2019s tendency to proactively flag issues with the inputs and outputs of an analysis, something other models routinely missed and left to the users to catch.Michael Ran Sr. Investment Associate",
+        "section_heading": "Collaborating with Opus 4.8",
+        "source_order": 14
+      },
+      {
+        "block_id": "block-15",
+        "kind": "blockquote",
+        "text": "Across CoCounsel Legal, Claude Opus 4.8 delivered meaningful improvements in consistency and reasoning quality compared to prior Opus models. For the high-stakes professional workflows our customers depend on, that reliability matters. As we build fiduciary-grade AI systems for legal and tax professionals, advances like these help raise the standard for trusted AI performance in real-world workflows.Joel Hron Chief Technology Officer",
+        "section_heading": "Collaborating with Opus 4.8",
+        "source_order": 15
+      },
+      {
+        "block_id": "block-16",
+        "kind": "blockquote",
+        "text": "Claude Opus 4.8 sets a new bar for enterprise AI. In Genie, Databricks\u2019 AI agent for data and knowledge work, the new Opus model unlocks a step change in agentic reasoning, tackling deeper, multistep questions faster than any prior Opus. Its multimodal strength also lets Genie reason directly over PDFs, diagrams, and other unstructured content at 61% cheaper token cost than Opus 4.7.Hanlin Tang CTO, Neural Networks",
+        "section_heading": "Collaborating with Opus 4.8",
+        "source_order": 16
+      },
+      {
+        "block_id": "block-17",
+        "kind": "blockquote",
+        "text": "For financial-document workflows in Hebbia\u2019s orchestrator, Claude Opus 4.8 delivers the same strong quality as Opus 4.7 with noticeably better citation precision and more token efficiency on retrieval, which works incredibly well for the kinds of dense filings our customers run every day.Aabhas Sharma CTO",
+        "section_heading": "Collaborating with Opus 4.8",
+        "source_order": 17
+      },
+      {
+        "block_id": "block-18",
+        "kind": "p",
+        "text": "One of the most prominent improvements in Opus 4.8 is its honesty. We train all our models to be honest\u2014for instance, to avoid making claims that they can\u2019t support. But a general problem with AI models is that they sometimes jump to conclusions, confidently claiming to have made progress in their work despite the evidence being thin. Early testers report that Opus 4.8 is more likely to flag uncertainties about its work and less likely to make unsupported claims. This is borne out in our evaluations, which show that Opus 4.8 is around four times less likely than its predecessor to allow flaws in code it has written to pass unremarked.",
+        "section_heading": "Collaborating with Opus 4.8",
+        "source_order": 18
+      },
+      {
+        "block_id": "block-19",
+        "kind": "p",
+        "text": "As always, we ran a detailed alignment assessment on the model before release. In terms of positive traits, our Alignment team concluded that Opus 4.8 \u201creaches new highs on our measures of prosocial traits like supporting user autonomy and acting in the user\u2019s best interest.\u201d The assessment also showed Opus 4.8 to have rates of misaligned behavior (such as deception or cooperation with misuse) that are substantially lower than Opus 4.7, and similar to our best-aligned model, Claude Mythos Preview. The full alignment assessment, accompanied by a suite of pre-deployment safety tests, is reported in the Claude Opus 4.8 System Card.",
+        "section_heading": "Collaborating with Opus 4.8",
+        "source_order": 19
+      },
+      {
+        "block_id": "block-20",
+        "kind": "h2",
+        "text": "Also launching today",
+        "section_heading": "Collaborating with Opus 4.8",
+        "source_order": 20
+      },
+      {
+        "block_id": "block-21",
+        "kind": "p",
+        "text": "In addition to Claude Opus 4.8, we\u2019re making the following updates:",
+        "section_heading": "Also launching today",
+        "source_order": 21
+      },
+      {
+        "block_id": "block-22",
+        "kind": "li",
+        "text": "Dynamic workflows. This new feature, available in research preview, allows Claude to take on even bigger tasks in Claude Code. Claude can plan the work and then run hundreds of parallel subagents in a single session (and with Opus 4.8, the agents can run for even longer). It then verifies its outputs before reporting back to the user. For example, Claude Code with Opus 4.8 can now carry out codebase-scale migrations across hundreds of thousands of lines of code from kickoff to merge, with the existing test suite as its bar. You can read more about dynamic workflows\u2014available in Claude Code for Enterprise, Team, and Max plans\u2014in this post.",
+        "section_heading": "Also launching today",
+        "source_order": 22
+      },
+      {
+        "block_id": "block-23",
+        "kind": "li",
+        "text": "Effort control in claude.ai and Cowork. A new control alongside the model selector lets users choose how much effort Claude puts into a response. On higher effort settings, Claude will think more frequently and more deeply to give better responses. On lower effort settings, Claude will respond faster and use up a user\u2019s rate limits more slowly. Users now have this choice\u2014the effort control is available on all plans.",
+        "section_heading": "Also launching today",
+        "source_order": 23
+      },
+      {
+        "block_id": "block-24",
+        "kind": "li",
+        "text": "The Messages API now accepts system entries inside the messages array. Developers can update Claude\u2019s instructions mid-task without breaking the prompt cache or routing the update through a user turn. This can be used in a given harness to update permissions, token budgets, or environment context as an agent runs.",
+        "section_heading": "Also launching today",
+        "source_order": 24
+      },
+      {
+        "block_id": "block-25",
+        "kind": "h2",
+        "text": "A note on effort",
+        "section_heading": "Also launching today",
+        "source_order": 25
+      },
+      {
+        "block_id": "block-26",
+        "kind": "p",
+        "text": "Opus 4.8 defaults to high effort, which we judge to be the best overall balance of quality and user experience. On coding tasks, this effort level spends a similar number of tokens as Opus 4.7\u2019s default, but with better performance. Users can choose \u201cextra\u201d (\u201cxhigh\u201d in Claude Code) or \u201cmax,\u201d and the model will spend more tokens to get better results; we recommend using \u201cextra\u201d for difficult tasks and long-running asynchronous workflows. We have increased rate limits in Claude Code to accommodate the higher token usage of higher effort levels; users can select whichever makes sense for their particular project.",
+        "section_heading": "A note on effort",
+        "source_order": 26
+      },
+      {
+        "block_id": "block-27",
+        "kind": "h2",
+        "text": "What\u2019s next?",
+        "section_heading": "A note on effort",
+        "source_order": 27
+      },
+      {
+        "block_id": "block-28",
+        "kind": "p",
+        "text": "Users will find Opus 4.8 to be a modest but tangible improvement on its predecessor. There\u2019s still more to be done: we\u2019re working on developing and releasing models that provide many of the same capabilities as Opus at a lower cost.",
+        "section_heading": "What\u2019s next?",
+        "source_order": 28
+      },
+      {
+        "block_id": "block-29",
+        "kind": "p",
+        "text": "Not only that, but we plan to release a new class of model with even higher intelligence than Opus. As part of Project Glasswing, a small number of organizations are currently using Claude Mythos Preview for cybersecurity work. Models of this capability level require stronger cyber safeguards before they can be generally released. We\u2019re making swift progress on developing these safeguards and expect to be able to bring Mythos-class models to all our customers in the coming weeks.",
+        "section_heading": "What\u2019s next?",
+        "source_order": 29
+      },
+      {
+        "block_id": "block-30",
+        "kind": "h2",
+        "text": "Availability",
+        "section_heading": "What\u2019s next?",
+        "source_order": 30
+      },
+      {
+        "block_id": "block-31",
+        "kind": "p",
+        "text": "Claude Opus 4.8 is available everywhere today. Pricing for regular usage is unchanged from Opus 4.7: $5 per million input tokens and $25 per million output tokens. Pricing for fast mode is $10 per million input tokens and $50 per million output tokens. Developers can use claude-opus-4-8 via the Claude API.",
+        "section_heading": "Availability",
+        "source_order": 31
+      }
+    ],
+    "decorations": [
+      {
+        "claim_id": "claim_agentic_reliability",
+        "verdict": "missing_context",
+        "original_text": "Early testers have found Claude Opus 4.8 to be more reliable and sharper in its judgement when it\u2019s performing agentic tasks.",
+        "rewritten_text": "Early testers report that Claude Opus 4.8 feels more reliable and sharper in judgment on agentic tasks, though the launch does not publish standardized reliability rates or intervention thresholds.",
+        "reason": "The launch offers consistent positive tester quotes, but it does not publish a standardized operational reliability rate, intervention threshold, or failure distribution for agentic tasks.",
+        "citations": [
+          {
+            "title": "Overview - platform.claude.com",
+            "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+            "snippet": "",
+            "why_relevant": "The evidence is directional rather than a single operational benchmark for reliability."
+          },
+          {
+            "title": "Pricing - claude.com",
+            "url": "https://claude.com/pricing#api",
+            "snippet": "",
+            "why_relevant": "The evidence is directional rather than a single operational benchmark for reliability."
+          }
+        ],
+        "anchor": {
+          "claim_id": "claim_agentic_reliability",
+          "block_id": "block-6",
+          "matched_text": "Early testers have found Claude Opus 4.8 to be more reliable and sharper in its judgement when it\u2019s performing agentic tasks.",
+          "start_char": 0,
+          "end_char": 125,
+          "match_type": "exact_claim",
+          "match_confidence": 1.0
+        }
+      },
+      {
+        "claim_id": "claim_benchmark_collaboration",
+        "verdict": "missing_context",
+        "original_text": "It builds on Opus 4.7 with improvements across benchmarks, and is a more effective collaborator.",
+        "rewritten_text": "It builds on Opus 4.7 with stronger results on several published evaluations and a launch narrative centered on improved collaboration.",
+        "reason": "The launch and system card support meaningful benchmark improvements, but \"more effective collaborator\" is a broader qualitative framing than the public materials measure directly.",
+        "citations": [
+          {
+            "title": "Pricing - claude.com",
+            "url": "https://claude.com/pricing#api",
+            "snippet": "",
+            "why_relevant": "The public materials support benchmark gains, but not a single quantified collaborator score."
+          },
+          {
+            "title": "Claude Opus 4.8 System Card - anthropic.com",
+            "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+            "snippet": "The system card reports broad capability sections across coding, reasoning, multimodal, and professional tasks and describes Opus 4.8 as an improvement over Opus 4.7 on many measures.",
+            "why_relevant": "The public materials support benchmark gains, but not a single quantified collaborator score."
+          }
+        ],
+        "anchor": {
+          "claim_id": "claim_benchmark_collaboration",
+          "block_id": "block-1",
+          "matched_text": "It builds on Opus 4.7 with improvements across benchmarks, and is a more effective collaborator.",
+          "start_char": 63,
+          "end_char": 159,
+          "match_type": "exact_claim",
+          "match_confidence": 1.0
+        }
+      },
+      {
+        "claim_id": "claim_honesty_flawed_code",
+        "verdict": "missing_context",
+        "original_text": "This is borne out in our evaluations, which show that Opus 4.8 is around four times less likely than its predecessor to allow flaws in code it has written to pass unremarked.",
+        "rewritten_text": "Anthropic\u2019s evaluations indicate that Opus 4.8 is materially less likely than prior Opus models to leave flawed code unflagged, though the public materials here emphasize the directional improvement more clearly than the exact ratio.",
+        "reason": "The reviewed public materials clearly support a strong directional improvement in honesty around reporting flawed code, but they surface that directional result more clearly than the exact four-times ratio.",
+        "citations": [
+          {
+            "title": "Pricing - claude.com",
+            "url": "https://claude.com/pricing#api",
+            "snippet": "",
+            "why_relevant": "The direction is clear, but the exact ratio is less front-and-center in the reviewed supporting material."
+          },
+          {
+            "title": "Claude Opus 4.8 System Card - anthropic.com",
+            "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+            "snippet": "The system card says honesty in agentic settings is markedly improved and that Opus 4.8 is much less likely than prior models to fail to report flawed code.",
+            "why_relevant": "The direction is clear, but the exact ratio is less front-and-center in the reviewed supporting material."
+          }
+        ],
+        "anchor": {
+          "claim_id": "claim_honesty_flawed_code",
+          "block_id": "block-18",
+          "matched_text": "This is borne out in our evaluations, which show that Opus 4.8 is around four times less likely than its predecessor to allow flaws in code it has written to pass unremarked.",
+          "start_char": 468,
+          "end_char": 642,
+          "match_type": "exact_claim",
+          "match_confidence": 1.0
+        }
+      },
+      {
+        "claim_id": "claim_super_agent_quote",
+        "verdict": "not_checkable",
+        "original_text": "On our Super-Agent benchmark, Claude Opus 4.8 is the only model to complete every case end-to-end, beating prior Opus models and GPT-5.5 at parity on cost.",
+        "rewritten_text": "Anthropic quotes an early tester saying Opus 4.8 completed every case end-to-end on that internal Super-Agent benchmark and matched GPT-5.5 at comparable cost, but the public launch does not disclose enough methodology to independently verify the claim.",
+        "reason": "The launch quote is concrete, but the public materials reviewed here do not disclose enough methodology, scoring details, or cost accounting to independently verify the result.",
+        "citations": [
+          {
+            "title": "Pricing - claude.com",
+            "url": "https://claude.com/pricing#api",
+            "snippet": "",
+            "why_relevant": "The quote is real, but the methodology remains opaque."
+          },
+          {
+            "title": "Claude Opus 4.8 System Card - anthropic.com",
+            "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+            "snippet": "The public evaluation packet reviewed here does not provide enough methodological detail to independently validate the specific Super-Agent result and parity-on-cost comparison.",
+            "why_relevant": "Independent verification is limited by missing benchmark-method detail."
+          }
+        ],
+        "anchor": {
+          "claim_id": "claim_super_agent_quote",
+          "block_id": "block-8",
+          "matched_text": "On our Super-Agent benchmark, Claude Opus 4.8 is the only model to complete every case end-to-end, beating prior Opus models and GPT-5.5 at parity on cost.",
+          "start_char": 0,
+          "end_char": 155,
+          "match_type": "exact_claim",
+          "match_confidence": 1.0
+        }
+      }
+    ],
+    "rewritten_claim_count": 4,
+    "explicit_reference_count": 3,
+    "primary_view": "audited_launch_page"
+  },
+  "publication": {
+    "slug": "anthropic-opus-48",
+    "lab": "Anthropic",
+    "launch_name": "Anthropic Claude Opus 4.8",
+    "original_url": "https://www.anthropic.com/news/claude-opus-4-8",
+    "original_label": "Original Anthropic launch post",
+    "source_note": "Curated against Anthropic's Opus 4.8 system card, model docs, pricing, and Responsible Scaling Policy references.",
+    "status": "reviewed",
+    "published_at": "2026-05-28",
+    "evidence_packet_url": "evidence_packets/anthropic-opus-48.json",
+    "gate_status": "pass",
+    "disclaimer": "Audited modified version of the original source. This page is provided for analysis and commentary and is not the original publisher's page."
+  }
+};
+    const launchPage = {
+  "source_title": "Introducing Claude Opus 4.8 \\ Anthropic",
+  "source_url": "https://www.anthropic.com/news/claude-opus-4-8",
+  "blocks": [
+    {
+      "block_id": "block-0",
+      "kind": "h1",
+      "text": "Introducing Claude Opus 4.8",
+      "source_order": 0
+    },
+    {
+      "block_id": "block-1",
+      "kind": "p",
+      "text": "We\u2019re upgrading Claude Opus to a new version: Claude Opus 4.8. It builds on Opus 4.7 with improvements across benchmarks, and is a more effective collaborator. It\u2019s available today for the same price.",
+      "section_heading": "Introducing Claude Opus 4.8",
+      "source_order": 1
+    },
+    {
+      "block_id": "block-2",
+      "kind": "p",
+      "text": "Opus 4.8 launches alongside several new features. Users on claude.ai now have control over the amount of effort Claude puts into a task. Claude Code has a new \u201cdynamic workflows\u201d feature that allows it to tackle very large-scale problems. And fast mode for Opus 4.8\u2014where the model can work at 2.5\u00d7 the speed\u2014is now three times cheaper than it was for previous models.",
+      "section_heading": "Introducing Claude Opus 4.8",
+      "source_order": 2
+    },
+    {
+      "block_id": "block-3",
+      "kind": "h2",
+      "text": "Opus 4.8\u2019s capabilities",
+      "section_heading": "Introducing Claude Opus 4.8",
+      "source_order": 3
+    },
+    {
+      "block_id": "block-4",
+      "kind": "p",
+      "text": "The table below shows how Opus 4.8 compares to its predecessor and to other models on tests of coding, agentic skills, reasoning, and practical knowledge work tasks. More details and a much wider range of capability evaluations are provided in the Claude Opus 4.8 System Card.",
+      "section_heading": "Opus 4.8\u2019s capabilities",
+      "source_order": 4
+    },
+    {
+      "block_id": "block-5",
+      "kind": "h2",
+      "text": "Collaborating with Opus 4.8",
+      "section_heading": "Opus 4.8\u2019s capabilities",
+      "source_order": 5
+    },
+    {
+      "block_id": "block-6",
+      "kind": "p",
+      "text": "Early testers have found Claude Opus 4.8 to be more reliable and sharper in its judgement when it\u2019s performing agentic tasks. Below are quotes from many of these testers about their experience collaborating with Opus 4.8:",
+      "section_heading": "Collaborating with Opus 4.8",
+      "source_order": 6
+    },
+    {
+      "block_id": "block-7",
+      "kind": "blockquote",
+      "text": "Claude Opus 4.8 has noticeably better judgment. In Claude Code, it asks the right questions, catches its own mistakes, pushes back when a plan isn\u2019t sound, and builds up confidence around complex, multi-service explorations before making big changes. It\u2019s a great model to build with.Tom Pritchard Staff Engineer",
+      "section_heading": "Collaborating with Opus 4.8",
+      "source_order": 7
+    },
+    {
+      "block_id": "block-8",
+      "kind": "blockquote",
+      "text": "On our Super-Agent benchmark, Claude Opus 4.8 is the only model to complete every case end-to-end, beating prior Opus models and GPT-5.5 at parity on cost. For agent products in translation, deep research, slide-building, and analysis, it delivers powerful reliability.Kay Zhu Co-Founder and CTO",
+      "section_heading": "Collaborating with Opus 4.8",
+      "source_order": 8
+    },
+    {
+      "block_id": "block-9",
+      "kind": "blockquote",
+      "text": "On CursorBench, Claude Opus 4.8 exceeds prior Opus models across every effort level. Tool calling is meaningfully more efficient, using fewer steps for the same intelligence, and it carries end-to-end tasks through. Michael Truell Co-Founder and CEO",
+      "section_heading": "Collaborating with Opus 4.8",
+      "source_order": 9
+    },
+    {
+      "block_id": "block-10",
+      "kind": "blockquote",
+      "text": "Claude Opus 4.8 delivers the highest score recorded on our Legal Agent Benchmark, and is the first model to break 10% overall on the all-pass standard. For substantive legal work, that\u2019s the kind of accuracy lift that translates directly into how much real attorney work our customers can hand off with confidence.Niko Grupen Head of Applied Research",
+      "section_heading": "Collaborating with Opus 4.8",
+      "source_order": 10
+    },
+    {
+      "block_id": "block-11",
+      "kind": "blockquote",
+      "text": "Claude Opus 4.8 feels like a major quality-of-life update over Opus 4.7: faster, easier to collaborate with, and better at carrying context and style direction across a long session. Opus 4.8 is the model I kept trusting for work where voice, taste, and technical execution all have to happen side-by-side.Katie Parrott Staff Writer",
+      "section_heading": "Collaborating with Opus 4.8",
+      "source_order": 11
+    },
+    {
+      "block_id": "block-12",
+      "kind": "blockquote",
+      "text": "Claude Opus 4.8 is the strongest computer-use and browser-agent model we\u2019ve tested, scoring 84% on Online-Mind2Web, which is a meaningful jump over both Opus 4.7 and GPT-5.5. It stays reflective and on-task in the way our customers\u2019 agent workloads need to be reliable end-to-end.Miguel Gonzalez Tech Lead",
+      "section_heading": "Collaborating with Opus 4.8",
+      "source_order": 12
+    },
+    {
+      "block_id": "block-13",
+      "kind": "blockquote",
+      "text": "Claude Opus 4.8 uses tools cleanly and follows instructions with the consistency our autonomous engineering workloads need to keep running unattended. It improves on Opus 4.6 and fixes the comment-verbosity and tool-calling issues we saw with Opus 4.7. This release from Anthropic translates directly into faster capability gains for engineers building on Devin.Scott Wu CEO",
+      "section_heading": "Collaborating with Opus 4.8",
+      "source_order": 13
+    },
+    {
+      "block_id": "block-14",
+      "kind": "blockquote",
+      "text": "On our long-running evals, Claude Opus 4.8\u2019s analysis was consistently higher quality than prior Opus models. It finished faster and produced richer, more information dense outputs. Overall, a noticeably better signal to noise ratio. The biggest differentiator was Opus 4.8\u2019s tendency to proactively flag issues with the inputs and outputs of an analysis, something other models routinely missed and left to the users to catch.Michael Ran Sr. Investment Associate",
+      "section_heading": "Collaborating with Opus 4.8",
+      "source_order": 14
+    },
+    {
+      "block_id": "block-15",
+      "kind": "blockquote",
+      "text": "Across CoCounsel Legal, Claude Opus 4.8 delivered meaningful improvements in consistency and reasoning quality compared to prior Opus models. For the high-stakes professional workflows our customers depend on, that reliability matters. As we build fiduciary-grade AI systems for legal and tax professionals, advances like these help raise the standard for trusted AI performance in real-world workflows.Joel Hron Chief Technology Officer",
+      "section_heading": "Collaborating with Opus 4.8",
+      "source_order": 15
+    },
+    {
+      "block_id": "block-16",
+      "kind": "blockquote",
+      "text": "Claude Opus 4.8 sets a new bar for enterprise AI. In Genie, Databricks\u2019 AI agent for data and knowledge work, the new Opus model unlocks a step change in agentic reasoning, tackling deeper, multistep questions faster than any prior Opus. Its multimodal strength also lets Genie reason directly over PDFs, diagrams, and other unstructured content at 61% cheaper token cost than Opus 4.7.Hanlin Tang CTO, Neural Networks",
+      "section_heading": "Collaborating with Opus 4.8",
+      "source_order": 16
+    },
+    {
+      "block_id": "block-17",
+      "kind": "blockquote",
+      "text": "For financial-document workflows in Hebbia\u2019s orchestrator, Claude Opus 4.8 delivers the same strong quality as Opus 4.7 with noticeably better citation precision and more token efficiency on retrieval, which works incredibly well for the kinds of dense filings our customers run every day.Aabhas Sharma CTO",
+      "section_heading": "Collaborating with Opus 4.8",
+      "source_order": 17
+    },
+    {
+      "block_id": "block-18",
+      "kind": "p",
+      "text": "One of the most prominent improvements in Opus 4.8 is its honesty. We train all our models to be honest\u2014for instance, to avoid making claims that they can\u2019t support. But a general problem with AI models is that they sometimes jump to conclusions, confidently claiming to have made progress in their work despite the evidence being thin. Early testers report that Opus 4.8 is more likely to flag uncertainties about its work and less likely to make unsupported claims. This is borne out in our evaluations, which show that Opus 4.8 is around four times less likely than its predecessor to allow flaws in code it has written to pass unremarked.",
+      "section_heading": "Collaborating with Opus 4.8",
+      "source_order": 18
+    },
+    {
+      "block_id": "block-19",
+      "kind": "p",
+      "text": "As always, we ran a detailed alignment assessment on the model before release. In terms of positive traits, our Alignment team concluded that Opus 4.8 \u201creaches new highs on our measures of prosocial traits like supporting user autonomy and acting in the user\u2019s best interest.\u201d The assessment also showed Opus 4.8 to have rates of misaligned behavior (such as deception or cooperation with misuse) that are substantially lower than Opus 4.7, and similar to our best-aligned model, Claude Mythos Preview. The full alignment assessment, accompanied by a suite of pre-deployment safety tests, is reported in the Claude Opus 4.8 System Card.",
+      "section_heading": "Collaborating with Opus 4.8",
+      "source_order": 19
+    },
+    {
+      "block_id": "block-20",
+      "kind": "h2",
+      "text": "Also launching today",
+      "section_heading": "Collaborating with Opus 4.8",
+      "source_order": 20
+    },
+    {
+      "block_id": "block-21",
+      "kind": "p",
+      "text": "In addition to Claude Opus 4.8, we\u2019re making the following updates:",
+      "section_heading": "Also launching today",
+      "source_order": 21
+    },
+    {
+      "block_id": "block-22",
+      "kind": "li",
+      "text": "Dynamic workflows. This new feature, available in research preview, allows Claude to take on even bigger tasks in Claude Code. Claude can plan the work and then run hundreds of parallel subagents in a single session (and with Opus 4.8, the agents can run for even longer). It then verifies its outputs before reporting back to the user. For example, Claude Code with Opus 4.8 can now carry out codebase-scale migrations across hundreds of thousands of lines of code from kickoff to merge, with the existing test suite as its bar. You can read more about dynamic workflows\u2014available in Claude Code for Enterprise, Team, and Max plans\u2014in this post.",
+      "section_heading": "Also launching today",
+      "source_order": 22
+    },
+    {
+      "block_id": "block-23",
+      "kind": "li",
+      "text": "Effort control in claude.ai and Cowork. A new control alongside the model selector lets users choose how much effort Claude puts into a response. On higher effort settings, Claude will think more frequently and more deeply to give better responses. On lower effort settings, Claude will respond faster and use up a user\u2019s rate limits more slowly. Users now have this choice\u2014the effort control is available on all plans.",
+      "section_heading": "Also launching today",
+      "source_order": 23
+    },
+    {
+      "block_id": "block-24",
+      "kind": "li",
+      "text": "The Messages API now accepts system entries inside the messages array. Developers can update Claude\u2019s instructions mid-task without breaking the prompt cache or routing the update through a user turn. This can be used in a given harness to update permissions, token budgets, or environment context as an agent runs.",
+      "section_heading": "Also launching today",
+      "source_order": 24
+    },
+    {
+      "block_id": "block-25",
+      "kind": "h2",
+      "text": "A note on effort",
+      "section_heading": "Also launching today",
+      "source_order": 25
+    },
+    {
+      "block_id": "block-26",
+      "kind": "p",
+      "text": "Opus 4.8 defaults to high effort, which we judge to be the best overall balance of quality and user experience. On coding tasks, this effort level spends a similar number of tokens as Opus 4.7\u2019s default, but with better performance. Users can choose \u201cextra\u201d (\u201cxhigh\u201d in Claude Code) or \u201cmax,\u201d and the model will spend more tokens to get better results; we recommend using \u201cextra\u201d for difficult tasks and long-running asynchronous workflows. We have increased rate limits in Claude Code to accommodate the higher token usage of higher effort levels; users can select whichever makes sense for their particular project.",
+      "section_heading": "A note on effort",
+      "source_order": 26
+    },
+    {
+      "block_id": "block-27",
+      "kind": "h2",
+      "text": "What\u2019s next?",
+      "section_heading": "A note on effort",
+      "source_order": 27
+    },
+    {
+      "block_id": "block-28",
+      "kind": "p",
+      "text": "Users will find Opus 4.8 to be a modest but tangible improvement on its predecessor. There\u2019s still more to be done: we\u2019re working on developing and releasing models that provide many of the same capabilities as Opus at a lower cost.",
+      "section_heading": "What\u2019s next?",
+      "source_order": 28
+    },
+    {
+      "block_id": "block-29",
+      "kind": "p",
+      "text": "Not only that, but we plan to release a new class of model with even higher intelligence than Opus. As part of Project Glasswing, a small number of organizations are currently using Claude Mythos Preview for cybersecurity work. Models of this capability level require stronger cyber safeguards before they can be generally released. We\u2019re making swift progress on developing these safeguards and expect to be able to bring Mythos-class models to all our customers in the coming weeks.",
+      "section_heading": "What\u2019s next?",
+      "source_order": 29
+    },
+    {
+      "block_id": "block-30",
+      "kind": "h2",
+      "text": "Availability",
+      "section_heading": "What\u2019s next?",
+      "source_order": 30
+    },
+    {
+      "block_id": "block-31",
+      "kind": "p",
+      "text": "Claude Opus 4.8 is available everywhere today. Pricing for regular usage is unchanged from Opus 4.7: $5 per million input tokens and $25 per million output tokens. Pricing for fast mode is $10 per million input tokens and $50 per million output tokens. Developers can use claude-opus-4-8 via the Claude API.",
+      "section_heading": "Availability",
+      "source_order": 31
+    }
+  ],
+  "decorations": [
+    {
+      "claim_id": "claim_agentic_reliability",
+      "verdict": "missing_context",
+      "original_text": "Early testers have found Claude Opus 4.8 to be more reliable and sharper in its judgement when it\u2019s performing agentic tasks.",
+      "rewritten_text": "Early testers report that Claude Opus 4.8 feels more reliable and sharper in judgment on agentic tasks, though the launch does not publish standardized reliability rates or intervention thresholds.",
+      "reason": "The launch offers consistent positive tester quotes, but it does not publish a standardized operational reliability rate, intervention threshold, or failure distribution for agentic tasks.",
+      "citations": [
+        {
+          "title": "Overview - platform.claude.com",
+          "url": "https://platform.claude.com/docs/en/about-claude/models/overview",
+          "snippet": "",
+          "why_relevant": "The evidence is directional rather than a single operational benchmark for reliability."
+        },
+        {
+          "title": "Pricing - claude.com",
+          "url": "https://claude.com/pricing#api",
+          "snippet": "",
+          "why_relevant": "The evidence is directional rather than a single operational benchmark for reliability."
+        }
+      ],
+      "anchor": {
+        "claim_id": "claim_agentic_reliability",
+        "block_id": "block-6",
+        "matched_text": "Early testers have found Claude Opus 4.8 to be more reliable and sharper in its judgement when it\u2019s performing agentic tasks.",
+        "start_char": 0,
+        "end_char": 125,
+        "match_type": "exact_claim",
+        "match_confidence": 1.0
+      }
+    },
+    {
+      "claim_id": "claim_benchmark_collaboration",
+      "verdict": "missing_context",
+      "original_text": "It builds on Opus 4.7 with improvements across benchmarks, and is a more effective collaborator.",
+      "rewritten_text": "It builds on Opus 4.7 with stronger results on several published evaluations and a launch narrative centered on improved collaboration.",
+      "reason": "The launch and system card support meaningful benchmark improvements, but \"more effective collaborator\" is a broader qualitative framing than the public materials measure directly.",
+      "citations": [
+        {
+          "title": "Pricing - claude.com",
+          "url": "https://claude.com/pricing#api",
+          "snippet": "",
+          "why_relevant": "The public materials support benchmark gains, but not a single quantified collaborator score."
+        },
+        {
+          "title": "Claude Opus 4.8 System Card - anthropic.com",
+          "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+          "snippet": "The system card reports broad capability sections across coding, reasoning, multimodal, and professional tasks and describes Opus 4.8 as an improvement over Opus 4.7 on many measures.",
+          "why_relevant": "The public materials support benchmark gains, but not a single quantified collaborator score."
+        }
+      ],
+      "anchor": {
+        "claim_id": "claim_benchmark_collaboration",
+        "block_id": "block-1",
+        "matched_text": "It builds on Opus 4.7 with improvements across benchmarks, and is a more effective collaborator.",
+        "start_char": 63,
+        "end_char": 159,
+        "match_type": "exact_claim",
+        "match_confidence": 1.0
+      }
+    },
+    {
+      "claim_id": "claim_honesty_flawed_code",
+      "verdict": "missing_context",
+      "original_text": "This is borne out in our evaluations, which show that Opus 4.8 is around four times less likely than its predecessor to allow flaws in code it has written to pass unremarked.",
+      "rewritten_text": "Anthropic\u2019s evaluations indicate that Opus 4.8 is materially less likely than prior Opus models to leave flawed code unflagged, though the public materials here emphasize the directional improvement more clearly than the exact ratio.",
+      "reason": "The reviewed public materials clearly support a strong directional improvement in honesty around reporting flawed code, but they surface that directional result more clearly than the exact four-times ratio.",
+      "citations": [
+        {
+          "title": "Pricing - claude.com",
+          "url": "https://claude.com/pricing#api",
+          "snippet": "",
+          "why_relevant": "The direction is clear, but the exact ratio is less front-and-center in the reviewed supporting material."
+        },
+        {
+          "title": "Claude Opus 4.8 System Card - anthropic.com",
+          "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+          "snippet": "The system card says honesty in agentic settings is markedly improved and that Opus 4.8 is much less likely than prior models to fail to report flawed code.",
+          "why_relevant": "The direction is clear, but the exact ratio is less front-and-center in the reviewed supporting material."
+        }
+      ],
+      "anchor": {
+        "claim_id": "claim_honesty_flawed_code",
+        "block_id": "block-18",
+        "matched_text": "This is borne out in our evaluations, which show that Opus 4.8 is around four times less likely than its predecessor to allow flaws in code it has written to pass unremarked.",
+        "start_char": 468,
+        "end_char": 642,
+        "match_type": "exact_claim",
+        "match_confidence": 1.0
+      }
+    },
+    {
+      "claim_id": "claim_super_agent_quote",
+      "verdict": "not_checkable",
+      "original_text": "On our Super-Agent benchmark, Claude Opus 4.8 is the only model to complete every case end-to-end, beating prior Opus models and GPT-5.5 at parity on cost.",
+      "rewritten_text": "Anthropic quotes an early tester saying Opus 4.8 completed every case end-to-end on that internal Super-Agent benchmark and matched GPT-5.5 at comparable cost, but the public launch does not disclose enough methodology to independently verify the claim.",
+      "reason": "The launch quote is concrete, but the public materials reviewed here do not disclose enough methodology, scoring details, or cost accounting to independently verify the result.",
+      "citations": [
+        {
+          "title": "Pricing - claude.com",
+          "url": "https://claude.com/pricing#api",
+          "snippet": "",
+          "why_relevant": "The quote is real, but the methodology remains opaque."
+        },
+        {
+          "title": "Claude Opus 4.8 System Card - anthropic.com",
+          "url": "https://www.anthropic.com/claude-opus-4-8-system-card",
+          "snippet": "The public evaluation packet reviewed here does not provide enough methodological detail to independently validate the specific Super-Agent result and parity-on-cost comparison.",
+          "why_relevant": "Independent verification is limited by missing benchmark-method detail."
+        }
+      ],
+      "anchor": {
+        "claim_id": "claim_super_agent_quote",
+        "block_id": "block-8",
+        "matched_text": "On our Super-Agent benchmark, Claude Opus 4.8 is the only model to complete every case end-to-end, beating prior Opus models and GPT-5.5 at parity on cost.",
+        "start_char": 0,
+        "end_char": 155,
+        "match_type": "exact_claim",
+        "match_confidence": 1.0
+      }
+    }
+  ],
+  "rewritten_claim_count": 4,
+  "explicit_reference_count": 3,
+  "primary_view": "audited_launch_page"
+};
+    const publication = {
+  "slug": "anthropic-opus-48",
+  "lab": "Anthropic",
+  "launch_name": "Anthropic Claude Opus 4.8",
+  "original_url": "https://www.anthropic.com/news/claude-opus-4-8",
+  "original_label": "Original Anthropic launch post",
+  "source_note": "Curated against Anthropic's Opus 4.8 system card, model docs, pricing, and Responsible Scaling Policy references.",
+  "status": "reviewed",
+  "published_at": "2026-05-28",
+  "evidence_packet_url": "evidence_packets/anthropic-opus-48.json",
+  "gate_status": "pass",
+  "disclaimer": "Audited modified version of the original source. This page is provided for analysis and commentary and is not the original publisher's page."
+};
+    let selected = 0;
+    let activeView = window.location.hash === '#ledger' ? 'ledger' : 'launch';
+    let launchTooltipGlobalsBound = false;
+    const filters = { verdict: 'all' };
+    const cls = (value) => String(value).replaceAll('_', '-').replaceAll(' ', '-');
+    const confidenceScore = { low: 34, medium: 67, high: 100 };
+    const verdictOrder = ['supported', 'overstated', 'missing_context', 'contradicted', 'not_checkable'];
+    const verdictLabels = {
+      supported: 'Supported',
+      overstated: 'Overstated',
+      missing_context: 'Missing Context',
+      contradicted: 'Contradicted',
+      not_checkable: 'Not Checkable'
+    };
+    const esc = (value) => String(value ?? '').replace(/[&<>"']/g, char => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[char]));
+    const safeHref = (value) => {
+      if (!value) return '';
+      try {
+        const url = new URL(String(value), document.baseURI);
+        if (['http:', 'https:', 'mailto:'].includes(url.protocol)) return url.href;
+      } catch (_) {}
+      return '';
+    };
+    const hint = (text) => `<span class="hint" tabindex="0" data-tip="${esc(text)}">?</span>`;
+    const fmtMs = (value) => {
+      const durationMs = Number(value ?? 0);
+      if (!Number.isFinite(durationMs) || durationMs <= 0) return '0ms';
+      if (durationMs >= 1000) return `${(durationMs / 1000).toFixed(2)}s`;
+      return `${durationMs}ms`;
+    };
+    function verdictTip(verdict) {
+      return ({
+        supported: 'Available evidence supports the claim as written or with only minor caveats.',
+        overstated: 'Evidence points in the same direction, but the wording is stronger, broader, or more certain than supported.',
+        missing_context: 'The claim may be true, but key scope, baseline, methodology, source, or denominator context is missing.',
+        contradicted: 'Available evidence conflicts with the claim as written.',
+        not_checkable: 'The available sources do not provide enough evidence to verify or falsify the claim.'
+      })[verdict] || 'Formal Honest Launches verdict for this claim.';
+    }
+    function verdictLabel(verdict) {
+      return verdictLabels[verdict] || String(verdict || '').replaceAll('_', ' ');
+    }
+    function renderPublicationHeader() {
+      const defaultSource = safeHref(launchPage.source_url || report.document?.source || '');
+      const originalHref = safeHref(publication.original_url || defaultSource);
+      const originalLabel = publication.original_label || (defaultSource ? 'Original source' : 'Source');
+      const note = publication.source_note || '';
+      const disclaimer = publication.disclaimer || 'Audited modified version of the original source.';
+      const status = publication.status || 'reviewed';
+      const publishedAt = publication.published_at || 'unknown';
+      const gateStatus = publication.gate_status || 'unknown';
+      const evidenceHref = safeHref(publication.evidence_packet_url || '');
+      document.getElementById('publication-notice').innerHTML = `
+        <strong>Audited modified version</strong>
+        <p class="wrap">${esc(disclaimer)}</p>
+        <p class="wrap"><strong>Status:</strong> ${esc(status)} · <strong>Published:</strong> ${esc(publishedAt)} · <strong>Gate:</strong> ${esc(gateStatus)}${note ? ` · ${esc(note)}` : ''}</p>
+      `;
+      document.getElementById('publication-links').innerHTML = [
+        evidenceHref ? `<a class="notice-link" href="${esc(evidenceHref)}" target="_blank" rel="noopener noreferrer">Evidence Packet</a>` : '',
+      ].filter(Boolean).join('');
+    }
+    function verdictCounts(audits) {
+      const counts = {
+        supported: 0,
+        overstated: 0,
+        missing_context: 0,
+        contradicted: 0,
+        not_checkable: 0,
+      };
+      for (const audit of audits) {
+        if (counts[audit.verdict] != null) counts[audit.verdict] += 1;
+      }
+      return counts;
+    }
+    function averageStretch(audits) {
+      if (!audits.length) return 0;
+      const total = audits.reduce((sum, audit) => sum + Number(audit.stretch_score || 0), 0);
+      return Math.round(total / audits.length);
+    }
+    function statCard(label, value, note = '') {
+      return `
+        <div class="stat-card">
+          <div class="stat-label">${esc(label)}</div>
+          <div class="stat-value">${esc(value)}</div>
+          ${note ? `<div class="stat-note">${esc(note)}</div>` : ''}
+        </div>
+      `;
+    }
+    function renderHeadline() {
+      const counts = verdictCounts(report.audits || []);
+      const avgStretch = averageStretch(report.audits || []);
+      const run = report.run_profile || {};
+      document.getElementById('scorecard-grid').innerHTML = [
+        statCard('Claims Audited', String((report.audits || []).length), `${run.claims_extracted ?? (report.claims || []).length} extracted`),
+        ...verdictOrder.map(key => statCard(verdictLabels[key], String(counts[key]), key === 'supported' ? 'best-case verdict' : '')),
+        statCard('Avg Stretch', `${avgStretch}/100`, 'higher means riskier wording'),
+      ].join('');
+      document.getElementById('telemetry-grid').innerHTML = [
+        statCard('Model', report.model || 'none', report.contrast_enabled ? 'contrast enabled' : 'contrast disabled'),
+        statCard('Execution Mode', report.mode),
+        statCard('Pipeline Wall', fmtMs(run.total_duration_ms || 0), `audit ${fmtMs(run.audit_claims_ms || 0)} · contrast ${fmtMs(run.contrast_duration_ms || 0)}`),
+        statCard('Specialist Passes', String(run.agent_passes || 0), `${run.claims_audited || (report.audits || []).length} claims`),
+        statCard('Unique Sources', String(run.unique_source_count || 0), 'support + caveat + contrast urls'),
+        statCard('Provided References', String((report.reference_urls || []).length), 'explicit --reference inputs'),
+      ].join('');
+    }
+    function setView(view) {
+      activeView = view === 'ledger' ? 'ledger' : 'launch';
+      document.getElementById('launch-view').hidden = activeView !== 'launch';
+      document.getElementById('ledger-view').hidden = activeView !== 'ledger';
+      document.getElementById('launch-toggle').classList.toggle('active', activeView === 'launch');
+      document.getElementById('ledger-toggle').classList.toggle('active', activeView === 'ledger');
+      const targetHash = activeView === 'ledger' ? '#ledger' : '#launch';
+      if (window.location.hash !== targetHash) {
+        history.replaceState(null, '', targetHash);
+      }
+      if (activeView === 'launch') renderLaunchPage();
+    }
+    function renderLaunchPage() {
+      document.getElementById('launch-summary').innerHTML = '';
+      const decorations = launchPage.decorations || [];
+      const byBlock = new Map();
+      for (const decoration of decorations) {
+        const blockId = decoration.anchor?.block_id;
+        if (!blockId) continue;
+        if (!byBlock.has(blockId)) byBlock.set(blockId, []);
+        byBlock.get(blockId).push(decoration);
+      }
+      for (const values of byBlock.values()) {
+        values.sort((left, right) => (left.anchor.start_char || 0) - (right.anchor.start_char || 0));
+      }
+      document.getElementById('launch-article').innerHTML = (launchPage.blocks || [])
+        .map(block => renderLaunchBlock(block, byBlock.get(block.block_id) || []))
+        .join('');
+      bindAuditMarks();
+    }
+    function renderLaunchBlock(block, decorations) {
+      const text = String(block.text || '');
+      const markup = decorateBlockText(text, decorations);
+      const kind = String(block.kind || 'paragraph').toLowerCase();
+      if (/^h[1-6]$/.test(kind)) {
+        return `<${kind} class="launch-block">${markup}</${kind}>`;
+      }
+      if (kind === 'blockquote') {
+        return `<blockquote class="launch-block">${markup}</blockquote>`;
+      }
+      if (kind === 'pre' || kind === 'table') {
+        return `<pre class="launch-block preformatted">${markup}</pre>`;
+      }
+      if (kind === 'li') {
+        return `<p class="launch-block list-item">${markup}</p>`;
+      }
+      return `<p class="launch-block">${markup}</p>`;
+    }
+    function decorateBlockText(text, decorations) {
+      if (!decorations.length) return esc(text);
+      let cursor = 0;
+      let output = '';
+      for (const decoration of decorations) {
+        const anchor = decoration.anchor || {};
+        const start = Number(anchor.start_char || 0);
+        const end = Number(anchor.end_char || 0);
+        if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start || start < cursor) continue;
+        output += esc(text.slice(cursor, start));
+        output += `<button type="button" class="audit-mark" data-claim-id="${esc(decoration.claim_id)}">${esc(decoration.rewritten_text)}</button>`;
+        cursor = end;
+      }
+      output += esc(text.slice(cursor));
+      return output;
+    }
+    function bindAuditMarks() {
+      const tooltip = document.getElementById('audit-tooltip');
+      const decorations = new Map((launchPage.decorations || []).map(item => [item.claim_id, item]));
+      document.querySelectorAll('.audit-mark').forEach(node => {
+        if (node.dataset.tooltipBound === '1') return;
+        node.dataset.tooltipBound = '1';
+        const claimId = node.getAttribute('data-claim-id');
+        if (!claimId) return;
+        const decoration = decorations.get(claimId);
+        if (!decoration) return;
+        const show = (event) => {
+          tooltip.innerHTML = tooltipMarkup(decoration);
+          tooltip.hidden = false;
+          positionTooltip(node, tooltip);
+          event?.stopPropagation?.();
+        };
+        const hide = () => {
+          tooltip.hidden = true;
+        };
+        node.addEventListener('mouseenter', show);
+        node.addEventListener('focus', show);
+        node.addEventListener('mouseleave', hide);
+        node.addEventListener('blur', hide);
+        node.addEventListener('click', show);
+      });
+      if (!launchTooltipGlobalsBound) {
+        launchTooltipGlobalsBound = true;
+        document.addEventListener('click', (event) => {
+          if (!event.target.closest('.audit-mark') && !event.target.closest('#audit-tooltip')) {
+            tooltip.hidden = true;
+          }
+        });
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape') {
+            tooltip.hidden = true;
+          }
+        });
+        window.addEventListener('scroll', () => {
+          tooltip.hidden = true;
+        }, { passive: true });
+      }
+    }
+    function tooltipMarkup(decoration) {
+      const citations = decoration.citations || [];
+      return `
+        <div class="tooltip-label">Original wording</div>
+        <p class="wrap">${esc(decoration.original_text)}</p>
+        <div class="tooltip-label">Why it changed</div>
+        <p class="wrap"><strong>${esc(verdictLabel(decoration.verdict))}</strong> - ${esc(decoration.reason)}</p>
+        <div class="tooltip-label">Citations</div>
+        <div class="tooltip-citations">
+          ${citations.length ? citations.map(citation => tooltipCitationMarkup(citation)).join('') : '<p class="muted">No explicit reference citations were attached to this claim.</p>'}
+        </div>
+      `;
+    }
+    function tooltipCitationMarkup(citation) {
+      const href = safeHref(citation.url);
+      const titleMarkup = href
+        ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(citation.title)}</a>`
+        : `<strong>${esc(citation.title)}</strong>`;
+      return `
+        <div class="tooltip-citation">
+          <p class="wrap">${titleMarkup}</p>
+          ${citation.snippet ? `<p class="muted wrap">${esc(citation.snippet)}</p>` : ''}
+          ${citation.why_relevant ? `<p class="muted wrap">${esc(citation.why_relevant)}</p>` : ''}
+        </div>
+      `;
+    }
+    function positionTooltip(target, tooltip) {
+      const rect = target.getBoundingClientRect();
+      const margin = 12;
+      const desiredTop = rect.bottom + margin;
+      const maxLeft = window.innerWidth - tooltip.offsetWidth - margin;
+      const left = Math.max(margin, Math.min(rect.left, maxLeft));
+      let top = desiredTop;
+      if (top + tooltip.offsetHeight > window.innerHeight - margin) {
+        top = Math.max(margin, rect.top - tooltip.offsetHeight - margin);
+      }
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
+    }
+    const filteredAudits = () => report.audits
+      .map((audit, index) => ({ ...audit, __index: index }))
+      .filter(audit => filters.verdict === 'all' || audit.verdict === filters.verdict);
+    function setupFilters() {
+      fillSelect('verdict-filter', 'All verdicts', [...new Set(report.audits.map(audit => audit.verdict))]);
+    }
+    function fillSelect(id, allLabel, values) {
+      document.getElementById(id).innerHTML = [
+        `<option value="all">${allLabel}</option>`,
+        ...values.map(value => `<option value="${esc(value)}">${esc(value)}</option>`)
+      ].join('');
+    }
+    function syncSelection() {
+      const audits = filteredAudits();
+      if (!audits.some(audit => audit.__index === selected)) selected = audits[0]?.__index ?? 0;
+    }
+    function render() {
+      const audits = filteredAudits();
+      document.getElementById('filter-summary').textContent = `${audits.length} of ${report.audits.length} claims shown`;
+      document.getElementById('claim-list').innerHTML = audits.map((audit, i) => `
+        <button class="claim-row ${audit.__index === selected ? 'active' : ''}" onclick="selected=${audit.__index}; render();">
+          <div class="claim-meta">
+            <span class="muted">${esc(audit.verdict)} · ${esc(audit.claim.claim_type)} · score ${audit.stretch_score}/100</span>
+          </div>
+          <div class="wrap">${esc(audit.claim.claim)}</div>
+          <div class="meter ${cls(audit.verdict)}" title="Stretch score ${audit.stretch_score} / 100"><div style="width: ${audit.stretch_score}%"></div></div>
+          <p class="muted wrap">${esc(audit.claim.why_risky || '')}</p>
+        </button>
+      `).join('');
+      if (!audits.length) {
+        document.getElementById('claim-detail').innerHTML = '<div class="panel"><p class="muted">No claims match the selected filters.</p></div>';
+        document.getElementById('evidence').innerHTML = '';
+        return;
+      }
+      const audit = audits.find(item => item.__index === selected) ?? audits[0];
+      const evidenceCount = audit.supporting_evidence.length + audit.counter_evidence.length;
+      const evidenceScore = Math.min(100, evidenceCount * 25);
+      const confidence = confidenceScore[audit.confidence] ?? 0;
+      const computedChecks = audit.numeric_findings?.length
+        ? `<div class="panel"><h3>Computed Checks</h3>${list(audit.numeric_findings)}</div>`
+        : '';
+      const runProfile = report.run_profile
+        ? `
+            <p class="wrap"><strong>Pipeline wall:</strong> ${fmtMs(report.run_profile.total_duration_ms)} · <strong>Load:</strong> ${fmtMs(report.run_profile.load_document_ms)} · <strong>Extract:</strong> ${fmtMs(report.run_profile.extract_claims_ms)} · <strong>Audit:</strong> ${fmtMs(report.run_profile.audit_claims_ms)} · <strong>Contrast:</strong> ${fmtMs(report.run_profile.contrast_duration_ms)}</p>
+            <p class="wrap"><strong>Claims extracted / audited:</strong> ${report.run_profile.claims_extracted} / ${report.run_profile.claims_audited} · <strong>Specialist passes:</strong> ${report.run_profile.agent_passes} · <strong>Unique sources:</strong> ${report.run_profile.unique_source_count}</p>
+          `
+        : '';
+      document.getElementById('claim-detail').innerHTML = `
+        <div class="panel">
+          <h3>Report Provenance</h3>
+          <p class="wrap"><strong>Mode:</strong> ${esc(report.mode)} · <strong>Model:</strong> ${esc(report.model || 'none')}</p>
+          <p class="wrap"><strong>Evidence Contrast:</strong> ${report.contrast_enabled ? 'enabled' : 'disabled'}</p>
+          <p class="wrap"><strong>Provided reference URLs:</strong> ${(report.reference_urls || []).length ? (report.reference_urls || []).map(esc).join(', ') : 'none'}</p>
+          ${runProfile}
+        </div>
+        <div class="panel">
+          <strong>Formal verdict: ${esc(audit.verdict)}</strong> ${hint(verdictTip(audit.verdict))}
+          <div class="score"><div style="width: ${audit.stretch_score}%"></div></div>
+          <p class="muted">
+            Confidence: ${esc(audit.confidence)} ${hint('Confidence reflects how strongly the available evidence supports this verdict, not whether the original claim is true.')}
+            · Stretch Score: ${audit.stretch_score} / 100 ${hint('Higher means the original wording stretches further beyond what the evidence supports.')}
+            · Evidence items: ${evidenceCount} ${hint('Evidence items are supporting or counter-evidence records attached to this claim.')}
+          </p>
+          <div class="strength-grid">
+            ${strengthCard('Stretch pressure', audit.stretch_score, audit.verdict, `${audit.stretch_score}/100`, 'How much the wording outruns the evidence.')}
+            ${strengthCard('Confidence', confidence, audit.verdict, esc(audit.confidence), 'How confident Honest Launches is in this verdict from available evidence.')}
+            ${strengthCard('Evidence depth', evidenceScore, audit.verdict, `${evidenceCount} item${evidenceCount === 1 ? '' : 's'}`, 'How much direct evidence is attached to this claim audit.')}
+          </div>
+        </div>
+        <div class="panel"><h3>Original</h3><p class="wrap">${esc(audit.claim.claim)}</p></div>
+        ${contrastCard(audit.contrast)}
+        <div class="panel"><h3>Defensible Rewrite</h3><p class="wrap">${esc(audit.weaker_supported_rewrite)}</p></div>
+        <div class="panel"><h3>Why</h3><p class="wrap">${esc(audit.why)}</p></div>
+        ${claimTimingPanel(audit.claim_timing)}
+        ${computedChecks}
+        <div class="panel"><h3>Agent Steps</h3>${agentSteps(audit.agent_outputs || [])}</div>
+      `;
+      document.getElementById('evidence').innerHTML = `
+        ${providedReferencesPanel(report.reference_urls || [])}
+        ${sourcesChecked(audit.contrast)}
+        <div class="panel"><h3>Gemini-Discovered Supporting Sources</h3><p class="muted">Sources found by the verifier while looking for the strongest support for this claim.</p>${items(audit.supporting_evidence)}</div>
+        <div class="panel"><h3>Gemini-Discovered Caveat / Counter Sources</h3><p class="muted">Sources found by the contradiction-finder while looking for caveats, missing context, benchmark limits, or contrary evidence.</p>${items(audit.counter_evidence)}</div>
+        <div class="panel"><h3>Missing Context</h3>${list(audit.missing_context)}</div>
+      `;
+    }
+    function strengthCard(label, value, verdict, display, tip) {
+      return `
+        <div class="strength-card">
+          <div class="strength-label"><span>${label} ${hint(tip)}</span><span>${display}</span></div>
+          <div class="meter ${cls(verdict)}"><div style="width: ${value}%"></div></div>
+        </div>
+      `;
+    }
+    function contrastCard(contrast) {
+      if (!contrast) return '';
+      const best = contrast.best_sources?.[0];
+      const sourceSummary = best ? best.evidence_summary : 'No usable reference source was available.';
+      const qualification = best?.key_qualification ? `<p><strong>Key qualification:</strong> ${esc(best.key_qualification)}</p>` : '';
+      return `
+        <div class="panel">
+          <h3>Evidence Contrast</h3>
+          <p><strong>Claim says:</strong> <span class="wrap">${esc(contrast.claim_text)}</span></p>
+          <p><strong>Best reference says:</strong> <span class="wrap">${esc(sourceSummary)}</span></p>
+          ${qualification}
+          <p><strong>Delta:</strong> ${esc(contrast.delta_type)} — ${esc(contrast.delta_explanation)}</p>
+          <p><strong>Final verdict:</strong> ${esc(contrast.recommended_verdict)} · Confidence: ${esc(contrast.confidence)}</p>
+          <p><strong>Defensible rewrite:</strong> <span class="wrap">${esc(contrast.suggested_rewrite)}</span></p>
+        </div>
+      `;
+    }
+    function claimTimingPanel(timing) {
+      if (!timing) return '';
+      return `
+        <div class="panel">
+          <h3>Claim Timing</h3>
+          <p class="muted">Measured wall-clock time for this claim during the run.</p>
+          <p><strong>Total:</strong> ${fmtMs(timing.total_duration_ms)} · <strong>Contrast:</strong> ${fmtMs(timing.contrast_ms)}</p>
+          <ul>
+            <li class="wrap"><strong>Verifier:</strong> ${fmtMs(timing.verifier_ms)}</li>
+            <li class="wrap"><strong>Contradiction finder:</strong> ${fmtMs(timing.contradiction_finder_ms)}</li>
+            <li class="wrap"><strong>Numeric calibrator:</strong> ${fmtMs(timing.numeric_calibrator_ms)}</li>
+            <li class="wrap"><strong>Aggregator:</strong> ${fmtMs(timing.aggregator_ms)}</li>
+          </ul>
+        </div>
+      `;
+    }
+    function providedReferencesPanel(values) {
+      if (!values.length) {
+        return `
+          <div class="panel">
+            <h3>Provided Reference URLs</h3>
+            <p class="muted">No explicit reference URLs were provided for this run.</p>
+          </div>
+        `;
+      }
+      return `
+        <div class="panel">
+          <h3>Provided Reference URLs</h3>
+          <p class="muted">Explicit sources supplied on the CLI with <code>--reference</code>. These anchor Evidence Contrast and define the source-of-truth packet for this run.</p>
+          ${plainUrlItems(values)}
+        </div>
+      `;
+    }
+    function sourcesChecked(contrast) {
+      if (!contrast) return '<div class="panel"><h3>Claim-Level Contrast References</h3><p class="muted">No contrast references checked for this claim. Contrast is applied only to the selected top-risk claims controlled by --contrast-top.</p></div>';
+      const references = contrast.reference_sources || [];
+      const best = contrast.best_sources || [];
+      return `
+        <div class="panel">
+          <h3>Claim-Level Contrast References</h3>
+          <p class="muted">References used by the Evidence Contrast pass for this selected claim. These are anchored by provided reference URLs, but Gemini may resolve nearby canonical pages or source titles while reading them.</p>
+          ${referenceItems(references)}
+        </div>
+        <div class="panel">
+          <h3>Reference Snippets / Mismatches</h3>
+          <p class="muted">Claim-level snippets showing how the referenced source supports, narrows, or conflicts with the original wording.</p>
+          ${contrastSourceItems(best)}
+        </div>
+      `;
+    }
+    function plainUrlItems(values) {
+      return values.map(value => {
+        const href = safeHref(value);
+        const source = href
+          ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(value)}</a>`
+          : `<span class="muted">${esc(value)}</span>`;
+        return `<div class="source-item"><p class="wrap">${source}</p></div>`;
+      }).join('');
+    }
+    function referenceItems(values) {
+      if (!values.length) return '<p class="muted">None recorded.</p>';
+      return values.map(item => {
+        const href = safeHref(item.url);
+        const source = href
+          ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(item.url)}</a>`
+          : `<span class="muted">${esc(item.url || 'No URL recorded')}</span>`;
+        return `
+          <div class="source-item">
+            <p><strong>${esc(item.title)}</strong> <span class="muted">(${esc(item.source_type)} · authority ${item.authority_score}/100)</span></p>
+            <p class="wrap">${source}</p>
+            <p class="muted wrap">${esc(item.why_relevant || '')}</p>
+          </div>
+        `;
+      }).join('');
+    }
+    function contrastSourceItems(values) {
+      if (!values.length) return '<p class="muted">None recorded.</p>';
+      return values.map(item => {
+        const href = safeHref(item.url);
+        const source = href
+          ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(item.url)}</a>`
+          : `<span class="muted">${esc(item.url || 'No URL recorded')}</span>`;
+        return `
+          <div class="source-item">
+            <p><strong>${esc(item.title)}</strong> <span class="muted">(${esc(item.stance)})</span></p>
+            <p class="wrap">${esc(item.evidence_summary)}</p>
+            <p class="wrap">${source}</p>
+            <p class="muted wrap">${esc(item.key_qualification || '')}</p>
+          </div>
+        `;
+      }).join('');
+    }
+    function agentSteps(values) {
+      if (!values.length) return '<p class="muted">No agent step trace recorded.</p>';
+      return values.map(step => `
+        <details>
+          <summary>${esc(step.agent)} — ${esc(step.summary)}</summary>
+          <p class="muted">Claim ID: ${esc(step.claim_id)}</p>
+          <p class="muted">Duration: ${step.duration_ms == null ? 'not recorded' : fmtMs(step.duration_ms)}</p>
+          <h4>Supporting evidence</h4>
+          ${items(step.supporting_evidence || [])}
+          <h4>Contradictions / narrowing evidence</h4>
+          ${items(step.counter_evidence || [])}
+          <h4>Missing context</h4>
+          ${list(step.missing_context || [])}
+          <h4>Computed checks</h4>
+          ${list(step.numeric_findings || [])}
+        </details>
+      `).join('');
+    }
+    function list(values) {
+      if (!values.length) return '<p class="muted">None recorded.</p>';
+      return `<ul>${values.map(value => `<li class="wrap">${esc(value)}</li>`).join('')}</ul>`;
+    }
+    function items(values) {
+      if (!values.length) return '<p class="muted">None recorded.</p>';
+      return values.map(item => {
+        const href = safeHref(item.url);
+        const source = href
+          ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(item.url)}</a>`
+          : `<span class="muted">${esc(item.url || 'No URL recorded')}</span>`;
+        return `
+          <div class="source-item">
+            <p><strong>${esc(item.source_title)}</strong></p>
+            <p class="wrap">${esc(item.snippet)}</p>
+            <p class="wrap">${source}</p>
+            <p class="muted wrap">${esc(item.relevance || '')}</p>
+          </div>
+        `;
+      }).join('');
+    }
+    setupFilters();
+    renderPublicationHeader();
+    renderHeadline();
+    render();
+    setView(activeView);
+    window.addEventListener('hashchange', () => {
+      const nextView = window.location.hash === '#ledger' ? 'ledger' : 'launch';
+      if (nextView !== activeView) {
+        setView(nextView);
+      }
+    });
+  </script>
+</body>
+</html>

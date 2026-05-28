@@ -1,20 +1,20 @@
 # Archive Quality Score
 
-- Overall score: `84/100`
+- Overall score: `79/100`
 - First-glance legibility: `100/100`
-- Trust and inspectability: `100/100`
+- Trust and inspectability: `84/100`
 - Judgment quality: `38/100`
-- Page fidelity and polish: `100/100`
-- Archive usefulness and coherence: `100/100`
+- Page fidelity and polish: `86/100`
+- Archive usefulness and coherence: `102/100`
 
 ## Proxy Metrics
 
-- Featured pages: `4`
+- Featured pages: `5`
 - Original-link coverage: `100%`
 - Modified-notice coverage: `100%`
-- Tooltip-citation coverage on rewritten claims: `100%`
-- Anchor coverage on rewritten claims: `100%`
-- Evidence-packet coverage: `100%`
+- Tooltip-citation coverage on rewritten claims: `80%`
+- Anchor coverage on rewritten claims: `80%`
+- Evidence-packet coverage: `80%`
 - Publication-gate pass rate: `100%`
 - Average stretch across featured archive: `52/100`
 - Gold-set coverage factor: `40%`
@@ -44,6 +44,15 @@
 - Tooltip-citation coverage: `100%`
 - Anchor coverage: `100%`
 - Publication gate: `pass`
+
+### Anthropic Claude Opus 4.8
+
+- Claims audited: `0`
+- Rewritten claims: `0`
+- Average stretch: `0/100`
+- Tooltip-citation coverage: `0%`
+- Anchor coverage: `0%`
+- Publication gate: `needs_review`
 
 ### xAI Grok 3
 

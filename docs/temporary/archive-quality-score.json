@@ -1,23 +1,23 @@
 {
-  "overallScore": 84,
+  "overallScore": 79,
   "categories": {
     "firstGlanceLegibility": 100,
-    "trustInspectability": 100,
+    "trustInspectability": 84,
     "judgmentQuality": 38,
-    "pageFidelityPolish": 100,
-    "archiveUsefulnessCoherence": 100
+    "pageFidelityPolish": 86,
+    "archiveUsefulnessCoherence": 102
   },
   "proxies": {
     "originalLinkCoveragePct": 100,
     "modifiedNoticeCoveragePct": 100,
     "reportSurfaceCoveragePct": 100,
-    "tooltipCitationCoveragePct": 100,
-    "anchorCoveragePct": 100,
-    "evidencePacketCoveragePct": 100,
+    "tooltipCitationCoveragePct": 80,
+    "anchorCoveragePct": 80,
+    "evidencePacketCoveragePct": 80,
     "gatePassRatePct": 100,
     "sourceNoteCoveragePct": 100,
-    "blocksPreservedCoveragePct": 100,
-    "featuredCount": 4,
+    "blocksPreservedCoveragePct": 80,
+    "featuredCount": 5,
     "featuredAverageStretch": 52,
     "goldSetCoverageFactorPct": 40
   },
@@ -158,6 +158,12 @@
       }
     },
     {
+      "slug": "anthropic-opus-48",
+      "title": "Anthropic Claude Opus 4.8",
+      "metrics": {},
+      "publicationGate": {}
+    },
+    {
       "slug": "xai-grok-3",
       "title": "xAI Grok 3",
       "metrics": {
@@ -223,6 +229,8 @@
     }
   ],
   "recommendations": [
-    "Expand the reviewed gold set beyond the current seed claims so judgment quality stops resting on a tiny sample."
+    "Expand the reviewed gold set beyond the current seed claims so judgment quality stops resting on a tiny sample.",
+    "Bring tooltip-citation coverage on rewritten claims to 100% before treating the archive as a durable reference.",
+    "Fix any remaining unanchored rewritten claims so every visible change maps to a concrete source span."
   ]
 }

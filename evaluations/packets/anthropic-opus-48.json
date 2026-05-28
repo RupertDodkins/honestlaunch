@@ -1,0 +1,57 @@
+{
+  "version": "qa-v1",
+  "slug": "anthropic-opus-48",
+  "launch": {
+    "lab": "Anthropic",
+    "title": "Anthropic Claude Opus 4.8",
+    "model": "Claude Opus 4.8",
+    "originalUrl": "https://www.anthropic.com/news/claude-opus-4-8",
+    "originalLabel": "Original Anthropic launch post",
+    "sourceNote": "Curated against Anthropic's Opus 4.8 system card, model docs, pricing, and Responsible Scaling Policy references."
+  },
+  "archiveArtifacts": {
+    "html": "anthropic_opus_48_report.html",
+    "json": "anthropic_opus_48_report.json",
+    "markdown": "anthropic_opus_48_report.md",
+    "evidencePacket": ""
+  },
+  "references": [
+    "https://www.anthropic.com/claude-opus-4-8-system-card",
+    "https://www.anthropic.com/news/claude-opus-4-8",
+    "https://platform.claude.com/docs/en/about-claude/models/overview",
+    "https://claude.com/pricing#api",
+    "https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy"
+  ],
+  "discovery": {
+    "providers": [
+      {
+        "provider": "anthropic_deep_research",
+        "status": "pending",
+        "suspectClaims": [],
+        "notes": ""
+      },
+      {
+        "provider": "openai_deep_research",
+        "status": "pending",
+        "suspectClaims": [],
+        "notes": ""
+      }
+    ],
+    "mergedReview": {
+      "status": "pending",
+      "mustCatchClaims": [],
+      "niceToCatchClaims": [],
+      "nonIssues": [],
+      "reviewerNotes": ""
+    }
+  },
+  "adjudication": {
+    "claims": []
+  },
+  "humanDecision": {
+    "publishStatus": "pending",
+    "decisionNotes": "",
+    "reviewer": "",
+    "reviewedAt": ""
+  }
+}

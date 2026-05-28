@@ -1,0 +1,54 @@
+{
+  "slug": "anthropic-opus-48",
+  "lab": "Anthropic",
+  "title": "Anthropic Claude Opus 4.8",
+  "publishedAt": "2026-05-28",
+  "status": "reviewed",
+  "primarySource": {
+    "title": "Anthropic Claude Opus 4.8",
+    "url": "https://www.anthropic.com/news/claude-opus-4-8",
+    "sourceKind": "html",
+    "renderedFrom": "original_source",
+    "documentSource": "https://www.anthropic.com/news/claude-opus-4-8",
+    "sourceNote": "Curated against Anthropic's Opus 4.8 system card, model docs, pricing, and Responsible Scaling Policy references."
+  },
+  "auditRuntime": {
+    "mode": "curated_manual",
+    "runtime": "manual",
+    "model": null,
+    "contrastEnabled": true
+  },
+  "references": {
+    "policy": "explicit_reference_urls",
+    "count": 5,
+    "urls": [
+      "https://www.anthropic.com/claude-opus-4-8-system-card",
+      "https://www.anthropic.com/news/claude-opus-4-8",
+      "https://platform.claude.com/docs/en/about-claude/models/overview",
+      "https://claude.com/pricing#api",
+      "https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy"
+    ]
+  },
+  "artifacts": {
+    "html": "anthropic_opus_48_report.html",
+    "json": "anthropic_opus_48_report.json",
+    "markdown": "anthropic_opus_48_report.md"
+  },
+  "metrics": {
+    "claimsAudited": 6,
+    "rewrittenClaims": 4,
+    "averageStretch": 46,
+    "verdictCounts": {
+      "supported": 2,
+      "overstated": 0,
+      "missing_context": 3,
+      "contradicted": 0,
+      "not_checkable": 1
+    },
+    "tooltipCitationCoveragePct": 100,
+    "anchorCoveragePct": 100,
+    "blocksPreserved": 32,
+    "explicitReferenceCount": 5,
+    "evidenceItemCount": 16
+  }
+}

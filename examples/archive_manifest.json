@@ -4,9 +4,9 @@
     "tagline": "Modified launch pages with inline corrections, source links, and audit receipts.",
     "methodologyFile": "methodology.html",
     "metrics": {
-      "featuredCount": 4,
+      "featuredCount": 5,
       "labsCovered": 4,
-      "averageStretch": 52,
+      "averageStretch": 51,
       "gatePassRatePct": 100,
       "tooltipCitationCoveragePct": 100
     }
@@ -150,6 +150,74 @@
         "primarySourceKind": "html",
         "renderedFrom": "original_source",
         "referenceCount": 2
+      }
+    },
+    {
+      "slug": "anthropic-opus-48",
+      "category": "featured",
+      "status": "reviewed",
+      "lab": "Anthropic",
+      "model": "Claude Opus 4.8",
+      "title": "Anthropic Claude Opus 4.8",
+      "badge": "mixed",
+      "artifactHtml": "anthropic_opus_48_report.html",
+      "artifactJson": "anthropic_opus_48_report.json",
+      "artifactMd": "anthropic_opus_48_report.md",
+      "originalUrl": "https://www.anthropic.com/news/claude-opus-4-8",
+      "originalLabel": "Original Anthropic launch post",
+      "summary": "Curated archive pass on Anthropic's Claude Opus 4.8 launch page with audited benchmark, honesty, alignment, and pricing claims.",
+      "sourceNote": "Curated against Anthropic's Opus 4.8 system card, model docs, pricing, and Responsible Scaling Policy references.",
+      "referenceUrls": [
+        "https://www.anthropic.com/claude-opus-4-8-system-card",
+        "https://www.anthropic.com/news/claude-opus-4-8",
+        "https://platform.claude.com/docs/en/about-claude/models/overview",
+        "https://claude.com/pricing#api",
+        "https://www.anthropic.com/news/announcing-our-updated-responsible-scaling-policy"
+      ],
+      "match": {
+        "sourceContains": [
+          "anthropic.com/news/claude-opus-4-8",
+          "anthropic_opus_48_report"
+        ],
+        "titleContains": [
+          "claude opus 4.8",
+          "anthropic"
+        ]
+      },
+      "publishedAt": "2026-05-28",
+      "evidencePacketFile": "evidence_packets/anthropic-opus-48.json",
+      "metrics": {
+        "claimsAudited": 6,
+        "rewrittenClaims": 4,
+        "averageStretch": 46,
+        "verdictCounts": {
+          "supported": 2,
+          "overstated": 0,
+          "missing_context": 3,
+          "contradicted": 0,
+          "not_checkable": 1
+        },
+        "tooltipCitationCoveragePct": 100,
+        "anchorCoveragePct": 100,
+        "blocksPreserved": 32,
+        "explicitReferenceCount": 5,
+        "evidenceItemCount": 16
+      },
+      "publicationGate": {
+        "overallPass": true,
+        "checks": {
+          "hasModifiedNotice": true,
+          "hasOriginalLink": true,
+          "hasEvidencePacketLink": true,
+          "allEditedClaimsAnchored": true,
+          "allEditedClaimsCited": true,
+          "hasPreservedBlocks": true
+        }
+      },
+      "evidencePacket": {
+        "primarySourceKind": "html",
+        "renderedFrom": "original_source",
+        "referenceCount": 5
       }
     },
     {
