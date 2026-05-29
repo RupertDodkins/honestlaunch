@@ -44,6 +44,8 @@ This rebuilds the featured HTML reports, refreshes archive metadata and evidence
 
 HonestLaunch was built as a submission to the [Google I/O Hackathon](https://cerebralvalley.ai/e/google-io-hackathon), hosted by Cerebral Valley with the Google DeepMind team.
 
+It was originally submitted under the name `CappinCheck`, before the project was rebranded to `HonestLaunch`.
+
 The project was shaped around the event prompt for Gemini 3.5 Flash: build something new for the agentic era that benefits from fast, low-cost multi-step reasoning. Rather than shipping another chat interface or RAG wrapper, HonestLaunch uses parallel Gemini specialist agents to audit dense public AI model reports and launch posts, compare claims against references, and rewrite overstated claims into wording that is still strong but actually defensible.
 
 ## Why Low-Latency Gemini
