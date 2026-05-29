@@ -16,6 +16,7 @@ from honestlaunch.schemas import (
     ClaimType,
     ContrastSource,
     Document,
+    EvidenceItem,
     EvidenceContrast,
     ReferenceSource,
     RiskyClaim,
@@ -233,6 +234,34 @@ class AuditedLaunchPageTests(unittest.TestCase):
         self.assertIn("Original Google launch post", markup)
         self.assertNotIn(">Methodology<", markup)
         self.assertNotIn(">Archive<", markup)
+
+    def test_write_html_suppresses_opaque_grounding_redirects_in_ui(self) -> None:
+        audit = _sample_audit()
+        audit.supporting_evidence = [
+            EvidenceItem(
+                source_title="Claude API Docs",
+                url="https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQFake",
+                snippet="Fast mode delivers up to 2.5x higher output tokens per second.",
+                relevance="Qualifies the speed claim.",
+            )
+        ]
+        report = AuditReport(
+            document=Document(
+                title="Claude Opus 4.8",
+                source="https://www.anthropic.com/news/claude-opus-4-8",
+                text="Fast mode is faster.",
+            ),
+            claims=[audit.claim],
+            audits=[audit],
+        )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = Path(temp_dir) / "report.html"
+            write_html(report, path)
+            markup = path.read_text(encoding="utf-8")
+
+        self.assertIn("isOpaqueGroundingUrl", markup)
+        self.assertIn("Opaque Gemini grounding redirect hidden; source title retained above.", markup)
 
     def test_report_metrics_and_publication_gate(self) -> None:
         snapshot = build_snapshot_from_text(

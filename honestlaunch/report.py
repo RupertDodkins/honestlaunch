@@ -874,10 +874,7 @@ def write_html(report: AuditReport, path: Path) -> None:
       `;
     }}
     function tooltipCitationMarkup(citation) {{
-      const href = safeHref(citation.url);
-      const titleMarkup = href
-        ? `<a href="${{esc(href)}}" target="_blank" rel="noopener noreferrer">${{esc(citation.title)}}</a>`
-        : `<strong>${{esc(citation.title)}}</strong>`;
+      const titleMarkup = sourceTitleMarkup(citation.title, citation.url);
       return `
         <div class="tooltip-citation">
           <p class="wrap">${{titleMarkup}}</p>
@@ -1061,23 +1058,17 @@ def write_html(report: AuditReport, path: Path) -> None:
     }}
     function plainUrlItems(values) {{
       return values.map(value => {{
-        const href = safeHref(value);
-        const source = href
-          ? `<a href="${{esc(href)}}" target="_blank" rel="noopener noreferrer">${{esc(value)}}</a>`
-          : `<span class="muted">${{esc(value)}}</span>`;
+        const source = sourceUrlMarkup(value);
         return `<div class="source-item"><p class="wrap">${{source}}</p></div>`;
       }}).join('');
     }}
     function referenceItems(values) {{
       if (!values.length) return '<p class="muted">None recorded.</p>';
       return values.map(item => {{
-        const href = safeHref(item.url);
-        const source = href
-          ? `<a href="${{esc(href)}}" target="_blank" rel="noopener noreferrer">${{esc(item.url)}}</a>`
-          : `<span class="muted">${{esc(item.url || 'No URL recorded')}}</span>`;
+        const source = sourceUrlMarkup(item.url);
         return `
           <div class="source-item">
-            <p><strong>${{esc(item.title)}}</strong> <span class="muted">(${{esc(item.source_type)}} · authority ${{item.authority_score}}/100)</span></p>
+            <p>${{sourceTitleMarkup(item.title, item.url)}} <span class="muted">(${{esc(item.source_type)}} · authority ${{item.authority_score}}/100)</span></p>
             <p class="wrap">${{source}}</p>
             <p class="muted wrap">${{esc(item.why_relevant || '')}}</p>
           </div>
@@ -1087,13 +1078,10 @@ def write_html(report: AuditReport, path: Path) -> None:
     function contrastSourceItems(values) {{
       if (!values.length) return '<p class="muted">None recorded.</p>';
       return values.map(item => {{
-        const href = safeHref(item.url);
-        const source = href
-          ? `<a href="${{esc(href)}}" target="_blank" rel="noopener noreferrer">${{esc(item.url)}}</a>`
-          : `<span class="muted">${{esc(item.url || 'No URL recorded')}}</span>`;
+        const source = sourceUrlMarkup(item.url);
         return `
           <div class="source-item">
-            <p><strong>${{esc(item.title)}}</strong> <span class="muted">(${{esc(item.stance)}})</span></p>
+            <p>${{sourceTitleMarkup(item.title, item.url)}} <span class="muted">(${{esc(item.stance)}})</span></p>
             <p class="wrap">${{esc(item.evidence_summary)}}</p>
             <p class="wrap">${{source}}</p>
             <p class="muted wrap">${{esc(item.key_qualification || '')}}</p>
@@ -1126,19 +1114,41 @@ def write_html(report: AuditReport, path: Path) -> None:
     function items(values) {{
       if (!values.length) return '<p class="muted">None recorded.</p>';
       return values.map(item => {{
-        const href = safeHref(item.url);
-        const source = href
-          ? `<a href="${{esc(href)}}" target="_blank" rel="noopener noreferrer">${{esc(item.url)}}</a>`
-          : `<span class="muted">${{esc(item.url || 'No URL recorded')}}</span>`;
+        const source = sourceUrlMarkup(item.url);
         return `
           <div class="source-item">
-            <p><strong>${{esc(item.source_title)}}</strong></p>
+            <p>${{sourceTitleMarkup(item.source_title, item.url)}}</p>
             <p class="wrap">${{esc(item.snippet)}}</p>
             <p class="wrap">${{source}}</p>
             <p class="muted wrap">${{esc(item.relevance || '')}}</p>
           </div>
         `;
       }}).join('');
+    }}
+    function isOpaqueGroundingUrl(value) {{
+      try {{
+        const url = new URL(String(value), document.baseURI);
+        return url.hostname === 'vertexaisearch.cloud.google.com' && url.pathname.includes('/grounding-api-redirect/');
+      }} catch (error) {{
+        return false;
+      }}
+    }}
+    function sourceTitleMarkup(title, url) {{
+      const label = title || 'Reference source';
+      const href = isOpaqueGroundingUrl(url) ? '' : safeHref(url);
+      return href
+        ? `<a href="${{esc(href)}}" target="_blank" rel="noopener noreferrer">${{esc(label)}}</a>`
+        : `<strong>${{esc(label)}}</strong>`;
+    }}
+    function sourceUrlMarkup(url) {{
+      if (!url) return '<span class="muted">No URL recorded</span>';
+      if (isOpaqueGroundingUrl(url)) {{
+        return '<span class="muted">Opaque Gemini grounding redirect hidden; source title retained above.</span>';
+      }}
+      const href = safeHref(url);
+      return href
+        ? `<a href="${{esc(href)}}" target="_blank" rel="noopener noreferrer">${{esc(url)}}</a>`
+        : `<span class="muted">${{esc(url)}}</span>`;
     }}
     setupFilters();
     renderPublicationHeader();
